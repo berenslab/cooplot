@@ -6,8 +6,14 @@ from typing import Dict, List, Optional, Tuple
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import patheffects
 from matplotlib.patches import Patch
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import (
+    FixedFormatter,
+    FixedLocator,
+    MaxNLocator,
+)
+from matplotlib.transforms import ScaledTranslation
 
 # Optional circos
 try:
@@ -121,6 +127,7 @@ def plot_panels(
     counts_label: str = "Shared coauthorships",
     legend_counts: bool = True,
     legend_groups: bool = True,
+    heatmap_counts: bool = False,
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
@@ -159,6 +166,8 @@ def plot_panels(
         )
         axs = axes.ravel().tolist()
         last_im = None
+        right_margin = 0.88 if legend_counts else 0.96
+        bottom_margin = 0.25 if legend_groups and group_col else 0.15
 
         for i, w in enumerate(wins):
             M = np.array(mats[w]["matrix"], dtype=int)
@@ -173,20 +182,80 @@ def plot_panels(
                 M, vmin=0, vmax=vmax_used, cmap=cmap, interpolation="nearest"
             )
             ax.set_title(w, loc="left")
-            ax.set_xticks(range(len(ordered_labels)))
-            ax.set_xticklabels(ordered_labels, rotation=90, fontsize=7)
-            ax.set_yticks(range(len(ordered_labels)))
-            ax.set_yticklabels(ordered_labels, fontsize=7)
+            tick_positions = np.arange(len(ordered_labels))
+            x_locator = FixedLocator(tick_positions)
+            y_locator = FixedLocator(tick_positions)
+            ax.xaxis.set_major_locator(x_locator)
+            ax.yaxis.set_major_locator(y_locator)
+            ax.xaxis.set_major_formatter(FixedFormatter(ordered_labels))
+            ax.yaxis.set_major_formatter(FixedFormatter(ordered_labels))
+            ax.tick_params(axis="x", labelsize=7, rotation=90)
+            ax.tick_params(axis="y", labelsize=7)
+
+            # match tick label styling to group colors, similar to the circle plot
+            for tick_label, color in zip(ax.get_xticklabels(), colors):
+                tick_label.set_color("white")
+                tick_label.set_bbox(dict(facecolor=color, edgecolor=color, pad=0))
+                tick_label.set_rotation_mode("anchor")
+                tick_label.set_ha("right")
+                tick_label.set_va("center")
+
+            for tick_label, color in zip(ax.get_yticklabels(), colors):
+                tick_label.set_color("white")
+                tick_label.set_bbox(dict(facecolor=color, edgecolor=color, pad=0))
+                tick_label.set_va("center")
+                tick_label.set_ha("right")
+
+            if heatmap_counts:
+                vmax_for_text = float(vmax_used) if vmax_used else 0.0
+                threshold = vmax_for_text * 0.5
+                for r in range(M.shape[0]):
+                    for c in range(M.shape[1]):
+                        val = M[r, c]
+                        try:
+                            val_float = float(val)
+                        except Exception:
+                            continue
+                        if np.isnan(val_float):
+                            continue
+                        try:
+                            disp = int(round(val_float))
+                        except Exception:
+                            disp = val_float
+                        if disp == 0:
+                            continue
+                        color_choice = "black"
+                        if vmax_for_text > 0 and val_float >= threshold:
+                            color_choice = "white"
+                        txt = ax.text(
+                            c,
+                            r,
+                            f"{disp}",
+                            ha="center",
+                            va="center",
+                            fontsize=6,
+                            color=color_choice,
+                        )
+                        stroke = "black" if color_choice == "white" else "white"
+                        txt.set_path_effects(
+                            [patheffects.withStroke(linewidth=0.8, foreground=stroke)]
+                        )
+
+        fig.tight_layout()
+        fig.subplots_adjust(right=right_margin, bottom=bottom_margin)
 
         # ---- counts legend (colorbar)
         if legend_counts:
             # Use a ScalarMappable so we control the label
             norm = mcolors.Normalize(vmin=0, vmax=vmax_used)
             sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
-            cb = fig.colorbar(sm, ax=axs, fraction=0.03, pad=0.02)
-            label = f" (capped at {cap_weights}" if cap_weights is not None else ""
+            cb = fig.colorbar(sm, ax=axs, fraction=0.03, pad=0.04)
+            label = counts_label + (
+                f" (capped at {cap_weights})" if cap_weights is not None else ""
+            )
             cb.set_label(label)
             cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+            cb.ax.tick_params(labelsize=8)
 
         # ---- groups legend (node color legend)
         if legend_groups and group_col:
@@ -198,11 +267,8 @@ def plot_panels(
                 )
                 for g in unique_groups
             ]
-            # leave some bottom space for legend
-            fig.subplots_adjust(bottom=0.18)
             fig.legend(
                 handles=handles,
-                title=group_col,
                 loc="lower center",
                 ncol=min(len(handles), 6),
                 frameon=False,
@@ -210,7 +276,6 @@ def plot_panels(
 
         if out_path:
             Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-            fig.tight_layout()
             fig.savefig(out_path, dpi=300, bbox_inches="tight")
             if save_pdf and str(out_path).lower().endswith(".png"):
                 fig.savefig(

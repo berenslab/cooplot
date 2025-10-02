@@ -58,6 +58,7 @@ def show(
     counts_label="Shared coauthorships",
     legend_counts=True,
     legend_groups=True,
+    heatmap_counts=False,
 ):
     return plot_panels(
         mats,
@@ -73,6 +74,7 @@ def show(
         counts_label=counts_label,
         legend_counts=legend_counts,
         legend_groups=legend_groups,
+        heatmap_counts=heatmap_counts,
     )
 
 
@@ -89,6 +91,7 @@ def run_inline(
     drop_subtitle: bool = False,
     fallback_semantic_if_empty: bool = False,
     cache_dir: str | Path = ".cache/cooplot",
+    heatmap_counts: bool = False,
 ):
     header, people = load_csv(csv_path, delimiter=delimiter)
     pubs = scrape(
@@ -101,4 +104,10 @@ def run_inline(
         fallback_semantic_if_empty=fallback_semantic_if_empty,
     )
     mats = build(pubs, people, windows, name_col=name_col)
-    return show(mats, people, group_col=group_col, style=style)
+    return show(
+        mats,
+        people,
+        group_col=group_col,
+        style=style,
+        heatmap_counts=heatmap_counts,
+    )

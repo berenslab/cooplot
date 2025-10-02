@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List
 
-from .build import build_matrices
+from .build import build_matrices, cross_group_publications
 from .io import read_rows_with_header
 from .scrape import scrape_all
 from .viz import plot_panels
@@ -126,5 +126,23 @@ def run_inline(
         group_col=group_col,
         style=style,
         heatmap_counts=heatmap_counts,
-        aggregate_groups=aggregate_groups,
+    )
+
+
+def cross_group_coauthored(
+    pubs_by_author: Dict[str, List[dict]],
+    people: List[dict],
+    windows: List[str],
+    *,
+    name_col: str = "name",
+    group_col: str | None = None,
+):
+    """Return per-window metadata about titles with authors from multiple groups."""
+
+    return cross_group_publications(
+        pubs_by_author,
+        people,
+        windows,
+        name_col=name_col,
+        group_col=group_col,
     )

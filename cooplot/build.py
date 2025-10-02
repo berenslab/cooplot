@@ -37,6 +37,35 @@ def _normalize_group(value: Optional[str]) -> str:
     return g if g else "Unlabeled"
 
 
+def _prepare_labels_and_groups(
+    people: List[dict], name_col: str, group_col: Optional[str]
+) -> Tuple[List[str], Dict[str, str]]:
+    labels = sorted([p[name_col] for p in people], key=_lastname)
+    group_map: Dict[str, str] = {}
+    if group_col:
+        for person in people:
+            name = person.get(name_col)
+            if not isinstance(name, str):
+                continue
+            group_map[name] = _normalize_group(person.get(group_col))
+    return labels, group_map
+
+
+def _titles_for_windows(
+    publications_by_author: Dict[str, List[dict]],
+    labels: List[str],
+    windows: List[str],
+) -> Dict[str, Dict[str, set[str]]]:
+    title_sets_by_window: Dict[str, Dict[str, set[str]]] = {}
+    for win in windows:
+        lo, hi = parse_window(win)
+        title_sets_by_window[win] = {
+            name: _titles_in_window(publications_by_author.get(name, []), lo, hi)
+            for name in labels
+        }
+    return title_sets_by_window
+
+
 def build_matrices(
     publications_by_author: Dict[str, List[dict]],
     people: List[dict],
@@ -50,24 +79,15 @@ def build_matrices(
     Returns {window: {"labels": [...], "matrix": [[...],[...],...]}}
     Ordering is stable alphabetical by last name.
     """
-    labels = sorted([p[name_col] for p in people], key=_lastname)
-    group_map: Dict[str, str] = {}
-    if group_col:
-        for person in people:
-            name = person.get(name_col)
-            if not isinstance(name, str):
-                continue
-            group_map[name] = _normalize_group(person.get(group_col))
+    labels, group_map = _prepare_labels_and_groups(people, name_col, group_col)
     if aggregate_groups and not group_map:
         raise ValueError("aggregate_groups=True requires a valid group_col with values.")
     mats: Dict[str, dict] = {}
 
+    title_sets_by_window = _titles_for_windows(publications_by_author, labels, windows)
+
     for win in windows:
-        lo, hi = parse_window(win)
-        title_sets = {
-            name: _titles_in_window(publications_by_author.get(name, []), lo, hi)
-            for name in labels
-        }
+        title_sets = title_sets_by_window[win]
         n = len(labels)
         M = np.zeros((n, n), dtype=int)
         for i in range(n):
@@ -109,3 +129,69 @@ def build_matrices(
                 }
             mats[win] = entry
     return mats
+
+
+def cross_group_publications(
+    publications_by_author: Dict[str, List[dict]],
+    people: List[dict],
+    windows: List[str],
+    *,
+    name_col: str = "name",
+    group_col: Optional[str] = None,
+) -> Dict[str, List[dict]]:
+    """Return window-indexed records of titles authored by multiple groups.
+
+    The returned dict is structured as ``{window: [{"title": ..., "groups": [...],
+    "authors": {group: [...]}}]}``. The authors and groups entries are
+    alphabetically sorted so downstream JSON serialization is stable.
+    """
+
+    labels, group_map = _prepare_labels_and_groups(people, name_col, group_col)
+    if not group_map:
+        return {win: [] for win in windows}
+
+    title_sets_by_window = _titles_for_windows(publications_by_author, labels, windows)
+    results: Dict[str, List[dict]] = {}
+
+    for win in windows:
+        title_sets = title_sets_by_window[win]
+        cross_titles: Dict[str, dict] = {}
+        for label in labels:
+            titles = title_sets[label]
+            if not titles:
+                continue
+            group_label = group_map.get(label, "Unlabeled")
+            for title in titles:
+                entry = cross_titles.setdefault(
+                    title,
+                    {
+                        "title": title,
+                        "groups": set(),
+                        "authors": {},
+                    },
+                )
+                entry["groups"].add(group_label)
+                authors_for_group = entry["authors"].setdefault(group_label, set())
+                authors_for_group.add(label)
+
+        formatted: List[dict] = []
+        for entry in cross_titles.values():
+            groups = entry["groups"]
+            if len(groups) < 2:
+                continue
+            sorted_groups = sorted(groups, key=str.lower)
+            formatted.append(
+                {
+                    "title": entry["title"],
+                    "groups": sorted_groups,
+                    "authors": {
+                        g: sorted(entry["authors"].get(g, set()), key=_lastname)
+                        for g in sorted_groups
+                    },
+                }
+            )
+
+        formatted.sort(key=lambda rec: rec["title"].lower())
+        results[win] = formatted
+
+    return results

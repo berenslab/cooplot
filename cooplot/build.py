@@ -78,24 +78,24 @@ def build_matrices(
         np.fill_diagonal(M, 0)
         if aggregate_groups:
             group_labels: List[str] = []
+            group_title_sets: Dict[str, set[str]] = {}
             for label in labels:
                 group_label = group_map.get(label, "Unlabeled")
                 if group_label not in group_labels:
                     group_labels.append(group_label)
+                titles = group_title_sets.setdefault(group_label, set())
+                titles.update(title_sets[label])
             g_count = len(group_labels)
             G = np.zeros((g_count, g_count), dtype=int)
-            group_indices = {g: idx for idx, g in enumerate(group_labels)}
-            for i in range(n):
-                gi = group_indices[group_map.get(labels[i], "Unlabeled")]
-                for j in range(i + 1, n):
-                    val = int(M[i, j])
-                    if val <= 0:
+            for idx_i, group_i in enumerate(group_labels):
+                titles_i = group_title_sets.get(group_i, set())
+                for idx_j in range(idx_i + 1, g_count):
+                    group_j = group_labels[idx_j]
+                    titles_j = group_title_sets.get(group_j, set())
+                    overlap = len(titles_i & titles_j)
+                    if overlap <= 0:
                         continue
-                    gj = group_indices[group_map.get(labels[j], "Unlabeled")]
-                    if gi == gj:
-                        continue
-                    G[gi, gj] += val
-                    G[gj, gi] += val
+                    G[idx_i, idx_j] = G[idx_j, idx_i] = overlap
             mats[win] = {
                 "labels": group_labels,
                 "matrix": G.tolist(),

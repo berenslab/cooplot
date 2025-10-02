@@ -68,7 +68,6 @@ def show(
     legend_groups=True,
     heatmap_counts=False,
     figsize=None,
-    aggregate_groups: bool = False,
 ):
     return plot_panels(
         mats,
@@ -85,7 +84,6 @@ def show(
         legend_groups=legend_groups,
         heatmap_counts=heatmap_counts,
         figsize=figsize,
-        aggregate_groups=aggregate_groups,
     )
 
 

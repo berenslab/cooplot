@@ -13,7 +13,6 @@ from matplotlib.ticker import (
     FixedLocator,
     MaxNLocator,
 )
-from matplotlib.transforms import ScaledTranslation
 
 # Optional circos
 try:
@@ -39,17 +38,14 @@ def _split_name(name: str) -> Tuple[str, str]:
     return _casefold(last), _casefold(first)
 
 
-def _group_value_for(name: str, people: List[dict], group_col: Optional[str]) -> str:
-    if not group_col:
+def _group_value_for(name: str, label_to_group: Optional[Dict[str, str]]) -> str:
+    if not label_to_group:
         return ""
-    for p in people:
-        if p.get("name") == name:
-            return str(p.get(group_col, "") or "")
-    return ""
+    return str(label_to_group.get(name, "") or "")
 
 
 def _order_indices(
-    labels: List[str], people: List[dict], group_col: Optional[str]
+    labels: List[str], label_to_group: Optional[Dict[str, str]]
 ) -> Tuple[List[int], List[str]]:
     """
     Compute a permutation that orders labels by:
@@ -60,7 +56,7 @@ def _order_indices(
     # Prepare sortable keys
     keys = []
     for i, name in enumerate(labels):
-        g = _group_value_for(name, people, group_col)
+        g = _group_value_for(name, label_to_group)
         last, first = _split_name(name)
         keys.append((i, _casefold(g), last, first))
 
@@ -98,24 +94,27 @@ def _reds_shaded():
 
 def _node_colors(
     labels: List[str],
-    people: List[dict],
-    group_col: Optional[str],
+    label_to_group: Optional[Dict[str, str]],
     palette: Optional[Dict[str, str]],
 ):
-    # build group list in label order
-    name_to_group = {}
-    for p in people:
-        name_to_group[p.get("name")] = p.get(group_col, "") if group_col else ""
-    keys = [name_to_group.get(n, "") for n in labels]
-    pal = palette or (_auto_palette(keys) if group_col else {"": "#808080"})
-    return [pal.get(k, "#808080") for k in keys], pal
+    label_to_group = label_to_group or {}
+    keys = [label_to_group.get(n, "") for n in labels]
+    has_groups = any(k for k in keys)
+    if palette:
+        pal = palette
+    elif has_groups:
+        pal = _auto_palette(keys)
+    else:
+        pal = {"": "#808080"}
+    default_color = pal.get("", "#808080")
+    colors = [pal.get(k, default_color) for k in keys]
+    return colors, pal
 
 
 def plot_panels(
     mats: Dict[str, dict],
     *,
     out_path: str | Path | None,
-    people: List[dict],
     group_col: Optional[str] = None,
     palette: Optional[Dict[str, str]] = None,
     vmax: Optional[int] = None,
@@ -128,46 +127,76 @@ def plot_panels(
     legend_counts: bool = True,
     legend_groups: bool = True,
     heatmap_counts: bool = False,
+    figsize: Optional[tuple] = None,
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
         raise ValueError("No matrices to plot.")
 
     base_labels = mats[wins[0]]["labels"]
+    label_to_group_map = mats[wins[0]].get("label_to_group", {}) or {}
+    group_col_for_plot = group_col or ("Group" if label_to_group_map else None)
+
     # Compute one consistent permutation for ALL windows
-    perm, ordered_labels = _order_indices(base_labels, people, group_col)
+    perm, ordered_labels = _order_indices(base_labels, label_to_group_map)
 
     # Determine global vmax and apply cap if requested
     vmax_base = vmax or max(int(np.max(np.array(mats[w]["matrix"]))) for w in wins)
     vmax_used = min(vmax_base, cap_weights) if cap_weights is not None else vmax_base
 
     cmap = _reds_shaded()
-    colors, used_palette = _node_colors(ordered_labels, people, group_col, palette)
+    node_colors, used_palette = _node_colors(
+        ordered_labels,
+        label_to_group_map if group_col_for_plot else {},
+        palette,
+    )
 
     # Build group keys in label order for a legend
-    name_to_group = {
-        p.get("name"): (p.get(group_col, "") if group_col else "") for p in people
-    }
-    group_keys_in_order = [name_to_group.get(n, "") for n in ordered_labels]
+    group_keys_in_order = [label_to_group_map.get(n, "") for n in ordered_labels]
     # stable unique
     unique_groups = []
     for k in group_keys_in_order:
         if k not in unique_groups:
             unique_groups.append(k)
 
-    vmax_all = vmax or max(int(np.max(np.array(mats[w]["matrix"]))) for w in wins)
-    cmap = _reds_shaded()
-    colors, used_palette = _node_colors(ordered_labels, people, group_col, palette)
+    if style == "heatmap" or not HAVE_CIRCLE:
+        default_figsize = (6 * len(wins), 6)
+    else:
+        default_figsize = (9 * len(wins), 9)
+    figsize_used = default_figsize if figsize is None else figsize
+    scale_x = figsize_used[0] / default_figsize[0] if default_figsize[0] else 1.0
+    scale_y = figsize_used[1] / default_figsize[1] if default_figsize[1] else 1.0
+    scale = min(scale_x, scale_y)
+    if not np.isfinite(scale) or scale <= 0:
+        scale = 1.0
+
+    def _scaled(value: float, floor: float) -> float:
+        return float(max(floor, value * scale))
+
+    tick_font = _scaled(7, 4)
+    cb_tick_font = _scaled(8, 4)
+    cb_label_font = _scaled(10, 6)
+    legend_font = _scaled(9, 6)
+
+    legend_title_font = _scaled(10, 7)
 
     # Heatmap path
     if style == "heatmap" or not HAVE_CIRCLE:
         fig, axes = plt.subplots(
-            1, len(wins), figsize=(6 * len(wins), 6), squeeze=False
+            1,
+            len(wins),
+            figsize=figsize_used,
+            squeeze=False,
         )
         axs = axes.ravel().tolist()
         last_im = None
         right_margin = 0.88 if legend_counts else 0.96
-        bottom_margin = 0.25 if legend_groups and group_col else 0.15
+        bottom_margin = 0.25 if legend_groups and group_col_for_plot else 0.15
+        heatmap_title_font = _scaled(12, 9)
+        tick_pad = max(1.0, 3.0 * scale)
+        tick_box_pad = max(0.2, 0.2 * scale)
+        count_font = _scaled(6, 4)
+        stroke_width = max(0.6, 0.8 * scale)
 
         for i, w in enumerate(wins):
             M = np.array(mats[w]["matrix"], dtype=int)
@@ -181,7 +210,7 @@ def plot_panels(
             last_im = ax.imshow(
                 M, vmin=0, vmax=vmax_used, cmap=cmap, interpolation="nearest"
             )
-            ax.set_title(w, loc="left")
+            ax.set_title(w, loc="left", fontsize=heatmap_title_font)
             tick_positions = np.arange(len(ordered_labels))
             x_locator = FixedLocator(tick_positions)
             y_locator = FixedLocator(tick_positions)
@@ -189,20 +218,26 @@ def plot_panels(
             ax.yaxis.set_major_locator(y_locator)
             ax.xaxis.set_major_formatter(FixedFormatter(ordered_labels))
             ax.yaxis.set_major_formatter(FixedFormatter(ordered_labels))
-            ax.tick_params(axis="x", labelsize=7, rotation=90)
-            ax.tick_params(axis="y", labelsize=7)
+            ax.tick_params(
+                axis="x", labelsize=tick_font, labelrotation=90, pad=tick_pad
+            )
+            ax.tick_params(axis="y", labelsize=tick_font, pad=tick_pad)
 
             # match tick label styling to group colors, similar to the circle plot
-            for tick_label, color in zip(ax.get_xticklabels(), colors):
+            for tick_label, color in zip(ax.get_xticklabels(), node_colors):
                 tick_label.set_color("white")
-                tick_label.set_bbox(dict(facecolor=color, edgecolor=color, pad=0))
+                tick_label.set_bbox(
+                    dict(facecolor=color, edgecolor=color, pad=tick_box_pad)
+                )
                 tick_label.set_rotation_mode("anchor")
                 tick_label.set_ha("right")
                 tick_label.set_va("center")
 
-            for tick_label, color in zip(ax.get_yticklabels(), colors):
+            for tick_label, color in zip(ax.get_yticklabels(), node_colors):
                 tick_label.set_color("white")
-                tick_label.set_bbox(dict(facecolor=color, edgecolor=color, pad=0))
+                tick_label.set_bbox(
+                    dict(facecolor=color, edgecolor=color, pad=tick_box_pad)
+                )
                 tick_label.set_va("center")
                 tick_label.set_ha("right")
 
@@ -233,12 +268,16 @@ def plot_panels(
                             f"{disp}",
                             ha="center",
                             va="center",
-                            fontsize=6,
+                            fontsize=count_font,
                             color=color_choice,
                         )
                         stroke = "black" if color_choice == "white" else "white"
                         txt.set_path_effects(
-                            [patheffects.withStroke(linewidth=0.8, foreground=stroke)]
+                            [
+                                patheffects.withStroke(
+                                    linewidth=stroke_width, foreground=stroke
+                                )
+                            ]
                         )
 
         fig.tight_layout()
@@ -253,12 +292,12 @@ def plot_panels(
             label = counts_label + (
                 f" (capped at {cap_weights})" if cap_weights is not None else ""
             )
-            cb.set_label(label)
+            cb.set_label(label, fontsize=cb_label_font)
             cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-            cb.ax.tick_params(labelsize=8)
+            cb.ax.tick_params(labelsize=cb_tick_font)
 
         # ---- groups legend (node color legend)
-        if legend_groups and group_col:
+        if legend_groups and group_col_for_plot:
             handles = [
                 Patch(
                     facecolor=used_palette.get(g, "#808080"),
@@ -269,9 +308,12 @@ def plot_panels(
             ]
             fig.legend(
                 handles=handles,
+                title=group_col_for_plot,
                 loc="lower center",
                 ncol=min(len(handles), 6),
                 frameon=False,
+                prop={"size": legend_font},
+                title_fontsize=legend_title_font,
             )
 
         if out_path:
@@ -294,7 +336,7 @@ def plot_panels(
         1,
         len(wins),
         subplot_kw={"projection": "polar"},
-        figsize=(9 * len(wins), 9),
+        figsize=figsize_used,
         facecolor="white",
     )
     if len(wins) == 1:
@@ -302,8 +344,11 @@ def plot_panels(
     axs = axes
     # Leave margin for the colorbar and optional group legend
     right_margin = 0.88
-    bottom_margin = 0.18 if legend_groups and group_col else 0.08
+    bottom_margin = 0.18 if legend_groups and group_col_for_plot else 0.08
     fig.subplots_adjust(right=right_margin, bottom=bottom_margin)
+    circle_title_font = _scaled(18, 10)
+    circle_name_font = _scaled(10, 6)
+    label_box_pad = max(0.3, 0.4 * scale)
 
     for i, w in enumerate(wins):
         M = np.array(mats[w]["matrix"], dtype=int)
@@ -314,7 +359,7 @@ def plot_panels(
         _circle(
             M,
             node_names=ordered_labels,
-            node_colors=colors,
+            node_colors=node_colors,
             vmin=0,
             vmax=vmax_used,
             colorbar=False,  # we'll add our own CB
@@ -325,14 +370,27 @@ def plot_panels(
             fig=fig,
             ax=axs[i],
             show=False,
-            fontsize_title=18,
-            fontsize_names=10,
+            fontsize_title=circle_title_font,
+            fontsize_names=circle_name_font,
         )
-        axs[i].set_title(w, fontsize=18, loc="left", pad=20, color="black")
+        axs[i].set_title(
+            w,
+            fontsize=circle_title_font,
+            loc="left",
+            pad=20 * scale,
+            color="black",
+        )
         # label backgrounds
         for j, label in enumerate(axs[i].texts):
             label.set_color("white")
-            label.set_bbox(dict(facecolor=colors[j], edgecolor=colors[j], pad=0.4))
+            label.set_fontsize(circle_name_font)
+            label.set_bbox(
+                dict(
+                    facecolor=node_colors[j],
+                    edgecolor=node_colors[j],
+                    pad=label_box_pad,
+                )
+            )
             rot = label.get_rotation()
             if 90 <= rot < 270:
                 label.set_rotation(rot - 180)
@@ -358,12 +416,12 @@ def plot_panels(
         label = counts_label + (
             f" (capped at {cap_weights})" if cap_weights is not None else ""
         )
-        cb.set_label(label)
+        cb.set_label(label, fontsize=cb_label_font)
         cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        cb.ax.tick_params(labelsize=8)
+        cb.ax.tick_params(labelsize=cb_tick_font)
 
     # ---- groups legend
-    if legend_groups and group_col:
+    if legend_groups and group_col_for_plot:
         handles = [
             Patch(
                 facecolor=used_palette.get(g, "#808080"),
@@ -374,9 +432,12 @@ def plot_panels(
         ]
         fig.legend(
             handles=handles,
+            title=group_col_for_plot,
             loc="lower center",
             ncol=min(len(handles), 6),
             frameon=False,
+            prop={"size": legend_font},
+            title_fontsize=legend_title_font,
         )
 
     if out_path:

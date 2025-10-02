@@ -42,13 +42,21 @@ def build(
     windows: List[str],
     *,
     name_col="name",
+    group_col: str | None = None,
+    aggregate_groups: bool = False,
 ):
-    return build_matrices(pubs_by_author, people, windows, name_col=name_col)
+    return build_matrices(
+        pubs_by_author,
+        people,
+        windows,
+        name_col=name_col,
+        group_col=group_col,
+        aggregate_groups=aggregate_groups,
+    )
 
 
 def show(
     mats,
-    people,
     *,
     group_col=None,
     style="circle",
@@ -59,11 +67,12 @@ def show(
     legend_counts=True,
     legend_groups=True,
     heatmap_counts=False,
+    figsize=None,
+    aggregate_groups: bool = False,
 ):
     return plot_panels(
         mats,
         out_path=None,
-        people=people,
         group_col=group_col,
         palette=palette,
         vmax=vmax,
@@ -75,6 +84,8 @@ def show(
         legend_counts=legend_counts,
         legend_groups=legend_groups,
         heatmap_counts=heatmap_counts,
+        figsize=figsize,
+        aggregate_groups=aggregate_groups,
     )
 
 
@@ -92,6 +103,7 @@ def run_inline(
     fallback_semantic_if_empty: bool = False,
     cache_dir: str | Path = ".cache/cooplot",
     heatmap_counts: bool = False,
+    aggregate_groups: bool = False,
 ):
     header, people = load_csv(csv_path, delimiter=delimiter)
     pubs = scrape(
@@ -103,11 +115,18 @@ def run_inline(
         drop_subtitle=drop_subtitle,
         fallback_semantic_if_empty=fallback_semantic_if_empty,
     )
-    mats = build(pubs, people, windows, name_col=name_col)
+    mats = build(
+        pubs,
+        people,
+        windows,
+        name_col=name_col,
+        group_col=group_col,
+        aggregate_groups=aggregate_groups,
+    )
     return show(
         mats,
-        people,
         group_col=group_col,
         style=style,
         heatmap_counts=heatmap_counts,
+        aggregate_groups=aggregate_groups,
     )

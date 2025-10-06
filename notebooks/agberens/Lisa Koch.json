@@ -1,0 +1,232 @@
+[
+  {
+    "title": "Deep learning techniques for automatic MRI cardiac multi-structures segmentation and diagnosis: is the problem solved?",
+    "norm_title": "deep learning techniques for automatic mri cardiac multi structures segmentation and diagnosis is the problem solved",
+    "year": 2018
+  },
+  {
+    "title": "SonoNet: real-time detection and localisation of fetal standard scan planes in freehand ultrasound",
+    "norm_title": "sononet real time detection and localisation of fetal standard scan planes in freehand ultrasound",
+    "year": 2017
+  },
+  {
+    "title": "An exploration of 2D and 3D deep learning techniques for cardiac MR image segmentation",
+    "norm_title": "an exploration of 2d and 3d deep learning techniques for cardiac mr image segmentation",
+    "year": 2017
+  },
+  {
+    "title": "Visual feature attribution using wasserstein gans",
+    "norm_title": "visual feature attribution using wasserstein gans",
+    "year": 2018
+  },
+  {
+    "title": "Learning to segment medical images with scribble-supervision alone",
+    "norm_title": "learning to segment medical images with scribble supervision alone",
+    "year": 2018
+  },
+  {
+    "title": "Construction of a fetal spatio-temporal cortical surface atlas from in utero MRI: Application of spectral surface matching",
+    "norm_title": "construction of a fetal spatio temporal cortical surface atlas from in utero mri application of spectral surface matching",
+    "year": 2015
+  },
+  {
+    "title": "Multi-atlas segmentation using partially annotated data: methods and annotation strategies",
+    "norm_title": "multi atlas segmentation using partially annotated data methods and annotation strategies",
+    "year": 2017
+  },
+  {
+    "title": "Self-aligning manifolds for matching disparate medical image datasets",
+    "norm_title": "self aligning manifolds for matching disparate medical image datasets",
+    "year": 2015
+  },
+  {
+    "title": "Uncertainty quantification in CNN-based surface prediction using shape priors",
+    "norm_title": "uncertainty quantification in cnn based surface prediction using shape priors",
+    "year": 2018
+  },
+  {
+    "title": "Right for the wrong reason: Can interpretable ML techniques detect spurious correlations?",
+    "norm_title": "right for the wrong reason can interpretable ml techniques detect spurious correlations",
+    "year": 2023
+  },
+  {
+    "title": "Inherently interpretable multi-label classification using class-specific counterfactuals",
+    "norm_title": "inherently interpretable multi label classification using class specific counterfactuals",
+    "year": 2023
+  },
+  {
+    "title": "Visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "norm_title": "visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "year": 2022
+  },
+  {
+    "title": "Employing weak annotations for medical image analysis problems",
+    "norm_title": "employing weak annotations for medical image analysis problems",
+    "year": 2017
+  },
+  {
+    "title": "Multi-atlas segmentation as a graph labelling problem: Application to partially annotated atlas data",
+    "norm_title": "multi atlas segmentation as a graph labelling problem application to partially annotated atlas data",
+    "year": 2015
+  },
+  {
+    "title": "Distribution shift detection for the postmarket surveillance of medical AI algorithms: a retrospective simulation study",
+    "norm_title": "distribution shift detection for the postmarket surveillance of medical ai algorithms a retrospective simulation study",
+    "year": 2024
+  },
+  {
+    "title": "Hidden in plain sight: Subgroup shifts escape OOD detection",
+    "norm_title": "hidden in plain sight subgroup shifts escape ood detection",
+    "year": 2022
+  },
+  {
+    "title": "Graph-based label propagation in fetal brain MR images",
+    "norm_title": "graph based label propagation in fetal brain mr images",
+    "year": 2014
+  },
+  {
+    "title": "Real-time detection and localisation of fetal standard scan planes in 2d freehand ultrasound",
+    "norm_title": "real time detection and localisation of fetal standard scan planes in 2d freehand ultrasound",
+    "year": 2016
+  },
+  {
+    "title": "Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "norm_title": "development and validation of an ai algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "year": 2025
+  },
+  {
+    "title": "Leveraging probabilistic segmentation models for improved glaucoma diagnosis: A clinical pipeline approach",
+    "norm_title": "leveraging probabilistic segmentation models for improved glaucoma diagnosis a clinical pipeline approach",
+    "year": 2024
+  },
+  {
+    "title": "Conformal performance range prediction for segmentation output quality control",
+    "norm_title": "conformal performance range prediction for segmentation output quality control",
+    "year": 2024
+  },
+  {
+    "title": "Sparse Activations for Interpretable Disease Grading",
+    "norm_title": "sparse activations for interpretable disease grading",
+    "year": 2023
+  },
+  {
+    "title": "Efficiently correcting patch-based segmentation errors to control image-level performance in retinal images",
+    "norm_title": "efficiently correcting patch based segmentation errors to control image level performance in retinal images",
+    "year": 2024
+  },
+  {
+    "title": "Benchmarking dependence measures to prevent shortcut learning in medical imaging",
+    "norm_title": "benchmarking dependence measures to prevent shortcut learning in medical imaging",
+    "year": 2024
+  },
+  {
+    "title": "A generative model reveals the influence of patient attributes on fundus images",
+    "norm_title": "a generative model reveals the influence of patient attributes on fundus images",
+    "year": 2022
+  },
+  {
+    "title": "Disentangling representations of retinal images with generative models",
+    "norm_title": "disentangling representations of retinal images with generative models",
+    "year": 2025
+  },
+  {
+    "title": "An inherently interpretable AI model improves screening speed and accuracy for early diabetic retinopathy",
+    "norm_title": "an inherently interpretable ai model improves screening speed and accuracy for early diabetic retinopathy",
+    "year": 2025
+  },
+  {
+    "title": "Interpretable-by-design deep survival analysis for disease progression modeling",
+    "norm_title": "interpretable by design deep survival analysis for disease progression modeling",
+    "year": 2024
+  },
+  {
+    "title": "Domain Adaptation and Representation Transfer: 4th MICCAI Workshop, DART 2022, Held in Conjunction with MICCAI 2022, Singapore, September 22, 2022, Proceedings",
+    "norm_title": "domain adaptation and representation transfer 4th miccai workshop dart 2022 held in conjunction with miccai 2022 singapore september 22 2022 proceedings",
+    "year": 2022
+  },
+  {
+    "title": "This actually looks like that: Proto-BagNets for local and global interpretability-by-design",
+    "norm_title": "this actually looks like that proto bagnets for local and global interpretability by design",
+    "year": 2024
+  },
+  {
+    "title": "Benchmarking Retinal Blood Vessel Segmentation Models for Cross-Dataset and Cross-Disease Generalization",
+    "norm_title": "benchmarking retinal blood vessel segmentation models for cross dataset and cross disease generalization",
+    "year": 2024
+  },
+  {
+    "title": "Supplementary Material for: Visual Feature Attribution using Wasserstein GANs",
+    "norm_title": "supplementary material for visual feature attribution using wasserstein gans",
+    "year": 2018
+  },
+  {
+    "title": "Attri-Net: A Globally and Locally Inherently Interpretable Model for Multi-Label Classification Using Class-Specific Counterfactuals",
+    "norm_title": "attri net a globally and locally inherently interpretable model for multi label classification using class specific counterfactuals",
+    "year": 2024
+  },
+  {
+    "title": "Deep Hypothesis Tests Detect Clinically Relevant Subgroup Shifts in Medical Images",
+    "norm_title": "deep hypothesis tests detect clinically relevant subgroup shifts in medical images",
+    "year": 2023
+  },
+  {
+    "title": "Label-free estimation of clinically relevant performance metrics under distribution shifts",
+    "norm_title": "label free estimation of clinically relevant performance metrics under distribution shifts",
+    "year": 2025
+  },
+  {
+    "title": "A Real-Time Digital Twin for Type 1 Diabetes using Simulation-Based Inference",
+    "norm_title": "a real time digital twin for type 1 diabetes using simulation based inference",
+    "year": 2025
+  },
+  {
+    "title": "Clinically Interpretable Deep Learning via Sparse BagNets for Epiretinal Membrane and Related Pathology Detection",
+    "norm_title": "clinically interpretable deep learning via sparse bagnets for epiretinal membrane and related pathology detection",
+    "year": 2025
+  },
+  {
+    "title": "Subgroup Performance Analysis in Hidden Stratifications",
+    "norm_title": "subgroup performance analysis in hidden stratifications",
+    "year": 2025
+  },
+  {
+    "title": "EyeMatics: An Ophthalmology Use Case Within the German Medical Informatics Initiative",
+    "norm_title": "eyematics an ophthalmology use case within the german medical informatics initiative",
+    "year": 2024
+  },
+  {
+    "title": "Preface DART 2023",
+    "norm_title": "preface dart 2023",
+    "year": 2024
+  },
+  {
+    "title": "Domain Adaptation and Representation Transfer",
+    "norm_title": "domain adaptation and representation transfer",
+    "year": 2023
+  },
+  {
+    "title": "System and method for contraception",
+    "norm_title": "system and method for contraception",
+    "year": 2019
+  },
+  {
+    "title": "Graphical methods for atlas-based segmentation and local disease grading in medical images",
+    "norm_title": "graphical methods for atlas based segmentation and local disease grading in medical images",
+    "year": 2016
+  },
+  {
+    "title": "Analysis of Breast Cancer Histology and Genetics Using Apriori Algorithm",
+    "norm_title": "analysis of breast cancer histology and genetics using apriori algorithm",
+    "year": 2010
+  },
+  {
+    "title": "Foundation models for OOD detection in medical images",
+    "norm_title": "foundation models for ood detection in medical images",
+    "year": null
+  },
+  {
+    "title": "Domain Adaptation and Representation Transfer",
+    "norm_title": "domain adaptation and representation transfer",
+    "year": null
+  }
+]

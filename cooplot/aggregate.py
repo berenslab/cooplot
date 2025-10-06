@@ -29,6 +29,26 @@ class GroupedPublications:
             records.append({name_field: group, "group": group})
         return records
 
+    def exclude_groups(self, groups: Iterable[str]) -> "GroupedPublications":
+        """Return a new instance without the specified groups."""
+
+        to_remove = {str(group).strip() for group in groups if group is not None}
+        to_remove.discard("")
+        if not to_remove:
+            return self
+
+        filtered_by_group = {
+            group: pubs
+            for group, pubs in self.by_group.items()
+            if group not in to_remove
+        }
+        filtered_paths = {
+            group: path
+            for group, path in self.paths.items()
+            if group not in to_remove
+        }
+        return GroupedPublications(by_group=filtered_by_group, paths=filtered_paths)
+
 
 def _lastname(name: str) -> str:
     return (name or "").strip().split()[-1].lower()

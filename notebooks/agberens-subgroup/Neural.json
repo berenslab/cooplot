@@ -1,0 +1,829 @@
+[
+  {
+    "title": "Modelling the neural code in large",
+    "norm_title": "modelling the neural code in large",
+    "year": null,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "sbi reloaded: a toolkit for simulation-based inference",
+    "norm_title": "sbi reloaded a toolkit for simulation based inference",
+    "year": null,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "Training Stay Review",
+    "norm_title": "training stay review",
+    "year": null,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "A Biologically Realistic Model of Saccadic Eye Control with Probabilistic Population Codes",
+    "norm_title": "a biologically realistic model of saccadic eye control with probabilistic population codes",
+    "year": 2012,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Retrieving contact points without environment knowledge",
+    "norm_title": "retrieving contact points without environment knowledge",
+    "year": 2012,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Efficient stochastic control with Kullback Leibler costs using kernel methods",
+    "norm_title": "efficient stochastic control with kullback leibler costs using kernel methods",
+    "year": 2013,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Correlations and signatures of criticality in neural population models",
+    "norm_title": "correlations and signatures of criticality in neural population models",
+    "year": 2015,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Implementing a Bayes Filter in a Neural Circuit: The Case of Unknown, Nonlinear Stimulus Dynamics",
+    "norm_title": "implementing a bayes filter in a neural circuit the case of unknown nonlinear stimulus dynamics",
+    "year": 2015,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Nonlinear Filtering with Population Codes.",
+    "norm_title": "nonlinear filtering with population codes",
+    "year": 2015,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Connectivity map of bipolar cells and photoreceptors in the mouse retina",
+    "norm_title": "connectivity map of bipolar cells and photoreceptors in the mouse retina",
+    "year": 2016,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Connectivity map of bipolar cells and photoreceptors in the outer mouse retina",
+    "norm_title": "connectivity map of bipolar cells and photoreceptors in the outer mouse retina",
+    "year": 2016,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Signatures of criticality arise in simple neural population models with correlations",
+    "norm_title": "signatures of criticality arise in simple neural population models with correlations",
+    "year": 2016,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Systemic frequency biases in ring oscillator pufs on fpgas",
+    "norm_title": "systemic frequency biases in ring oscillator pufs on fpgas",
+    "year": 2016,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Community-based benchmarking improves spike inference from two-photon calcium imaging data",
+    "norm_title": "community based benchmarking improves spike inference from two photon calcium imaging data",
+    "year": 2017,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Connectomics of synaptic microcircuits: lessons from the outer retina",
+    "norm_title": "connectomics of synaptic microcircuits lessons from the outer retina",
+    "year": 2017,
+    "authors": [
+      "Christian Behrens",
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Implementing a bayes filter in a neural circuit: The case of unknown stimulus dynamics",
+    "norm_title": "implementing a bayes filter in a neural circuit the case of unknown stimulus dynamics",
+    "year": 2017,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Local Signals in Mouse Horizontal Cell Dendrites",
+    "norm_title": "local signals in mouse horizontal cell dendrites",
+    "year": 2017,
+    "authors": [
+      "Christian Behrens",
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Signatures of criticality arise from random subsampling in simple population models",
+    "norm_title": "signatures of criticality arise from random subsampling in simple population models",
+    "year": 2017,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Bayesian hypothesis testing and experimental design for two-photon imaging data",
+    "norm_title": "bayesian hypothesis testing and experimental design for two photon imaging data",
+    "year": 2018,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Combining two photon microscopy and CMOS MEA to uncover the mechanism of aberrant activity in blind retina",
+    "norm_title": "combining two photon microscopy and cmos mea to uncover the mechanism of aberrant activity in blind retina",
+    "year": 2018,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Community-based benchmarking improves spike rate inference from two-photon calcium imaging data",
+    "norm_title": "community based benchmarking improves spike rate inference from two photon calcium imaging data",
+    "year": 2018,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Connectivity of the Outer Plexiform Layer of the Mouse Retina",
+    "norm_title": "connectivity of the outer plexiform layer of the mouse retina",
+    "year": 2018,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Manipulating hippocampal place cell activity by single-cell stimulation in freely moving mice",
+    "norm_title": "manipulating hippocampal place cell activity by single cell stimulation in freely moving mice",
+    "year": 2018,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Conditional finite mixtures of poisson distributions for context-dependent neural correlations",
+    "norm_title": "conditional finite mixtures of poisson distributions for context dependent neural correlations",
+    "year": 2019,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Correction: Bayesian hypothesis testing and experimental design for two-photon imaging data",
+    "norm_title": "correction bayesian hypothesis testing and experimental design for two photon imaging data",
+    "year": 2019,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Dynamical synapses in the retina",
+    "norm_title": "dynamical synapses in the retina",
+    "year": 2019,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "Human perception of dichotic high-frequency complex sounds simulated with a two-channel count comparison model",
+    "norm_title": "human perception of dichotic high frequency complex sounds simulated with a two channel count comparison model",
+    "year": 2019,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Implementing Bayesian Inference with Neural Networks",
+    "norm_title": "implementing bayesian inference with neural networks",
+    "year": 2019,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
+    "norm_title": "layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
+    "year": 2019,
+    "authors": [
+      "Yves Bernaerts",
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas. Nat Commun 10: 4174",
+    "norm_title": "layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas nat commun 10 4174",
+    "year": 2019,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Neuronal causes and behavioural effects: a review on logical, methodological, and technical issues with respect to causal explanations of behaviour in neuroscience",
+    "norm_title": "neuronal causes and behavioural effects a review on logical methodological and technical issues with respect to causal explanations of behaviour in neuroscience",
+    "year": 2019,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Systematic spatio-temporal mapping reveals divergent cell death pathways in three mouse models of hereditary retinal degeneration",
+    "norm_title": "systematic spatio temporal mapping reveals divergent cell death pathways in three mouse models of hereditary retinal degeneration",
+    "year": 2019,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "The temporal structure of the inner retina at a single glance",
+    "norm_title": "the temporal structure of the inner retina at a single glance",
+    "year": 2019,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "A systematic evaluation of interneuron morphology representations for cell type discrimination",
+    "norm_title": "a systematic evaluation of interneuron morphology representations for cell type discrimination",
+    "year": 2020,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Bayesian inference for biophysical neuron models enables stimulus optimization for retinal neuroprosthetics",
+    "norm_title": "bayesian inference for biophysical neuron models enables stimulus optimization for retinal neuroprosthetics",
+    "year": 2020,
+    "authors": [
+      "Christian Behrens",
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "MorphoPy: A python package for feature extraction of neural morphologies.",
+    "norm_title": "morphopy a python package for feature extraction of neural morphologies",
+    "year": 2020,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Neural rate difference model can account for lateralization of high-frequency stimuli",
+    "norm_title": "neural rate difference model can account for lateralization of high frequency stimuli",
+    "year": 2020,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Probing and predicting ganglion cell responses to smooth electrical stimulation in healthy and blind mouse retina",
+    "norm_title": "probing and predicting ganglion cell responses to smooth electrical stimulation in healthy and blind mouse retina",
+    "year": 2020,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Redefining the role of Ca2+-permeable channels in hereditary photoreceptor degeneration using the D- and L-cis enantiomers of diltiazem",
+    "norm_title": "redefining the role of ca2 permeable channels in hereditary photoreceptor degeneration using the d and l cis enantiomers of diltiazem",
+    "year": 2020,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Redefining the role of Ca2+-permeable channels in photoreceptor degeneration using diltiazem",
+    "norm_title": "redefining the role of ca2 permeable channels in photoreceptor degeneration using diltiazem",
+    "year": 2020,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Sparse bottleneck networks for exploratory analysis and visualization of neural Patch-seq data",
+    "norm_title": "sparse bottleneck networks for exploratory analysis and visualization of neural patch seq data",
+    "year": 2020,
+    "authors": [
+      "Yves Bernaerts"
+    ]
+  },
+  {
+    "title": "System identification with biophysical constraints: A circuit model of the inner retina",
+    "norm_title": "system identification with biophysical constraints a circuit model of the inner retina",
+    "year": 2020,
+    "authors": [
+      "Sarah Strauß"
+    ]
+  },
+  {
+    "title": "The temporal structure of the inner retina at a single glance",
+    "norm_title": "the temporal structure of the inner retina at a single glance",
+    "year": 2020,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "A multimodal cell census and atlas of the mammalian primary motor cortex",
+    "norm_title": "a multimodal cell census and atlas of the mammalian primary motor cortex",
+    "year": 2021,
+    "authors": [
+      "Yves Bernaerts",
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Center-surround interactions underlie bipolar cell motion sensing in the mouse retina",
+    "norm_title": "center surround interactions underlie bipolar cell motion sensing in the mouse retina",
+    "year": 2021,
+    "authors": [
+      "Sarah Strauß"
+    ]
+  },
+  {
+    "title": "Distinct synaptic transfer functions in same-type photoreceptors",
+    "norm_title": "distinct synaptic transfer functions in same type photoreceptors",
+    "year": 2021,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Dynamical Synapses in Retinal Surprise coding",
+    "norm_title": "dynamical synapses in retinal surprise coding",
+    "year": 2021,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "Estimating smooth and sparse neural receptive fields with a flexible spline basis",
+    "norm_title": "estimating smooth and sparse neural receptive fields with a flexible spline basis",
+    "year": 2021,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Functional analysis of information rates conveyed by rat whisker-related trigeminal nuclei neurons",
+    "norm_title": "functional analysis of information rates conveyed by rat whisker related trigeminal nuclei neurons",
+    "year": 2021,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Modelling the neural code in large populations of correlated neurons",
+    "norm_title": "modelling the neural code in large populations of correlated neurons",
+    "year": 2021,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "MorphVAE: Generating Neural Morphologies from 3D-Walks using a Variational Autoencoder with Spherical Latent Space",
+    "norm_title": "morphvae generating neural morphologies from 3d walks using a variational autoencoder with spherical latent space",
+    "year": 2021,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Phenotypic variation of transcriptomic cell types in mouse motor cortex",
+    "norm_title": "phenotypic variation of transcriptomic cell types in mouse motor cortex",
+    "year": 2021,
+    "authors": [
+      "Yves Bernaerts",
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "Sparse reduced-rank regression for exploratory visualisation of paired multivariate data",
+    "norm_title": "sparse reduced rank regression for exploratory visualisation of paired multivariate data",
+    "year": 2021,
+    "authors": [
+      "Yves Bernaerts"
+    ]
+  },
+  {
+    "title": "Structured patterns of activity in pulse-coupled oscillator networks with varied connectivity",
+    "norm_title": "structured patterns of activity in pulse coupled oscillator networks with varied connectivity",
+    "year": 2021,
+    "authors": [
+      "Kyra Kadhim"
+    ]
+  },
+  {
+    "title": "The Dynamics of Random Pulse-Coupled Oscillator Networks",
+    "norm_title": "the dynamics of random pulse coupled oscillator networks",
+    "year": 2021,
+    "authors": [
+      "Kyra Kadhim"
+    ]
+  },
+  {
+    "title": "The Role of Dynamical Synapses in Retinal Surprise Coding",
+    "norm_title": "the role of dynamical synapses in retinal surprise coding",
+    "year": 2021,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "Using Machine Learning to Investigate Representations of Neural Morphologies for Cell Type Identification",
+    "norm_title": "using machine learning to investigate representations of neural morphologies for cell type identification",
+    "year": 2021,
+    "authors": [
+      "Sophie Laturnus"
+    ]
+  },
+  {
+    "title": "A chromatic feature detector in the retina signals visual context changes. bioRxiv (2022)",
+    "norm_title": "a chromatic feature detector in the retina signals visual context changes biorxiv 2022",
+    "year": 2022,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Center-surround interactions underlie bipolar cell motion sensitivity in the mouse retina",
+    "norm_title": "center surround interactions underlie bipolar cell motion sensitivity in the mouse retina",
+    "year": 2022,
+    "authors": [
+      "Sarah Strauß"
+    ]
+  },
+  {
+    "title": "Efficient identification of informative features in simulation-based inference",
+    "norm_title": "efficient identification of informative features in simulation based inference",
+    "year": 2022,
+    "authors": [
+      "Jonas Beck",
+      "Yves Bernaerts"
+    ]
+  },
+  {
+    "title": "FingerFlex: Inferring finger trajectories from ECoG signals",
+    "norm_title": "fingerflex inferring finger trajectories from ecog signals",
+    "year": 2022,
+    "authors": [
+      "Aleksejs Timčenko"
+    ]
+  },
+  {
+    "title": "Hierarchical mixtures of Gaussians for combined dimensionality reduction and clustering",
+    "norm_title": "hierarchical mixtures of gaussians for combined dimensionality reduction and clustering",
+    "year": 2022,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Probabilistic solvers enable a straight-forward exploration of numerical uncertainty in neuroscience models",
+    "norm_title": "probabilistic solvers enable a straight forward exploration of numerical uncertainty in neuroscience models",
+    "year": 2022,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Redefining the role of Ca2+-permeable channels in photoreceptor degeneration using diltiazem",
+    "norm_title": "redefining the role of ca2 permeable channels in photoreceptor degeneration using diltiazem",
+    "year": 2022,
+    "authors": [
+      "Luke Rogerson"
+    ]
+  },
+  {
+    "title": "Retinal horizontal cells use different synaptic sites for global feedforward and local feedback signaling",
+    "norm_title": "retinal horizontal cells use different synaptic sites for global feedforward and local feedback signaling",
+    "year": 2022,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "Augmented Mirror Hand (MIRANDA): Advanced Training System for New Generation Prosthesis",
+    "norm_title": "augmented mirror hand miranda advanced training system for new generation prosthesis",
+    "year": 2023,
+    "authors": [
+      "Aleksejs Timčenko"
+    ]
+  },
+  {
+    "title": "Combined statistical-mechanistic modeling links ion channel genes to physiology of cortical neuron types. bioRxiv",
+    "norm_title": "combined statistical mechanistic modeling links ion channel genes to physiology of cortical neuron types biorxiv",
+    "year": 2023,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "Computational Approaches to Bridge Experimental and Simulation Viewpoints in Neuroscience",
+    "norm_title": "computational approaches to bridge experimental and simulation viewpoints in neuroscience",
+    "year": 2023,
+    "authors": [
+      "Yves Bernaerts"
+    ]
+  },
+  {
+    "title": "Dynamical synapses in the retinal network",
+    "norm_title": "dynamical synapses in the retinal network",
+    "year": 2023,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "FingerFlex: High-precision Finger Movement Decoding using ECoG",
+    "norm_title": "fingerflex high precision finger movement decoding using ecog",
+    "year": 2023,
+    "authors": [
+      "Aleksejs Timčenko"
+    ]
+  },
+  {
+    "title": "Neuromodulation of retinal bipolar cell glutamate signaling by nitric oxide and endocannabinoids",
+    "norm_title": "neuromodulation of retinal bipolar cell glutamate signaling by nitric oxide and endocannabinoids",
+    "year": 2023,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Nitric oxide mediates differential effects in mouse retinal ganglion cells",
+    "norm_title": "nitric oxide mediates differential effects in mouse retinal ganglion cells",
+    "year": 2023,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Parametric and Numerical Uncertainty in Mechanistic Neuron Models",
+    "norm_title": "parametric and numerical uncertainty in mechanistic neuron models",
+    "year": 2023,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Plasticity of neuronal dynamics in the lateral habenula for cue-punishment associative learning",
+    "norm_title": "plasticity of neuronal dynamics in the lateral habenula for cue punishment associative learning",
+    "year": 2023,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Synapses dynamiques dans le réseau rétinien",
+    "norm_title": "synapses dynamiques dans le réseau rétinien",
+    "year": 2023,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "The combination of stimulus-driven and modulatory inputs in visual thalamus depend on visual responsiveness and stimulus type",
+    "norm_title": "the combination of stimulus driven and modulatory inputs in visual thalamus depend on visual responsiveness and stimulus type",
+    "year": 2023,
+    "authors": [
+      "Lisa Schmors",
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "A chromatic feature detector in the retina signals visual context changes",
+    "norm_title": "a chromatic feature detector in the retina signals visual context changes",
+    "year": 2024,
+    "authors": [
+      "Christian Behrens"
+    ]
+  },
+  {
+    "title": "A computational approach to visual ecology with deep reinforcement learning",
+    "norm_title": "a computational approach to visual ecology with deep reinforcement learning",
+    "year": 2024,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "A novel method for nonparametric statistical inference for niche overlap in multiple species",
+    "norm_title": "a novel method for nonparametric statistical inference for niche overlap in multiple species",
+    "year": 2024,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "A Unified Theory of Exact Inference and Learning in Exponential Family Latent Variable Models",
+    "norm_title": "a unified theory of exact inference and learning in exponential family latent variable models",
+    "year": 2024,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "A unifying framework for rank and pseudo-rank based inference using nonparametric confidence distributions",
+    "norm_title": "a unifying framework for rank and pseudo rank based inference using nonparametric confidence distributions",
+    "year": 2024,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "Asymmetric distribution of color-opponent response types across mouse visual cortex supports superior color vision in the sky",
+    "norm_title": "asymmetric distribution of color opponent response types across mouse visual cortex supports superior color vision in the sky",
+    "year": 2024,
+    "authors": [
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Aversion encoding and behavioral state modulation of lateral habenula neurons",
+    "norm_title": "aversion encoding and behavioral state modulation of lateral habenula neurons",
+    "year": 2024,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Can Linear-Nonlinear Models capture simple forms of retinal adaptation?",
+    "norm_title": "can linear nonlinear models capture simple forms of retinal adaptation",
+    "year": 2024,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "Differentiable simulation enables large-scale training of detailed biophysical models of neural dynamics",
+    "norm_title": "differentiable simulation enables large scale training of detailed biophysical models of neural dynamics",
+    "year": 2024,
+    "authors": [
+      "Jonas Beck",
+      "Kyra Kadhim"
+    ]
+  },
+  {
+    "title": "Diffusion tempering improves parameter estimation with probabilistic integrators for ordinary differential equations",
+    "norm_title": "diffusion tempering improves parameter estimation with probabilistic integrators for ordinary differential equations",
+    "year": 2024,
+    "authors": [
+      "Jonas Beck",
+      "Kyra Kadhim"
+    ]
+  },
+  {
+    "title": "Juxtacellular recordings from identified neurons in the mouse locus coeruleus",
+    "norm_title": "juxtacellular recordings from identified neurons in the mouse locus coeruleus",
+    "year": 2024,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Most discriminative stimuli for functional cell type clustering",
+    "norm_title": "most discriminative stimuli for functional cell type clustering",
+    "year": 2024,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Real-Time Machine Learning Strategies for a New Kind of Neuroscience Experiments",
+    "norm_title": "real time machine learning strategies for a new kind of neuroscience experiments",
+    "year": 2024,
+    "authors": [
+      "Yves Bernaerts"
+    ]
+  },
+  {
+    "title": "sbi reloaded: a toolkit for simulation-based inference workflows",
+    "norm_title": "sbi reloaded a toolkit for simulation based inference workflows",
+    "year": 2024,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "Statistical frameworks for sensory processing in the mammalian brain",
+    "norm_title": "statistical frameworks for sensory processing in the mammalian brain",
+    "year": 2024,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  },
+  {
+    "title": "Temporal pattern recognition in retinal ganglion cells is mediated by dynamical inhibitory synapses",
+    "norm_title": "temporal pattern recognition in retinal ganglion cells is mediated by dynamical inhibitory synapses",
+    "year": 2024,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "Alike but still different: coexistence of four raptor species explained by breeding niche overlap",
+    "norm_title": "alike but still different coexistence of four raptor species explained by breeding niche overlap",
+    "year": 2025,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "ALVI Interface: Towards Full Hand Motion Decoding for Amputees Using sEMG",
+    "norm_title": "alvi interface towards full hand motion decoding for amputees using semg",
+    "year": 2025,
+    "authors": [
+      "Aleksejs Timčenko"
+    ]
+  },
+  {
+    "title": "Combined statistical-biophysical modeling links ion channel genes to physiology of cortical neuron types",
+    "norm_title": "combined statistical biophysical modeling links ion channel genes to physiology of cortical neuron types",
+    "year": 2025,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "Combined statistical-mechanistic modeling links ion channel genes to physiology of cortical neuron types.",
+    "norm_title": "combined statistical mechanistic modeling links ion channel genes to physiology of cortical neuron types",
+    "year": 2025,
+    "authors": [
+      "Yves Bernaerts"
+    ]
+  },
+  {
+    "title": "Combining stochastic tendency and distribution overlap towards improved nonparametric effect measures and inference",
+    "norm_title": "combining stochastic tendency and distribution overlap towards improved nonparametric effect measures and inference",
+    "year": 2025,
+    "authors": [
+      "Jonas Beck"
+    ]
+  },
+  {
+    "title": "Distinct inhibitory connectivity motifs trigger distinct forms of anticipation in the retinal network",
+    "norm_title": "distinct inhibitory connectivity motifs trigger distinct forms of anticipation in the retinal network",
+    "year": 2025,
+    "authors": [
+      "Simone Ebert"
+    ]
+  },
+  {
+    "title": "Effects of corticothalamic feedback depend on visual responsiveness and stimulus type",
+    "norm_title": "effects of corticothalamic feedback depend on visual responsiveness and stimulus type",
+    "year": 2025,
+    "authors": [
+      "Lisa Schmors",
+      "Sacha Sokoloski"
+    ]
+  },
+  {
+    "title": "Photoreceptor degeneration has heterogeneous effects on functional retinal ganglion cell types",
+    "norm_title": "photoreceptor degeneration has heterogeneous effects on functional retinal ganglion cell types",
+    "year": 2025,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "Task-specific regional circuit adaptations in distinct mouse retinal ganglion cells",
+    "norm_title": "task specific regional circuit adaptations in distinct mouse retinal ganglion cells",
+    "year": 2025,
+    "authors": [
+      "Jonathan Oesterle"
+    ]
+  },
+  {
+    "title": "TRACE: Contrastive learning for multi-trial time-series data in neuroscience",
+    "norm_title": "trace contrastive learning for multi trial time series data in neuroscience",
+    "year": 2025,
+    "authors": [
+      "Lisa Schmors"
+    ]
+  }
+]

@@ -6,7 +6,7 @@ import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Set
 
 import requests
 from scholarly import scholarly
@@ -50,6 +50,32 @@ class Publications:
 
     def resolve_group_column(self, fallback: Optional[str] = None) -> Optional[str]:
         return self.group_col if self.group_col is not None else fallback
+
+    def exclude_authors(self, names: Iterable[str]) -> "Publications":
+        """Return a new instance excluding the specified authors."""
+
+        to_remove: Set[str] = {str(name).strip() for name in names if name is not None}
+        to_remove.discard("")
+        if not to_remove:
+            return self
+
+        filtered_by_author = {
+            author: pubs
+            for author, pubs in self.by_author.items()
+            if author not in to_remove
+        }
+        resolved_name_col = self.resolve_name_column("name")
+        filtered_people = [
+            row
+            for row in self.people
+            if str(row.get(resolved_name_col, "")).strip() not in to_remove
+        ]
+        return Publications(
+            by_author=filtered_by_author,
+            people=filtered_people,
+            name_col=self.name_col,
+            group_col=self.group_col,
+        )
 
 
 _RE_SPACES = re.compile(r"\s+")

@@ -1,0 +1,772 @@
+[
+  {
+    "title": "Domain Adaptation and Representation Transfer",
+    "norm_title": "domain adaptation and representation transfer",
+    "year": null,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Foundation models for OOD detection in medical images",
+    "norm_title": "foundation models for ood detection in medical images",
+    "year": null,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Learning to Pay Multiple Attention with Fully Convolutional Transformers",
+    "norm_title": "learning to pay multiple attention with fully convolutional transformers",
+    "year": null,
+    "authors": [
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "Analysis of Breast Cancer Histology and Genetics Using Apriori Algorithm",
+    "norm_title": "analysis of breast cancer histology and genetics using apriori algorithm",
+    "year": 2010,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Determining Relevant Features based on 3D-SSP to Detect Dementia Caused by Alzheimer's Disease",
+    "norm_title": "determining relevant features based on 3d ssp to detect dementia caused by alzheimer s disease",
+    "year": 2010,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Exploitation of 3D Stereotactic Surface Projection for automated classification of Alzheimer's disease according to dementia levels",
+    "norm_title": "exploitation of 3d stereotactic surface projection for automated classification of alzheimer s disease according to dementia levels",
+    "year": 2010,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Towards Indefinite Gaussian Processes",
+    "norm_title": "towards indefinite gaussian processes",
+    "year": 2012,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Utilization of domain-knowledge for simplicity and comprehensibility in predictive modeling of Alzheimer's disease",
+    "norm_title": "utilization of domain knowledge for simplicity and comprehensibility in predictive modeling of alzheimer s disease",
+    "year": 2012,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Composite kernels for automatic relevance determination in computerized diagnosis of Alzheimer’s disease",
+    "norm_title": "composite kernels for automatic relevance determination in computerized diagnosis of alzheimer s disease",
+    "year": 2013,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Evaluation of Autoencoders for Bases to Represent Neuroimaging Data",
+    "norm_title": "evaluation of autoencoders for bases to represent neuroimaging data",
+    "year": 2013,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Exploitation of 3D stereotactic surface projection for predictive modelling of Alzheimer’s disease",
+    "norm_title": "exploitation of 3d stereotactic surface projection for predictive modelling of alzheimer s disease",
+    "year": 2013,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Natural Image Bases to Represent Neuroimaging Data",
+    "norm_title": "natural image bases to represent neuroimaging data",
+    "year": 2013,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Graph-based label propagation in fetal brain MR images",
+    "norm_title": "graph based label propagation in fetal brain mr images",
+    "year": 2014,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "A Probabilistic Biomarker for Alzheimer's Disease",
+    "norm_title": "a probabilistic biomarker for alzheimer s disease",
+    "year": 2015,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Construction of a fetal spatio-temporal cortical surface atlas from in utero MRI: Application of spectral surface matching",
+    "norm_title": "construction of a fetal spatio temporal cortical surface atlas from in utero mri application of spectral surface matching",
+    "year": 2015,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Multi-atlas segmentation as a graph labelling problem: Application to partially annotated atlas data",
+    "norm_title": "multi atlas segmentation as a graph labelling problem application to partially annotated atlas data",
+    "year": 2015,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Self-aligning manifolds for matching disparate medical image datasets",
+    "norm_title": "self aligning manifolds for matching disparate medical image datasets",
+    "year": 2015,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Graphical methods for atlas-based segmentation and local disease grading in medical images",
+    "norm_title": "graphical methods for atlas based segmentation and local disease grading in medical images",
+    "year": 2016,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Real-time detection and localisation of fetal standard scan planes in 2d freehand ultrasound",
+    "norm_title": "real time detection and localisation of fetal standard scan planes in 2d freehand ultrasound",
+    "year": 2016,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "An exploration of 2D and 3D deep learning techniques for cardiac MR image segmentation",
+    "norm_title": "an exploration of 2d and 3d deep learning techniques for cardiac mr image segmentation",
+    "year": 2017,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Employing weak annotations for medical image analysis problems",
+    "norm_title": "employing weak annotations for medical image analysis problems",
+    "year": 2017,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Investigating Relationship Between Expressed Cancer Related Genes and Patient Survival",
+    "norm_title": "investigating relationship between expressed cancer related genes and patient survival",
+    "year": 2017,
+    "authors": [
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "Leveraging uncertainty information from deep neural networks for disease detection",
+    "norm_title": "leveraging uncertainty information from deep neural networks for disease detection",
+    "year": 2017,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Multi-atlas segmentation using partially annotated data: methods and annotation strategies",
+    "norm_title": "multi atlas segmentation using partially annotated data methods and annotation strategies",
+    "year": 2017,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Multiple kernel learning and automatic subspace relevance determination for high-dimensional neuroimaging data",
+    "norm_title": "multiple kernel learning and automatic subspace relevance determination for high dimensional neuroimaging data",
+    "year": 2017,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "SonoNet: real-time detection and localisation of fetal standard scan planes in freehand ultrasound",
+    "norm_title": "sononet real time detection and localisation of fetal standard scan planes in freehand ultrasound",
+    "year": 2017,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Automated segmentation of abdominal organs in T1-weighted MR images using a deep learning approach: application on a large epidemiological MR study",
+    "norm_title": "automated segmentation of abdominal organs in t1 weighted mr images using a deep learning approach application on a large epidemiological mr study",
+    "year": 2018,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Coopération entre FIP et FS pour l'allocation dynamique des ressources",
+    "norm_title": "coopération entre fip et fs pour l allocation dynamique des ressources",
+    "year": 2018,
+    "authors": [
+      "Kerol Djoumessi"
+    ]
+  },
+  {
+    "title": "Deep learning techniques for automatic MRI cardiac multi-structures segmentation and diagnosis: is the problem solved?",
+    "norm_title": "deep learning techniques for automatic mri cardiac multi structures segmentation and diagnosis is the problem solved",
+    "year": 2018,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Efficient and Automatic Subspace Relevance Determination via Multiple Kernel Learning for High-Dimensional Neuroimaging Data",
+    "norm_title": "efficient and automatic subspace relevance determination via multiple kernel learning for high dimensional neuroimaging data",
+    "year": 2018,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Learning to segment medical images with scribble-supervision alone",
+    "norm_title": "learning to segment medical images with scribble supervision alone",
+    "year": 2018,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Semantic organ segmentation in 3D whole-body MR images",
+    "norm_title": "semantic organ segmentation in 3d whole body mr images",
+    "year": 2018,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Supplementary Material for: Visual Feature Attribution using Wasserstein GANs",
+    "norm_title": "supplementary material for visual feature attribution using wasserstein gans",
+    "year": 2018,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Test-time Data Augmentation for Estimation of Heteroscedastic Aleatoric Uncertainty in Deep Neural Networks",
+    "norm_title": "test time data augmentation for estimation of heteroscedastic aleatoric uncertainty in deep neural networks",
+    "year": 2018,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Transcriptomic proﬁle based cancer disease prediction and patient survival time differentiation",
+    "norm_title": "transcriptomic proﬁle based cancer disease prediction and patient survival time differentiation",
+    "year": 2018,
+    "authors": [
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "Uncertainty quantification in CNN-based surface prediction using shape priors",
+    "norm_title": "uncertainty quantification in cnn based surface prediction using shape priors",
+    "year": 2018,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Visual feature attribution using wasserstein gans",
+    "norm_title": "visual feature attribution using wasserstein gans",
+    "year": 2018,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Automated organ segmentation of liver and spleen in whole-body T1-weighted MR images: Transfer learning between epidemiological cohort studies",
+    "norm_title": "automated organ segmentation of liver and spleen in whole body t1 weighted mr images transfer learning between epidemiological cohort studies",
+    "year": 2019,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Maximal adversarial perturbations for obfuscation: Hiding certain attributes while preserving rest",
+    "norm_title": "maximal adversarial perturbations for obfuscation hiding certain attributes while preserving rest",
+    "year": 2019,
+    "authors": [
+      "Indu Ilanchezian"
+    ]
+  },
+  {
+    "title": "Prediction of Malaria Vaccination Outcomes from Gene Expression Data.",
+    "norm_title": "prediction of malaria vaccination outcomes from gene expression data",
+    "year": 2019,
+    "authors": [
+      "Indu Ilanchezian"
+    ]
+  },
+  {
+    "title": "Proprietary data formats block health research",
+    "norm_title": "proprietary data formats block health research",
+    "year": 2019,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "System and method for contraception",
+    "norm_title": "system and method for contraception",
+    "year": 2019,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Expert-validated estimation of diagnostic uncertainty for deep neural networks in diabetic retinopathy detection",
+    "norm_title": "expert validated estimation of diagnostic uncertainty for deep neural networks in diabetic retinopathy detection",
+    "year": 2020,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Mathematical Model for the transmission dynamics of Lassa fever with control",
+    "norm_title": "mathematical model for the transmission dynamics of lassa fever with control",
+    "year": 2020,
+    "authors": [
+      "Ifeoma Veronica Nwabufo"
+    ]
+  },
+  {
+    "title": "Potential of methods of artificial intelligence for quality assurance",
+    "norm_title": "potential of methods of artificial intelligence for quality assurance",
+    "year": 2020,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Interpretable gender classification from retinal fundus images using BagNets",
+    "norm_title": "interpretable gender classification from retinal fundus images using bagnets",
+    "year": 2021,
+    "authors": [
+      "Murat Seçkin Ayhan",
+      "Indu Ilanchezian"
+    ]
+  },
+  {
+    "title": "Local policy search with Bayesian optimization",
+    "norm_title": "local policy search with bayesian optimization",
+    "year": 2021,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Towards the Localisation of Lesions in Diabetic Retinopathy",
+    "norm_title": "towards the localisation of lesions in diabetic retinopathy",
+    "year": 2021,
+    "authors": [
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "A Generative Model Reveals the Influence of Patient Attributes on Fundus Images",
+    "norm_title": "a generative model reveals the influence of patient attributes on fundus images",
+    "year": 2022,
+    "authors": [
+      "Lisa Koch",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Clinical validation of saliency maps for understanding deep neural networks in ophthalmology",
+    "norm_title": "clinical validation of saliency maps for understanding deep neural networks in ophthalmology",
+    "year": 2022,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Domain Adaptation and Representation Transfer: 4th MICCAI Workshop, DART 2022, Held in Conjunction with MICCAI 2022, Singapore, September 22, 2022, Proceedings",
+    "norm_title": "domain adaptation and representation transfer 4th miccai workshop dart 2022 held in conjunction with miccai 2022 singapore september 22 2022 proceedings",
+    "year": 2022,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Hidden in plain sight: Subgroup shifts escape OOD detection",
+    "norm_title": "hidden in plain sight subgroup shifts escape ood detection",
+    "year": 2022,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "norm_title": "visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "year": 2022,
+    "authors": [
+      "Murat Seçkin Ayhan",
+      "Indu Ilanchezian",
+      "Lisa Koch",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "A foundation model for generalizable disease detection from retinal images",
+    "norm_title": "a foundation model for generalizable disease detection from retinal images",
+    "year": 2023,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Deep Hypothesis Tests Detect Clinically Relevant Subgroup Shifts in Medical Images",
+    "norm_title": "deep hypothesis tests detect clinically relevant subgroup shifts in medical images",
+    "year": 2023,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Domain Adaptation and Representation Transfer",
+    "norm_title": "domain adaptation and representation transfer",
+    "year": 2023,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Generating realistic counterfactuals for retinal fundus and oct images using diffusion models",
+    "norm_title": "generating realistic counterfactuals for retinal fundus and oct images using diffusion models",
+    "year": 2023,
+    "authors": [
+      "Indu Ilanchezian"
+    ]
+  },
+  {
+    "title": "Inherently interpretable multi-label classification using class-specific counterfactuals",
+    "norm_title": "inherently interpretable multi label classification using class specific counterfactuals",
+    "year": 2023,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Mathematical modelling of tuberculosis outbreak in an East African country incorporating vaccination and treatment",
+    "norm_title": "mathematical modelling of tuberculosis outbreak in an east african country incorporating vaccination and treatment",
+    "year": 2023,
+    "authors": [
+      "Ifeoma Veronica Nwabufo"
+    ]
+  },
+  {
+    "title": "Maximally discriminative stimuli for functional cell type identification",
+    "norm_title": "maximally discriminative stimuli for functional cell type identification",
+    "year": 2023,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Multimodal interactive lung lesion segmentation: a framework for annotating PET/CT images based on physiological and anatomical cues",
+    "norm_title": "multimodal interactive lung lesion segmentation a framework for annotating pet ct images based on physiological and anatomical cues",
+    "year": 2023,
+    "authors": [
+      "Verena Jasmin Hallitschke"
+    ]
+  },
+  {
+    "title": "Multitask Learning for Activity Detection in Neovascular Age-Related Macular Degeneration",
+    "norm_title": "multitask learning for activity detection in neovascular age related macular degeneration",
+    "year": 2023,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Right for the wrong reason: Can interpretable ML techniques detect spurious correlations?",
+    "norm_title": "right for the wrong reason can interpretable ml techniques detect spurious correlations",
+    "year": 2023,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Sparse Activations for Interpretable Disease Grading",
+    "norm_title": "sparse activations for interpretable disease grading",
+    "year": 2023,
+    "authors": [
+      "Kerol Djoumessi",
+      "Indu Ilanchezian",
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Attri-Net: A Globally and Locally Inherently Interpretable Model for Multi-Label Classification Using Class-Specific Counterfactuals",
+    "norm_title": "attri net a globally and locally inherently interpretable model for multi label classification using class specific counterfactuals",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Benchmarking Dependence Measures to Prevent Shortcut Learning in Medical Imaging",
+    "norm_title": "benchmarking dependence measures to prevent shortcut learning in medical imaging",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Benchmarking Retinal Blood Vessel Segmentation Models for Cross-Dataset and Cross-Disease Generalization",
+    "norm_title": "benchmarking retinal blood vessel segmentation models for cross dataset and cross disease generalization",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch",
+      "Patrick Köhler"
+    ]
+  },
+  {
+    "title": "Conformal performance range prediction for segmentation output quality control",
+    "norm_title": "conformal performance range prediction for segmentation output quality control",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Distribution shift detection for the postmarket surveillance of medical AI algorithms: a retrospective simulation study",
+    "norm_title": "distribution shift detection for the postmarket surveillance of medical ai algorithms a retrospective simulation study",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Efficiently correcting patch-based segmentation errors to control image-level performance in retinal images",
+    "norm_title": "efficiently correcting patch based segmentation errors to control image level performance in retinal images",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch",
+      "Patrick Köhler"
+    ]
+  },
+  {
+    "title": "EyeMatics: An Ophthalmology Use Case Within the German Medical Informatics Initiative",
+    "norm_title": "eyematics an ophthalmology use case within the german medical informatics initiative",
+    "year": 2024,
+    "authors": [
+      "Julius Gervelmeyer",
+      "Lisa Koch",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "EyeMatics–Multizentrische Datenauswertung von Real-World-Daten mit interoperabler medizinischer Informatik",
+    "norm_title": "eyematics multizentrische datenauswertung von real world daten mit interoperabler medizinischer informatik",
+    "year": 2024,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Interpretable-by-design deep survival analysis for disease progression modeling",
+    "norm_title": "interpretable by design deep survival analysis for disease progression modeling",
+    "year": 2024,
+    "authors": [
+      "Kerol Djoumessi",
+      "Julius Gervelmeyer",
+      "Lisa Koch",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Interpretable detection of epiretinal membrane from optical coherence tomography with deep neural networks",
+    "norm_title": "interpretable detection of epiretinal membrane from optical coherence tomography with deep neural networks",
+    "year": 2024,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Leveraging probabilistic segmentation models for improved glaucoma diagnosis: A clinical pipeline approach",
+    "norm_title": "leveraging probabilistic segmentation models for improved glaucoma diagnosis a clinical pipeline approach",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Preface DART 2023",
+    "norm_title": "preface dart 2023",
+    "year": 2024,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Self-supervised Visualisation of Medical Image Datasets",
+    "norm_title": "self supervised visualisation of medical image datasets",
+    "year": 2024,
+    "authors": [
+      "Ifeoma Veronica Nwabufo"
+    ]
+  },
+  {
+    "title": "This actually looks like that: Proto-BagNets for local and global interpretability-by-design",
+    "norm_title": "this actually looks like that proto bagnets for local and global interpretability by design",
+    "year": 2024,
+    "authors": [
+      "Kerol Djoumessi",
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Visually Explaining Decisions of Deep Neural Network Classifiers in Ophthalmology",
+    "norm_title": "visually explaining decisions of deep neural network classifiers in ophthalmology",
+    "year": 2024,
+    "authors": [
+      "Indu Ilanchezian"
+    ]
+  },
+  {
+    "title": "A Hybrid Fully Convolutional CNN-Transformer Model for Inherently Interpretable Medical Image Classification",
+    "norm_title": "a hybrid fully convolutional cnn transformer model for inherently interpretable medical image classification",
+    "year": 2025,
+    "authors": [
+      "Kerol Djoumessi",
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "A Real-Time Digital Twin for Type 1 Diabetes using Simulation-Based Inference",
+    "norm_title": "a real time digital twin for type 1 diabetes using simulation based inference",
+    "year": 2025,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "An inherently interpretable AI model improves screening speed and accuracy for early diabetic retinopathy",
+    "norm_title": "an inherently interpretable ai model improves screening speed and accuracy for early diabetic retinopathy",
+    "year": 2025,
+    "authors": [
+      "Kerol Djoumessi",
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Clinically Interpretable Deep Learning via Sparse BagNets for Epiretinal Membrane and Related Pathology Detection",
+    "norm_title": "clinically interpretable deep learning via sparse bagnets for epiretinal membrane and related pathology detection",
+    "year": 2025,
+    "authors": [
+      "Murat Seçkin Ayhan",
+      "Kerol Djoumessi",
+      "Lisa Koch",
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "norm_title": "development and validation of an ai algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "year": 2025,
+    "authors": [
+      "Murat Seçkin Ayhan",
+      "Indu Ilanchezian",
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Disentangling representations of retinal images with generative models",
+    "norm_title": "disentangling representations of retinal images with generative models",
+    "year": 2025,
+    "authors": [
+      "Lisa Koch",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "EyeMatics–Multizentrische Datenauswertung von Real-World-Daten mit interoperabler medizinischer Informatik",
+    "norm_title": "eyematics multizentrische datenauswertung von real world daten mit interoperabler medizinischer informatik",
+    "year": 2025,
+    "authors": [
+      "Julius Gervelmeyer"
+    ]
+  },
+  {
+    "title": "Fundus Image Toolbox: A Python package for fundus image processing",
+    "norm_title": "fundus image toolbox a python package for fundus image processing",
+    "year": 2025,
+    "authors": [
+      "Julius Gervelmeyer",
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "In-context learning for data-efficient diabetic retinopathy detection via multimodal foundation models",
+    "norm_title": "in context learning for data efficient diabetic retinopathy detection via multimodal foundation models",
+    "year": 2025,
+    "authors": [
+      "Murat Seçkin Ayhan"
+    ]
+  },
+  {
+    "title": "Label-free estimation of clinically relevant performance metrics under distribution shifts",
+    "norm_title": "label free estimation of clinically relevant performance metrics under distribution shifts",
+    "year": 2025,
+    "authors": [
+      "Lisa Koch"
+    ]
+  },
+  {
+    "title": "Learning Disease State from Noisy Ordinal Disease Progression Labels",
+    "norm_title": "learning disease state from noisy ordinal disease progression labels",
+    "year": 2025,
+    "authors": [
+      "Sarah Müller"
+    ]
+  },
+  {
+    "title": "Prototype-Guided and Lightweight Adapters for Inherent Interpretation and Generalisation in Federated Learning",
+    "norm_title": "prototype guided and lightweight adapters for inherent interpretation and generalisation in federated learning",
+    "year": 2025,
+    "authors": [
+      "Kerol Djoumessi",
+      "Samuel Ofosu Mensah"
+    ]
+  },
+  {
+    "title": "Soft-CAM: Making black box models self-explainable for high-stakes decisions",
+    "norm_title": "soft cam making black box models self explainable for high stakes decisions",
+    "year": 2025,
+    "authors": [
+      "Kerol Djoumessi"
+    ]
+  },
+  {
+    "title": "Subgroup Performance Analysis in Hidden Stratifications",
+    "norm_title": "subgroup performance analysis in hidden stratifications",
+    "year": 2025,
+    "authors": [
+      "Lisa Koch"
+    ]
+  }
+]

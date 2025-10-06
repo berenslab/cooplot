@@ -1,0 +1,57 @@
+[
+  {
+    "title": "A multimodal cell census and atlas of the mammalian primary motor cortex",
+    "norm_title": "a multimodal cell census and atlas of the mammalian primary motor cortex",
+    "year": 2021
+  },
+  {
+    "title": "Phenotypic variation of transcriptomic cell types in mouse motor cortex",
+    "norm_title": "phenotypic variation of transcriptomic cell types in mouse motor cortex",
+    "year": 2021
+  },
+  {
+    "title": "Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
+    "norm_title": "layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
+    "year": 2019
+  },
+  {
+    "title": "Manipulating hippocampal place cell activity by single-cell stimulation in freely moving mice",
+    "norm_title": "manipulating hippocampal place cell activity by single cell stimulation in freely moving mice",
+    "year": 2018
+  },
+  {
+    "title": "A systematic evaluation of interneuron morphology representations for cell type discrimination",
+    "norm_title": "a systematic evaluation of interneuron morphology representations for cell type discrimination",
+    "year": 2020
+  },
+  {
+    "title": "MorphVAE: Generating Neural Morphologies from 3D-Walks using a Variational Autoencoder with Spherical Latent Space",
+    "norm_title": "morphvae generating neural morphologies from 3d walks using a variational autoencoder with spherical latent space",
+    "year": 2021
+  },
+  {
+    "title": "Functional analysis of information rates conveyed by rat whisker-related trigeminal nuclei neurons",
+    "norm_title": "functional analysis of information rates conveyed by rat whisker related trigeminal nuclei neurons",
+    "year": 2021
+  },
+  {
+    "title": "Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas. Nat Commun 10: 4174",
+    "norm_title": "layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas nat commun 10 4174",
+    "year": 2019
+  },
+  {
+    "title": "MorphoPy: A python package for feature extraction of neural morphologies.",
+    "norm_title": "morphopy a python package for feature extraction of neural morphologies",
+    "year": 2020
+  },
+  {
+    "title": "Retrieving contact points without environment knowledge",
+    "norm_title": "retrieving contact points without environment knowledge",
+    "year": 2012
+  },
+  {
+    "title": "Using Machine Learning to Investigate Representations of Neural Morphologies for Cell Type Identification",
+    "norm_title": "using machine learning to investigate representations of neural morphologies for cell type identification",
+    "year": 2021
+  }
+]

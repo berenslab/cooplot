@@ -209,3 +209,32 @@ def test_cross_group_publications_save_json(tmp_path, sample_publications, sampl
     assert out_file.exists()
     assert records == cross_group_publications(grouped)
 
+
+
+def test_publications_exclude_authors(sample_publications, sample_people):
+    pubs = Publications.from_data(
+        sample_publications,
+        sample_people,
+        group_col="team",
+    )
+    filtered = pubs.exclude_authors(["Bob Beta"])
+    assert "Bob Beta" not in filtered.mapping()
+    name_key = filtered.resolve_name_column("name")
+    remaining_names = {row[name_key] for row in filtered.people_rows()}
+    assert "Bob Beta" not in remaining_names
+    assert "Alice Alpha" in remaining_names
+
+
+def test_grouped_publications_exclude_groups(tmp_path, sample_publications, sample_people):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+    filtered = grouped.exclude_groups(["Unlabeled"])
+    assert "Unlabeled" not in filtered.by_group
+    assert all(g != "Unlabeled" for g in filtered.sorted_groups())

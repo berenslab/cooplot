@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Sparse Activations for Interpretable Disease Grading",
+    "norm_title": "sparse activations for interpretable disease grading",
+    "year": 2023
+  },
+  {
+    "title": "An inherently interpretable AI model improves screening speed and accuracy for early diabetic retinopathy",
+    "norm_title": "an inherently interpretable ai model improves screening speed and accuracy for early diabetic retinopathy",
+    "year": 2025
+  },
+  {
+    "title": "A Hybrid Fully Convolutional CNN-Transformer Model for Inherently Interpretable Medical Image Classification",
+    "norm_title": "a hybrid fully convolutional cnn transformer model for inherently interpretable medical image classification",
+    "year": 2025
+  },
+  {
+    "title": "Interpretable-by-design deep survival analysis for disease progression modeling",
+    "norm_title": "interpretable by design deep survival analysis for disease progression modeling",
+    "year": 2024
+  },
+  {
+    "title": "This actually looks like that: Proto-BagNets for local and global interpretability-by-design",
+    "norm_title": "this actually looks like that proto bagnets for local and global interpretability by design",
+    "year": 2024
+  },
+  {
+    "title": "Prototype-Guided and Lightweight Adapters for Inherent Interpretation and Generalisation in Federated Learning",
+    "norm_title": "prototype guided and lightweight adapters for inherent interpretation and generalisation in federated learning",
+    "year": 2025
+  },
+  {
+    "title": "Clinically Interpretable Deep Learning via Sparse BagNets for Epiretinal Membrane and Related Pathology Detection",
+    "norm_title": "clinically interpretable deep learning via sparse bagnets for epiretinal membrane and related pathology detection",
+    "year": 2025
+  },
+  {
+    "title": "Soft-CAM: Making black box models self-explainable for high-stakes decisions",
+    "norm_title": "soft cam making black box models self explainable for high stakes decisions",
+    "year": 2025
+  },
+  {
+    "title": "Coopération entre FIP et FS pour l'allocation dynamique des ressources",
+    "norm_title": "coopération entre fip et fs pour l allocation dynamique des ressources",
+    "year": 2018
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Attraction-repulsion spectrum in neighbor embeddings",
+    "norm_title": "attraction repulsion spectrum in neighbor embeddings",
+    "year": 2022
+  },
+  {
+    "title": "From -SNE to UMAP with contrastive learning",
+    "norm_title": "from sne to umap with contrastive learning",
+    "year": 2022
+  },
+  {
+    "title": "Unsupervised visualization of image datasets using contrastive learning",
+    "norm_title": "unsupervised visualization of image datasets using contrastive learning",
+    "year": 2022
+  },
+  {
+    "title": "Contrastive learning unifies t-SNE and UMAP",
+    "norm_title": "contrastive learning unifies t sne and umap",
+    "year": 2022
+  },
+  {
+    "title": "On the Importance of Embedding Norms in Self-Supervised Learning",
+    "norm_title": "on the importance of embedding norms in self supervised learning",
+    "year": 2025
+  },
+  {
+    "title": "Dimensionality Reduction with Neighborhood Embeddings",
+    "norm_title": "dimensionality reduction with neighborhood embeddings",
+    "year": 2020
+  },
+  {
+    "title": "Node Embeddings via Neighbor Embeddings",
+    "norm_title": "node embeddings via neighbor embeddings",
+    "year": 2025
+  },
+  {
+    "title": "Self-supervised Visualisation of Medical Image Datasets",
+    "norm_title": "self supervised visualisation of medical image datasets",
+    "year": 2024
+  },
+  {
+    "title": "TRACE: Contrastive learning for multi-trial time-series data in neuroscience",
+    "norm_title": "trace contrastive learning for multi trial time series data in neuroscience",
+    "year": 2025
+  },
+  {
+    "title": "Visualization beyond Riemannian Manifolds",
+    "norm_title": "visualization beyond riemannian manifolds",
+    "year": null
+  }
+]

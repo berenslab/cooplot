@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Bayesian inference for biophysical neuron models enables stimulus optimization for retinal neuroprosthetics",
+    "norm_title": "bayesian inference for biophysical neuron models enables stimulus optimization for retinal neuroprosthetics",
+    "year": 2020
+  },
+  {
+    "title": "Probing and predicting ganglion cell responses to smooth electrical stimulation in healthy and blind mouse retina",
+    "norm_title": "probing and predicting ganglion cell responses to smooth electrical stimulation in healthy and blind mouse retina",
+    "year": 2020
+  },
+  {
+    "title": "Systemic frequency biases in ring oscillator pufs on fpgas",
+    "norm_title": "systemic frequency biases in ring oscillator pufs on fpgas",
+    "year": 2016
+  },
+  {
+    "title": "Estimating smooth and sparse neural receptive fields with a flexible spline basis",
+    "norm_title": "estimating smooth and sparse neural receptive fields with a flexible spline basis",
+    "year": 2021
+  },
+  {
+    "title": "Distinct synaptic transfer functions in same-type photoreceptors",
+    "norm_title": "distinct synaptic transfer functions in same type photoreceptors",
+    "year": 2021
+  },
+  {
+    "title": "Most discriminative stimuli for functional cell type clustering",
+    "norm_title": "most discriminative stimuli for functional cell type clustering",
+    "year": 2024
+  },
+  {
+    "title": "Nitric oxide mediates differential effects in mouse retinal ganglion cells",
+    "norm_title": "nitric oxide mediates differential effects in mouse retinal ganglion cells",
+    "year": 2023
+  },
+  {
+    "title": "Probabilistic solvers enable a straight-forward exploration of numerical uncertainty in neuroscience models",
+    "norm_title": "probabilistic solvers enable a straight forward exploration of numerical uncertainty in neuroscience models",
+    "year": 2022
+  },
+  {
+    "title": "Photoreceptor degeneration has heterogeneous effects on functional retinal ganglion cell types",
+    "norm_title": "photoreceptor degeneration has heterogeneous effects on functional retinal ganglion cell types",
+    "year": 2025
+  },
+  {
+    "title": "Task-specific regional circuit adaptations in distinct mouse retinal ganglion cells",
+    "norm_title": "task specific regional circuit adaptations in distinct mouse retinal ganglion cells",
+    "year": 2025
+  },
+  {
+    "title": "Neuromodulation of retinal bipolar cell glutamate signaling by nitric oxide and endocannabinoids",
+    "norm_title": "neuromodulation of retinal bipolar cell glutamate signaling by nitric oxide and endocannabinoids",
+    "year": 2023
+  },
+  {
+    "title": "Parametric and Numerical Uncertainty in Mechanistic Neuron Models",
+    "norm_title": "parametric and numerical uncertainty in mechanistic neuron models",
+    "year": 2023
+  }
+]

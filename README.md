@@ -1,6 +1,6 @@
 # cooplot
 
-A new Python project.
+![](.github/berens.png)
 
 ## Installation
 

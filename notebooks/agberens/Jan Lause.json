@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Analytic Pearson residuals for normalization of single-cell RNA-seq UMI data",
+    "norm_title": "analytic pearson residuals for normalization of single cell rna seq umi data",
+    "year": 2021
+  },
+  {
+    "title": "Delving into LLM-assisted writing in biomedical publications through excess vocabulary",
+    "norm_title": "delving into llm assisted writing in biomedical publications through excess vocabulary",
+    "year": 2025
+  },
+  {
+    "title": "The art of seeing the elephant in the room: 2D embeddings of single-cell data do make sense",
+    "norm_title": "the art of seeing the elephant in the room 2d embeddings of single cell data do make sense",
+    "year": 2024
+  },
+  {
+    "title": "Retinal horizontal cells use different synaptic sites for global feedforward and local feedback signaling",
+    "norm_title": "retinal horizontal cells use different synaptic sites for global feedforward and local feedback signaling",
+    "year": 2022
+  },
+  {
+    "title": "Most discriminative stimuli for functional cell type identification",
+    "norm_title": "most discriminative stimuli for functional cell type identification",
+    "year": 2024
+  },
+  {
+    "title": "Delving into ChatGPT usage in academic writing through excess vocabulary. arXiv 2024",
+    "norm_title": "delving into chatgpt usage in academic writing through excess vocabulary arxiv 2024",
+    "year": null
+  },
+  {
+    "title": "Models and methods to process single-cell RNA sequencing data for neuroscience",
+    "norm_title": "models and methods to process single cell rna sequencing data for neuroscience",
+    "year": 2025
+  },
+  {
+    "title": "Compound models and Pearson residuals for single-cell RNA-seq data without UMIs",
+    "norm_title": "compound models and pearson residuals for single cell rna seq data without umis",
+    "year": 2024
+  }
+]

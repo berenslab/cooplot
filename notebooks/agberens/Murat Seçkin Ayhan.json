@@ -1,0 +1,127 @@
+[
+  {
+    "title": "A foundation model for generalizable disease detection from retinal images",
+    "norm_title": "a foundation model for generalizable disease detection from retinal images",
+    "year": 2023
+  },
+  {
+    "title": "Leveraging uncertainty information from deep neural networks for disease detection",
+    "norm_title": "leveraging uncertainty information from deep neural networks for disease detection",
+    "year": 2017
+  },
+  {
+    "title": "Natural Image Bases to Represent Neuroimaging Data",
+    "norm_title": "natural image bases to represent neuroimaging data",
+    "year": 2013
+  },
+  {
+    "title": "Test-time Data Augmentation for Estimation of Heteroscedastic Aleatoric Uncertainty in Deep Neural Networks",
+    "norm_title": "test time data augmentation for estimation of heteroscedastic aleatoric uncertainty in deep neural networks",
+    "year": 2018
+  },
+  {
+    "title": "Expert-validated estimation of diagnostic uncertainty for deep neural networks in diabetic retinopathy detection",
+    "norm_title": "expert validated estimation of diagnostic uncertainty for deep neural networks in diabetic retinopathy detection",
+    "year": 2020
+  },
+  {
+    "title": "Clinical validation of saliency maps for understanding deep neural networks in ophthalmology",
+    "norm_title": "clinical validation of saliency maps for understanding deep neural networks in ophthalmology",
+    "year": 2022
+  },
+  {
+    "title": "Interpretable gender classification from retinal fundus images using BagNets",
+    "norm_title": "interpretable gender classification from retinal fundus images using bagnets",
+    "year": 2021
+  },
+  {
+    "title": "Visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "norm_title": "visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "year": 2022
+  },
+  {
+    "title": "Multitask Learning for Activity Detection in Neovascular Age-Related Macular Degeneration",
+    "norm_title": "multitask learning for activity detection in neovascular age related macular degeneration",
+    "year": 2023
+  },
+  {
+    "title": "Proprietary data formats block health research",
+    "norm_title": "proprietary data formats block health research",
+    "year": 2019
+  },
+  {
+    "title": "Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "norm_title": "development and validation of an ai algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "year": 2025
+  },
+  {
+    "title": "Interpretable detection of epiretinal membrane from optical coherence tomography with deep neural networks",
+    "norm_title": "interpretable detection of epiretinal membrane from optical coherence tomography with deep neural networks",
+    "year": 2024
+  },
+  {
+    "title": "Potential of methods of artificial intelligence for quality assurance",
+    "norm_title": "potential of methods of artificial intelligence for quality assurance",
+    "year": 2020
+  },
+  {
+    "title": "Exploitation of 3D stereotactic surface projection for predictive modelling of Alzheimer’s disease",
+    "norm_title": "exploitation of 3d stereotactic surface projection for predictive modelling of alzheimer s disease",
+    "year": 2013
+  },
+  {
+    "title": "Composite kernels for automatic relevance determination in computerized diagnosis of Alzheimer’s disease",
+    "norm_title": "composite kernels for automatic relevance determination in computerized diagnosis of alzheimer s disease",
+    "year": 2013
+  },
+  {
+    "title": "Towards Indefinite Gaussian Processes",
+    "norm_title": "towards indefinite gaussian processes",
+    "year": 2012
+  },
+  {
+    "title": "Utilization of domain-knowledge for simplicity and comprehensibility in predictive modeling of Alzheimer's disease",
+    "norm_title": "utilization of domain knowledge for simplicity and comprehensibility in predictive modeling of alzheimer s disease",
+    "year": 2012
+  },
+  {
+    "title": "Exploitation of 3D Stereotactic Surface Projection for automated classification of Alzheimer's disease according to dementia levels",
+    "norm_title": "exploitation of 3d stereotactic surface projection for automated classification of alzheimer s disease according to dementia levels",
+    "year": 2010
+  },
+  {
+    "title": "Evaluation of Autoencoders for Bases to Represent Neuroimaging Data",
+    "norm_title": "evaluation of autoencoders for bases to represent neuroimaging data",
+    "year": 2013
+  },
+  {
+    "title": "In-context learning for data-efficient diabetic retinopathy detection via multimodal foundation models",
+    "norm_title": "in context learning for data efficient diabetic retinopathy detection via multimodal foundation models",
+    "year": 2025
+  },
+  {
+    "title": "Multiple kernel learning and automatic subspace relevance determination for high-dimensional neuroimaging data",
+    "norm_title": "multiple kernel learning and automatic subspace relevance determination for high dimensional neuroimaging data",
+    "year": 2017
+  },
+  {
+    "title": "Clinically Interpretable Deep Learning via Sparse BagNets for Epiretinal Membrane and Related Pathology Detection",
+    "norm_title": "clinically interpretable deep learning via sparse bagnets for epiretinal membrane and related pathology detection",
+    "year": 2025
+  },
+  {
+    "title": "Efficient and Automatic Subspace Relevance Determination via Multiple Kernel Learning for High-Dimensional Neuroimaging Data",
+    "norm_title": "efficient and automatic subspace relevance determination via multiple kernel learning for high dimensional neuroimaging data",
+    "year": 2018
+  },
+  {
+    "title": "A Probabilistic Biomarker for Alzheimer's Disease",
+    "norm_title": "a probabilistic biomarker for alzheimer s disease",
+    "year": 2015
+  },
+  {
+    "title": "Determining Relevant Features based on 3D-SSP to Detect Dementia Caused by Alzheimer's Disease",
+    "norm_title": "determining relevant features based on 3d ssp to detect dementia caused by alzheimer s disease",
+    "year": 2010
+  }
+]

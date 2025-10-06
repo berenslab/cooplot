@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Interpretable gender classification from retinal fundus images using BagNets",
+    "norm_title": "interpretable gender classification from retinal fundus images using bagnets",
+    "year": 2021
+  },
+  {
+    "title": "Visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "norm_title": "visual explanations for the detection of diabetic retinopathy from retinal fundus images",
+    "year": 2022
+  },
+  {
+    "title": "Generating realistic counterfactuals for retinal fundus and oct images using diffusion models",
+    "norm_title": "generating realistic counterfactuals for retinal fundus and oct images using diffusion models",
+    "year": 2023
+  },
+  {
+    "title": "Maximal adversarial perturbations for obfuscation: Hiding certain attributes while preserving rest",
+    "norm_title": "maximal adversarial perturbations for obfuscation hiding certain attributes while preserving rest",
+    "year": 2019
+  },
+  {
+    "title": "Sparse activations for interpretable disease grading",
+    "norm_title": "sparse activations for interpretable disease grading",
+    "year": 2023
+  },
+  {
+    "title": "Prediction of Malaria Vaccination Outcomes from Gene Expression Data.",
+    "norm_title": "prediction of malaria vaccination outcomes from gene expression data",
+    "year": 2019
+  },
+  {
+    "title": "Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "norm_title": "development and validation of an ai algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "year": 2025
+  },
+  {
+    "title": "Visually Explaining Decisions of Deep Neural Network Classifiers in Ophthalmology",
+    "norm_title": "visually explaining decisions of deep neural network classifiers in ophthalmology",
+    "year": 2024
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "title": "FingerFlex: Inferring finger trajectories from ECoG signals",
+    "norm_title": "fingerflex inferring finger trajectories from ecog signals",
+    "year": 2022
+  },
+  {
+    "title": "Augmented Mirror Hand (MIRANDA): Advanced Training System for New Generation Prosthesis",
+    "norm_title": "augmented mirror hand miranda advanced training system for new generation prosthesis",
+    "year": 2023
+  },
+  {
+    "title": "FingerFlex: High-precision Finger Movement Decoding using ECoG",
+    "norm_title": "fingerflex high precision finger movement decoding using ecog",
+    "year": 2023
+  },
+  {
+    "title": "ALVI Interface: Towards Full Hand Motion Decoding for Amputees Using sEMG",
+    "norm_title": "alvi interface towards full hand motion decoding for amputees using semg",
+    "year": 2025
+  }
+]

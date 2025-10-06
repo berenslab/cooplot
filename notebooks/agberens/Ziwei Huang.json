@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Type-specific dendritic integration in mouse retinal ganglion cells",
+    "norm_title": "type specific dendritic integration in mouse retinal ganglion cells",
+    "year": 2020
+  },
+  {
+    "title": "Grid cells show field-to-field variability and this explains the aperiodic response of inhibitory interneurons",
+    "norm_title": "grid cells show field to field variability and this explains the aperiodic response of inhibitory interneurons",
+    "year": 2017
+  },
+  {
+    "title": "Estimating smooth and sparse neural receptive fields with a flexible spline basis",
+    "norm_title": "estimating smooth and sparse neural receptive fields with a flexible spline basis",
+    "year": 2021
+  },
+  {
+    "title": "MorphoPy: A python package for feature extraction of neural morphologies.",
+    "norm_title": "morphopy a python package for feature extraction of neural morphologies",
+    "year": 2020
+  },
+  {
+    "title": "Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "norm_title": "development and validation of an ai algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models",
+    "year": 2025
+  },
+  {
+    "title": "Differentiable simulation enables large-scale training of detailed biophysical models of neural dynamics",
+    "norm_title": "differentiable simulation enables large scale training of detailed biophysical models of neural dynamics",
+    "year": 2024
+  },
+  {
+    "title": "An inherently interpretable AI model improves screening speed and accuracy for early diabetic retinopathy",
+    "norm_title": "an inherently interpretable ai model improves screening speed and accuracy for early diabetic retinopathy",
+    "year": 2025
+  },
+  {
+    "title": "Effects of corticothalamic feedback depend on visual responsiveness and stimulus type",
+    "norm_title": "effects of corticothalamic feedback depend on visual responsiveness and stimulus type",
+    "year": 2025
+  },
+  {
+    "title": "Fundus Image Toolbox: A Python package for fundus image processing",
+    "norm_title": "fundus image toolbox a python package for fundus image processing",
+    "year": 2025
+  }
+]

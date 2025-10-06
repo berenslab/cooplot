@@ -1,0 +1,107 @@
+[
+  {
+    "title": "On UMAP's True Loss Function",
+    "norm_title": "on umap s true loss function",
+    "year": 2021
+  },
+  {
+    "title": "From -SNE to UMAP with contrastive learning",
+    "norm_title": "from sne to umap with contrastive learning",
+    "year": 2022
+  },
+  {
+    "title": "Multistar: Instance segmentation of overlapping objects with star-convex polygons",
+    "norm_title": "multistar instance segmentation of overlapping objects with star convex polygons",
+    "year": 2021
+  },
+  {
+    "title": "Crowding in and crowding out within a contribution good model of research",
+    "norm_title": "crowding in and crowding out within a contribution good model of research",
+    "year": 2022
+  },
+  {
+    "title": "Geometric Autoencoders--What You See is What You Decode",
+    "norm_title": "geometric autoencoders what you see is what you decode",
+    "year": 2023
+  },
+  {
+    "title": "Visualizing hierarchies in scRNA-seq data using a density tree-biased autoencoder",
+    "norm_title": "visualizing hierarchies in scrna seq data using a density tree biased autoencoder",
+    "year": 2022
+  },
+  {
+    "title": "Persistent homology for high-dimensional data based on spectral methods",
+    "norm_title": "persistent homology for high dimensional data based on spectral methods",
+    "year": 2023
+  },
+  {
+    "title": "The algebraic path problem for graph metrics",
+    "norm_title": "the algebraic path problem for graph metrics",
+    "year": 2022
+  },
+  {
+    "title": "Probabilistic Watershed: Sampling all spanning forests for seeded segmentation and semi-supervised learning",
+    "norm_title": "probabilistic watershed sampling all spanning forests for seeded segmentation and semi supervised learning",
+    "year": 2019
+  },
+  {
+    "title": "A model of parallel currencies under free floating exchange rates",
+    "norm_title": "a model of parallel currencies under free floating exchange rates",
+    "year": 2020
+  },
+  {
+    "title": "Visualizing single-cell data with the neighbor embedding spectrum",
+    "norm_title": "visualizing single cell data with the neighbor embedding spectrum",
+    "year": 2024
+  },
+  {
+    "title": "Deep learning image analysis for continuous single-cell imaging of dynamic processes in Plasmodium falciparum-infected erythrocytes",
+    "norm_title": "deep learning image analysis for continuous single cell imaging of dynamic processes in plasmodium falciparum infected erythrocytes",
+    "year": 2025
+  },
+  {
+    "title": "On the Importance of Embedding Norms in Self-Supervised Learning",
+    "norm_title": "on the importance of embedding norms in self supervised learning",
+    "year": 2025
+  },
+  {
+    "title": "Directed probabilistic watershed",
+    "norm_title": "directed probabilistic watershed",
+    "year": 2021
+  },
+  {
+    "title": "Node Embeddings via Neighbor Embeddings",
+    "norm_title": "node embeddings via neighbor embeddings",
+    "year": 2025
+  },
+  {
+    "title": "Parallel Currencies under Free Floating Exchange Rates: A Model Setting Out the Conditions for Stable Currency Competition",
+    "norm_title": "parallel currencies under free floating exchange rates a model setting out the conditions for stable currency competition",
+    "year": 2024
+  },
+  {
+    "title": "Low-Dimensional Embeddings of High-Dimensional Data: Algorithms and Applications (Dagstuhl Seminar 24122)",
+    "norm_title": "low dimensional embeddings of high dimensional data algorithms and applications dagstuhl seminar 24122",
+    "year": 2024
+  },
+  {
+    "title": "Low-dimensional embeddings of high-dimensional data",
+    "norm_title": "low dimensional embeddings of high dimensional data",
+    "year": 2025
+  },
+  {
+    "title": "DREAMS: Preserving both Local and Global Structure in Dimensionality Reduction",
+    "norm_title": "dreams preserving both local and global structure in dimensionality reduction",
+    "year": 2025
+  },
+  {
+    "title": "TRACE: Contrastive learning for multi-trial time-series data in neuroscience",
+    "norm_title": "trace contrastive learning for multi trial time series data in neuroscience",
+    "year": 2025
+  },
+  {
+    "title": "Discovering structure without labels",
+    "norm_title": "discovering structure without labels",
+    "year": 2023
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "title": "A Hybrid Fully Convolutional CNN-Transformer Model for Inherently Interpretable Medical Image Classification",
+    "norm_title": "a hybrid fully convolutional cnn transformer model for inherently interpretable medical image classification",
+    "year": 2025
+  },
+  {
+    "title": "Towards the Localisation of Lesions in Diabetic Retinopathy",
+    "norm_title": "towards the localisation of lesions in diabetic retinopathy",
+    "year": 2021
+  },
+  {
+    "title": "Prototype-Guided and Lightweight Adapters for Inherent Interpretation and Generalisation in Federated Learning",
+    "norm_title": "prototype guided and lightweight adapters for inherent interpretation and generalisation in federated learning",
+    "year": 2025
+  },
+  {
+    "title": "Clinically Interpretable Deep Learning via Sparse BagNets for Epiretinal Membrane and Related Pathology Detection",
+    "norm_title": "clinically interpretable deep learning via sparse bagnets for epiretinal membrane and related pathology detection",
+    "year": 2025
+  },
+  {
+    "title": "Transcriptomic proﬁle based cancer disease prediction and patient survival time differentiation",
+    "norm_title": "transcriptomic proﬁle based cancer disease prediction and patient survival time differentiation",
+    "year": 2018
+  },
+  {
+    "title": "Investigating Relationship Between Expressed Cancer Related Genes and Patient Survival",
+    "norm_title": "investigating relationship between expressed cancer related genes and patient survival",
+    "year": 2017
+  },
+  {
+    "title": "Learning to Pay Multiple Attention with Fully Convolutional Transformers",
+    "norm_title": "learning to pay multiple attention with fully convolutional transformers",
+    "year": null
+  }
+]

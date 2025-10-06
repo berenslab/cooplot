@@ -7,8 +7,7 @@ Analysis of co-operation between members and subgroups.
 ## Installation
 
 ```bash
-source .venv/bin/activate
-uv pip install ".[dev]"
+uv pip install -e ".[dev]"
 ```
 
 ## Usage

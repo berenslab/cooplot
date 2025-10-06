@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -108,7 +109,6 @@ def cross_group_publications(
     include_missing_year: bool = False,
     include_unlabeled: bool = False,
     min_group_count: int = 2,
-    save_json: bool = False,
     out_path: str | Path | None = None,
     ensure_ascii: bool = False,
 ) -> List[dict]:
@@ -131,12 +131,11 @@ def cross_group_publications(
         the cross-group computation.
     min_group_count
         Minimum distinct groups required for a record to be returned.
-    save_json
-        When ``True`` the resulting list is serialized to ``out_path`` as JSON.
     out_path
-        Destination file for the JSON export. Required when ``save_json`` is ``True``.
+        Optional destination file. When provided, the extension determines the
+        export format (``.json`` or ``.csv``).
     ensure_ascii
-        Controls :func:`json.dumps(ensure_ascii=...)` when exporting.
+        Controls :func:`json.dumps(ensure_ascii=...)` when exporting to JSON.
 
     Returns
     -------
@@ -220,14 +219,40 @@ def cross_group_publications(
         )
 
     results.sort(key=_publication_sort_key)
-    if save_json:
-        if out_path is None:
-            raise ValueError("out_path is required when save_json=True")
-        out_file = Path(out_path)
-        out_file.parent.mkdir(parents=True, exist_ok=True)
+    if out_path is None:
+        return results
+
+    out_file = Path(out_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+    suffix = out_file.suffix.lower()
+
+    if suffix == ".json":
         out_file.write_text(
             json.dumps(results, ensure_ascii=ensure_ascii, indent=2),
             encoding="utf-8",
+        )
+    elif suffix == ".csv":
+        fieldnames = ["title", "norm_title", "year", "groups", "authors"]
+        with out_file.open("w", newline="", encoding="utf-8") as fh:
+            writer = csv.DictWriter(fh, fieldnames=fieldnames)
+            writer.writeheader()
+            for record in results:
+                writer.writerow(
+                    {
+                        "title": record["title"],
+                        "norm_title": record["norm_title"],
+                        "year": "" if record["year"] is None else record["year"],
+                        "groups": ";".join(record["groups"]),
+                        "authors": json.dumps(
+                            record["authors"],
+                            ensure_ascii=ensure_ascii,
+                            separators=(",", ":"),
+                        ),
+                    }
+                )
+    else:
+        raise ValueError(
+            f"Unsupported export format for {out_file}. Expected .json or .csv",
         )
     return results
 

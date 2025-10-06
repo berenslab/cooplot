@@ -190,7 +190,7 @@ def test_build_with_author_publications_wrapper(sample_publications, sample_peop
     assert matrix[0][1] == 1
 
 
-def test_cross_group_publications_save_json(tmp_path, sample_publications, sample_people):
+def test_cross_group_publications_export(tmp_path, sample_publications, sample_people):
     grouped = aggregate_publications(
         sample_publications,
         sample_people,
@@ -203,11 +203,19 @@ def test_cross_group_publications_save_json(tmp_path, sample_publications, sampl
     out_file = tmp_path / "cross.json"
     records = cross_group_publications(
         grouped,
-        save_json=True,
         out_path=out_file,
     )
     assert out_file.exists()
     assert records == cross_group_publications(grouped)
+
+    out_csv = tmp_path / "cross.csv"
+    cross_group_publications(grouped, out_path=out_csv)
+    assert out_csv.exists()
+    with out_csv.open() as fh:
+        header = fh.readline().strip()
+        assert header == "title,norm_title,year,groups,authors"
+        rows = [line.strip() for line in fh if line.strip()]
+        assert len(rows) == len(records)
 
 
 

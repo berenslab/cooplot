@@ -1,6 +1,6 @@
 # cooplot
 
-Analysis of co-operation between members and subgroups.
+Analysis of co-op between members and subgroups.
 
 ![](.github/berens.png)
 

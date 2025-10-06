@@ -1,9 +1,11 @@
 import json
+
 import pytest
 
 from cooplot import api
 from cooplot.aggregate import aggregate_publications
 from cooplot.metrics import cross_group_publications
+from cooplot.scrape import Publications
 
 
 @pytest.fixture
@@ -35,7 +37,9 @@ def sample_publications():
     }
 
 
-def test_aggregate_publications_deduplicates(tmp_path, sample_publications, sample_people):
+def test_aggregate_publications_deduplicates(
+    tmp_path, sample_publications, sample_people
+):
     grouped = aggregate_publications(
         sample_publications,
         sample_people,
@@ -50,7 +54,9 @@ def test_aggregate_publications_deduplicates(tmp_path, sample_publications, samp
     group_one_records = grouped.by_group["Group 1"]
     titles = {record["title"] for record in group_one_records}
     assert titles == {"Deep Learning", "Shared Paper"}
-    shared_record = next(record for record in group_one_records if record["title"] == "Shared Paper")
+    shared_record = next(
+        record for record in group_one_records if record["title"] == "Shared Paper"
+    )
     assert shared_record["authors"] == ["Alice Alpha", "Bob Beta"]
 
     # JSON files are written using slugified group names
@@ -109,7 +115,6 @@ def test_build_from_grouped_data(sample_publications, sample_people):
     assert matrix[0][0] == 0
 
 
-
 def test_cross_group_publications_year_resolution(tmp_path):
     people = [
         {"name": "Author Missing", "team": "Group 1"},
@@ -119,16 +124,32 @@ def test_cross_group_publications_year_resolution(tmp_path):
     ]
     publications = {
         "Author Missing": [
-            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": None}
+            {
+                "title": "Advanced Search Search",
+                "norm_title": "advanced search search",
+                "year": None,
+            }
         ],
         "Author Early": [
-            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": 2020}
+            {
+                "title": "Advanced Search Search",
+                "norm_title": "advanced search search",
+                "year": 2020,
+            }
         ],
         "Author Frequent A": [
-            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": 2021}
+            {
+                "title": "Advanced Search Search",
+                "norm_title": "advanced search search",
+                "year": 2021,
+            }
         ],
         "Author Frequent B": [
-            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": 2021}
+            {
+                "title": "Advanced Search Search",
+                "norm_title": "advanced search search",
+                "year": 2021,
+            }
         ],
     }
 
@@ -154,3 +175,16 @@ def test_cross_group_publications_year_resolution(tmp_path):
     ]
     expected_authors.sort(key=lambda name: name.split()[-1].lower())
     assert record["authors"]["Group 2"] == expected_authors
+
+
+def test_build_with_author_publications_wrapper(sample_publications, sample_people):
+    author_data = Publications.from_data(
+        sample_publications,
+        sample_people,
+        group_col="team",
+    )
+    mats = api.build(author_data, ["2019-2020"])
+    window = mats["2019-2020"]
+    assert window["label_to_group"]["Alice Alpha"] == "Group 1"
+    matrix = window["matrix"]
+    assert matrix[0][1] == 1

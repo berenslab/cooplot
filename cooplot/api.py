@@ -8,14 +8,12 @@ from .aggregate import GroupedPublications, aggregate_publications
 from .build import build_matrices
 from .io import read_rows_with_header
 from .metrics import (
-    cross_group_publications as metrics_cross_group_publications,
+    cross_group_publications,
 )
-from .metrics import (
-    cross_group_publications_by_window,
-)
-from .scrape import scrape_all
+from .scrape import Publications, scrape_all
 from .viz import plot_panels
 
+PublicationInput = Publications | Dict[str, List[dict]]
 GroupedInput = GroupedPublications | Dict[str, List[dict]]
 
 
@@ -33,7 +31,8 @@ def scrape(
     cache_dir=".cache/cooplot",
     drop_subtitle=False,
     fallback_semantic_if_empty=False,
-) -> Dict[str, List[dict]]:
+    group_col: str | None = None,
+) -> Publications:
     return scrape_all(
         csv_rows,
         name_col=name_col,
@@ -42,12 +41,30 @@ def scrape(
         cache_dir=cache_dir,
         drop_subtitle=drop_subtitle,
         fallback_semantic_if_empty=fallback_semantic_if_empty,
+        group_col=group_col,
+    )
+
+
+def publications_from_data(
+    publications_by_author: Dict[str, List[dict]] | Iterable[tuple[str, List[dict]]],
+    people: Iterable[dict],
+    *,
+    name_col: str = "name",
+    group_col: str | None = None,
+) -> Publications:
+    """Wrap raw author publications with their metadata for downstream use."""
+
+    return Publications.from_data(
+        publications_by_author,
+        people,
+        name_col=name_col,
+        group_col=group_col,
     )
 
 
 def aggregate(
-    publications_by_author: Dict[str, List[dict]],
-    people: Iterable[dict],
+    publications: PublicationInput,
+    people: Iterable[dict] | None = None,
     *,
     name_col: str = "name",
     group_col: str = "group",
@@ -58,8 +75,21 @@ def aggregate(
 ) -> GroupedPublications:
     """Group and deduplicate publications at the group level."""
 
+    if isinstance(publications, Publications):
+        pub_data = publications
+        if people is None:
+            people = pub_data.people_rows()
+        publications = pub_data.mapping()
+        if name_col == "name":
+            name_col = pub_data.resolve_name_column(name_col)
+        resolved_group = pub_data.resolve_group_column(group_col)
+        if resolved_group is not None:
+            group_col = resolved_group
+    if people is None:
+        raise ValueError("people list is required when aggregating publications")
+
     return aggregate_publications(
-        publications_by_author,
+        publications,
         people,
         name_col=name_col,
         group_col=group_col,
@@ -71,7 +101,7 @@ def aggregate(
 
 
 def build(
-    pubs: Dict[str, List[dict]] | GroupedPublications,
+    pubs: PublicationInput | GroupedPublications,
     windows: List[str],
     *,
     people: List[dict] | None = None,
@@ -80,11 +110,21 @@ def build(
 ):
     """Build co-authorship matrices from author or group level data.
 
-    When ``pubs`` is a :class:`GroupedPublications` the ``people`` list can be
-    omitted. Otherwise supply the author records so groups can be resolved
-    alongside the raw publications.
+    When ``pubs`` is a :class:`Publications` or :class:`GroupedPublications`
+    instance the people metadata is already bundled and does not need to be passed
+    explicitly. Supplying bare mappings still requires the corresponding people
+    list so group assignments can be resolved.
     """
 
+    if isinstance(pubs, Publications):
+        pub_data = pubs
+        if people is None:
+            people = pub_data.people_rows()
+        pubs = pub_data.mapping()
+        if name_col == "name":
+            name_col = pub_data.resolve_name_column(name_col)
+        if group_col is None:
+            group_col = pub_data.resolve_group_column(group_col)
     if isinstance(pubs, GroupedPublications):
         grouped = pubs
         if people is None:
@@ -133,117 +173,3 @@ def show(
         heatmap_counts=heatmap_counts,
         figsize=figsize,
     )
-
-
-def run_inline(
-    csv_path: str | Path,
-    *,
-    windows: List[str],
-    delimiter: str = ";",
-    name_col="name",
-    scholar_col="scholar_id",
-    semantic_col="semantic_id",
-    group_col: str | None = None,
-    style: str = "circle",
-    drop_subtitle: bool = False,
-    fallback_semantic_if_empty: bool = False,
-    cache_dir: str | Path = ".cache/cooplot",
-    heatmap_counts: bool = False,
-):
-    header, people = load_csv(csv_path, delimiter=delimiter)
-    pubs = scrape(
-        people,
-        name_col=name_col,
-        scholar_col=scholar_col,
-        semantic_col=semantic_col,
-        cache_dir=cache_dir,
-        drop_subtitle=drop_subtitle,
-        fallback_semantic_if_empty=fallback_semantic_if_empty,
-    )
-    mats = build(
-        pubs,
-        windows,
-        people=people,
-        name_col=name_col,
-        group_col=group_col,
-    )
-    return show(
-        mats,
-        group_col=group_col,
-        style=style,
-        heatmap_counts=heatmap_counts,
-    )
-
-
-def cross_group_coauthored(
-    pubs_by_author: Dict[str, List[dict]],
-    people: List[dict],
-    windows: List[str],
-    *,
-    name_col: str = "name",
-    group_col: str | None = None,
-):
-    """Return per-window metadata about titles with authors from multiple groups."""
-
-    return cross_group_publications_by_window(
-        pubs_by_author,
-        people,
-        windows,
-        name_col=name_col,
-        group_col=group_col,
-    )
-
-
-def cross_group_publications_grouped(
-    grouped: GroupedInput,
-    people: Optional[Iterable[dict]] = None,
-    *,
-    year_from: Optional[int] = None,
-    year_to: Optional[int] = None,
-    include_missing_year: bool = False,
-    include_unlabeled: bool = False,
-    min_group_count: int = 2,
-) -> List[dict]:
-    """Cross-group publication records based on grouped data."""
-
-    return metrics_cross_group_publications(
-        grouped,
-        people,
-        year_from=year_from,
-        year_to=year_to,
-        include_missing_year=include_missing_year,
-        include_unlabeled=include_unlabeled,
-        min_group_count=min_group_count,
-    )
-
-
-def cross_group_publications_summary(
-    grouped: GroupedInput,
-    people: Optional[Iterable[dict]] = None,
-    *,
-    year_from: Optional[int] = None,
-    year_to: Optional[int] = None,
-    include_missing_year: bool = False,
-    include_unlabeled: bool = False,
-    min_group_count: int = 2,
-) -> Dict[str, object]:
-    """Summarize cross-group publications with optional year filters."""
-
-    publications = cross_group_publications_grouped(
-        grouped,
-        people,
-        year_from=year_from,
-        year_to=year_to,
-        include_missing_year=include_missing_year,
-        include_unlabeled=include_unlabeled,
-        min_group_count=min_group_count,
-    )
-    summary: Dict[str, object] = {
-        "count": len(publications),
-        "publications": publications,
-    }
-    if year_from is not None:
-        summary["year_from"] = year_from
-    if year_to is not None:
-        summary["year_to"] = year_to
-    return summary

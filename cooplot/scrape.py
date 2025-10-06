@@ -5,11 +5,51 @@ import random
 import re
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import Dict, Iterable, List, Optional
 
 import requests
 from scholarly import scholarly
 from tqdm import tqdm
+
+@dataclass(frozen=True)
+class Publications:
+    """Container for author-level publication data."""
+
+    by_author: Dict[str, List[dict]]
+    people: List[dict]
+    name_col: str = "name"
+    group_col: Optional[str] = None
+
+    @classmethod
+    def from_data(
+        cls,
+        publications_by_author: Dict[str, List[dict]]
+        | Iterable[tuple[str, List[dict]]],
+        people: Iterable[dict],
+        *,
+        name_col: str = "name",
+        group_col: Optional[str] = None,
+    ) -> "Publications":
+        return cls(
+            by_author=dict(publications_by_author),
+            people=list(people),
+            name_col=name_col,
+            group_col=group_col,
+        )
+
+    def mapping(self) -> Dict[str, List[dict]]:
+        return self.by_author
+
+    def people_rows(self) -> List[dict]:
+        return self.people
+
+    def resolve_name_column(self, fallback: str = "name") -> str:
+        return self.name_col or fallback
+
+    def resolve_group_column(self, fallback: Optional[str] = None) -> Optional[str]:
+        return self.group_col if self.group_col is not None else fallback
+
 
 _RE_SPACES = re.compile(r"\s+")
 _RE_PUNCT = re.compile(r"[^\w\s]")
@@ -90,9 +130,11 @@ def scrape_all(
     cache_dir: str | Path = ".cache/cooplot",
     drop_subtitle: bool = False,
     fallback_semantic_if_empty: bool = False,
-) -> Dict[str, List[dict]]:
+    group_col: str | None = None,
+) -> Publications:
     """
-    Returns: { person_name: [ {title, norm_title, year}, ... ], ... }
+    Returns a :class:`Publications` instance containing the normalized
+    author-to-publication mapping.
     Strategy:
       - If Google Scholar ID present → use GS.
       - Else if Semantic ID present → use S2.
@@ -101,8 +143,9 @@ def scrape_all(
     cache = Path(cache_dir)
     cache.mkdir(parents=True, exist_ok=True)
     out: Dict[str, List[dict]] = {}
+    people_rows = list(people)
 
-    for p in tqdm(people, desc="Scraping"):
+    for p in tqdm(people_rows, desc="Scraping"):
         name = p[name_col]
         gs_id = p.get(scholar_col, "")
         s2_id = p.get(semantic_col, "")
@@ -141,4 +184,9 @@ def scrape_all(
         cache_file.write_text(json.dumps(normed, ensure_ascii=False, indent=2), encoding="utf-8")
         out[name] = normed
 
-    return out
+    return Publications(
+        by_author=out,
+        people=people_rows,
+        name_col=name_col,
+        group_col=group_col,
+    )

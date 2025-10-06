@@ -73,15 +73,16 @@ def build_matrices(
     *,
     name_col: str = "name",
     group_col: Optional[str] = None,
-    aggregate_groups: bool = False,
 ) -> Dict[str, dict]:
+    """Return co-authorship matrices for each window using author-level data.
+
+    The result is ``{window: {"labels": [...], "matrix": [[...]]}}`` with
+    labels ordered by alphabetical last name. When ``group_col`` is provided the
+    output also includes a ``label_to_group`` mapping so callers can color the
+    visualization by group.
     """
-    Returns {window: {"labels": [...], "matrix": [[...],[...],...]}}
-    Ordering is stable alphabetical by last name.
-    """
+
     labels, group_map = _prepare_labels_and_groups(people, name_col, group_col)
-    if aggregate_groups and not group_map:
-        raise ValueError("aggregate_groups=True requires a valid group_col with values.")
     mats: Dict[str, dict] = {}
 
     title_sets_by_window = _titles_for_windows(publications_by_author, labels, windows)
@@ -96,102 +97,13 @@ def build_matrices(
                 tj = title_sets[labels[j]]
                 M[i, j] = M[j, i] = len(ti & tj)
         np.fill_diagonal(M, 0)
-        if aggregate_groups:
-            group_labels: List[str] = []
-            group_title_sets: Dict[str, set[str]] = {}
-            for label in labels:
-                group_label = group_map.get(label, "Unlabeled")
-                if group_label not in group_labels:
-                    group_labels.append(group_label)
-                titles = group_title_sets.setdefault(group_label, set())
-                titles.update(title_sets[label])
-            g_count = len(group_labels)
-            G = np.zeros((g_count, g_count), dtype=int)
-            for idx_i, group_i in enumerate(group_labels):
-                titles_i = group_title_sets.get(group_i, set())
-                for idx_j in range(idx_i + 1, g_count):
-                    group_j = group_labels[idx_j]
-                    titles_j = group_title_sets.get(group_j, set())
-                    overlap = len(titles_i & titles_j)
-                    if overlap <= 0:
-                        continue
-                    G[idx_i, idx_j] = G[idx_j, idx_i] = overlap
-            mats[win] = {
-                "labels": group_labels,
-                "matrix": G.tolist(),
-                "label_to_group": {g: g for g in group_labels},
+
+        entry = {"labels": labels, "matrix": M.tolist()}
+        if group_col:
+            entry["label_to_group"] = {
+                label: group_map.get(label, "Unlabeled") for label in labels
             }
-        else:
-            entry = {"labels": labels, "matrix": M.tolist()}
-            if group_col:
-                entry["label_to_group"] = {
-                    label: group_map.get(label, "Unlabeled") for label in labels
-                }
-            mats[win] = entry
+        mats[win] = entry
+
     return mats
 
-
-def cross_group_publications(
-    publications_by_author: Dict[str, List[dict]],
-    people: List[dict],
-    windows: List[str],
-    *,
-    name_col: str = "name",
-    group_col: Optional[str] = None,
-) -> Dict[str, List[dict]]:
-    """Return window-indexed records of titles authored by multiple groups.
-
-    The returned dict is structured as ``{window: [{"title": ..., "groups": [...],
-    "authors": {group: [...]}}]}``. The authors and groups entries are
-    alphabetically sorted so downstream JSON serialization is stable.
-    """
-
-    labels, group_map = _prepare_labels_and_groups(people, name_col, group_col)
-    if not group_map:
-        return {win: [] for win in windows}
-
-    title_sets_by_window = _titles_for_windows(publications_by_author, labels, windows)
-    results: Dict[str, List[dict]] = {}
-
-    for win in windows:
-        title_sets = title_sets_by_window[win]
-        cross_titles: Dict[str, dict] = {}
-        for label in labels:
-            titles = title_sets[label]
-            if not titles:
-                continue
-            group_label = group_map.get(label, "Unlabeled")
-            for title in titles:
-                entry = cross_titles.setdefault(
-                    title,
-                    {
-                        "title": title,
-                        "groups": set(),
-                        "authors": {},
-                    },
-                )
-                entry["groups"].add(group_label)
-                authors_for_group = entry["authors"].setdefault(group_label, set())
-                authors_for_group.add(label)
-
-        formatted: List[dict] = []
-        for entry in cross_titles.values():
-            groups = entry["groups"]
-            if len(groups) < 2:
-                continue
-            sorted_groups = sorted(groups, key=str.lower)
-            formatted.append(
-                {
-                    "title": entry["title"],
-                    "groups": sorted_groups,
-                    "authors": {
-                        g: sorted(entry["authors"].get(g, set()), key=_lastname)
-                        for g in sorted_groups
-                    },
-                }
-            )
-
-        formatted.sort(key=lambda rec: rec["title"].lower())
-        results[win] = formatted
-
-    return results

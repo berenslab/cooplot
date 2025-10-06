@@ -1,0 +1,156 @@
+import json
+import pytest
+
+from cooplot import api
+from cooplot.aggregate import aggregate_publications
+from cooplot.metrics import cross_group_publications
+
+
+@pytest.fixture
+def sample_people():
+    return [
+        {"name": "Alice Alpha", "team": "Group 1"},
+        {"name": "Bob Beta", "team": "Group 1"},
+        {"name": "Cara Gamma", "team": "Group 2"},
+    ]
+
+
+@pytest.fixture
+def sample_publications():
+    return {
+        "Alice Alpha": [
+            {"title": "Deep Learning", "norm_title": "deep learning", "year": 2021},
+            {"title": "Shared Paper", "norm_title": "shared paper", "year": 2020},
+        ],
+        "Bob Beta": [
+            {"title": "Shared Paper", "norm_title": "shared paper", "year": 2020},
+        ],
+        "Cara Gamma": [
+            {"title": "Shared Paper", "norm_title": "shared paper", "year": 2020},
+        ],
+        # Dana is missing from people to exercise the unlabeled bucket
+        "Dana Delta": [
+            {"title": "Shared Paper", "norm_title": "shared paper", "year": 2020},
+        ],
+    }
+
+
+def test_aggregate_publications_deduplicates(tmp_path, sample_publications, sample_people):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+    )
+
+    assert set(grouped.by_group.keys()) == {"Group 1", "Group 2", "Unlabeled"}
+
+    group_one_records = grouped.by_group["Group 1"]
+    titles = {record["title"] for record in group_one_records}
+    assert titles == {"Deep Learning", "Shared Paper"}
+    shared_record = next(record for record in group_one_records if record["title"] == "Shared Paper")
+    assert shared_record["authors"] == ["Alice Alpha", "Bob Beta"]
+
+    # JSON files are written using slugified group names
+    expected_path = tmp_path / "Group_1.json"
+    assert expected_path.exists()
+    saved_data = json.loads(expected_path.read_text(encoding="utf-8"))
+    assert len(saved_data) == len(group_one_records)
+
+    unlabeled_path = grouped.paths["Unlabeled"]
+    assert unlabeled_path == tmp_path / "Unlabeled.json"
+
+
+def test_cross_group_publications_filters(tmp_path, sample_publications, sample_people):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    records = cross_group_publications(grouped)
+    assert len(records) == 1
+    record = records[0]
+    assert record["groups"] == ["Group 1", "Group 2"]
+
+    records_with_unlabeled = cross_group_publications(grouped, include_unlabeled=True)
+    assert records_with_unlabeled[0]["groups"] == ["Group 1", "Group 2", "Unlabeled"]
+
+    filtered_out = cross_group_publications(grouped, year_from=2021)
+    assert filtered_out == []
+
+    filtered_in = cross_group_publications(grouped, year_from=2019, year_to=2020)
+    assert len(filtered_in) == 1
+
+
+def test_build_from_grouped_data(sample_publications, sample_people):
+    grouped = api.aggregate(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        save_json=False,
+    )
+
+    mats = api.build(
+        grouped,
+        ["2019-2020"],
+    )
+    window = mats["2019-2020"]
+    assert window["labels"] == ["Group 1", "Group 2", "Unlabeled"]
+    matrix = window["matrix"]
+    assert matrix[0][1] == 1  # Group 1 vs Group 2 share "Shared Paper"
+    assert matrix[0][0] == 0
+
+
+
+def test_cross_group_publications_year_resolution(tmp_path):
+    people = [
+        {"name": "Author Missing", "team": "Group 1"},
+        {"name": "Author Early", "team": "Group 2"},
+        {"name": "Author Frequent A", "team": "Group 2"},
+        {"name": "Author Frequent B", "team": "Group 2"},
+    ]
+    publications = {
+        "Author Missing": [
+            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": None}
+        ],
+        "Author Early": [
+            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": 2020}
+        ],
+        "Author Frequent A": [
+            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": 2021}
+        ],
+        "Author Frequent B": [
+            {"title": "Advanced Search Search", "norm_title": "advanced search search", "year": 2021}
+        ],
+    }
+
+    grouped = aggregate_publications(
+        publications,
+        people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    records = cross_group_publications(grouped)
+    assert len(records) == 1
+    record = records[0]
+    assert record["year"] == 2021
+    assert record["groups"] == ["Group 1", "Group 2"]
+    expected_authors = [
+        "Author Early",
+        "Author Frequent A",
+        "Author Frequent B",
+    ]
+    expected_authors.sort(key=lambda name: name.split()[-1].lower())
+    assert record["authors"]["Group 2"] == expected_authors

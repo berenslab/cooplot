@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Tuple
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 from .aggregate import GroupedPublications
 from .build import _prepare_labels_and_groups, _titles_for_windows
@@ -35,7 +37,6 @@ class CrossGroupSummary:
     @property
     def count(self) -> int:
         return len(self.publications)
-
 
 
 def cross_group_publications_by_window(
@@ -98,6 +99,7 @@ def cross_group_publications_by_window(
 
     return results
 
+
 def cross_group_publications(
     grouped_publications: GroupedPublications | Dict[str, List[dict]],
     *,
@@ -106,6 +108,9 @@ def cross_group_publications(
     include_missing_year: bool = False,
     include_unlabeled: bool = False,
     min_group_count: int = 2,
+    save_json: bool = False,
+    out_path: str | Path | None = None,
+    ensure_ascii: bool = False,
 ) -> List[dict]:
     """Identify publications that include authors from multiple groups.
 
@@ -126,6 +131,12 @@ def cross_group_publications(
         the cross-group computation.
     min_group_count
         Minimum distinct groups required for a record to be returned.
+    save_json
+        When ``True`` the resulting list is serialized to ``out_path`` as JSON.
+    out_path
+        Destination file for the JSON export. Required when ``save_json`` is ``True``.
+    ensure_ascii
+        Controls :func:`json.dumps(ensure_ascii=...)` when exporting.
 
     Returns
     -------
@@ -153,7 +164,9 @@ def cross_group_publications(
                     continue
                 year_key: Optional[int] = year
             else:
-                if (year_from is not None or year_to is not None) and not include_missing_year:
+                if (
+                    year_from is not None or year_to is not None
+                ) and not include_missing_year:
                     continue
                 year_key = None
 
@@ -183,7 +196,9 @@ def cross_group_publications(
         counts = entry.pop("year_counts")
         chosen_year: Optional[int] = None
         if counts:
-            int_counts = [(year, freq) for year, freq in counts.items() if isinstance(year, int)]
+            int_counts = [
+                (year, freq) for year, freq in counts.items() if isinstance(year, int)
+            ]
             if int_counts:
                 int_counts.sort(key=lambda item: (-item[1], -item[0]))
                 chosen_year = int_counts[0][0]
@@ -205,6 +220,15 @@ def cross_group_publications(
         )
 
     results.sort(key=_publication_sort_key)
+    if save_json:
+        if out_path is None:
+            raise ValueError("out_path is required when save_json=True")
+        out_file = Path(out_path)
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+        out_file.write_text(
+            json.dumps(results, ensure_ascii=ensure_ascii, indent=2),
+            encoding="utf-8",
+        )
     return results
 
 

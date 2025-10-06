@@ -4,13 +4,14 @@ import json
 import random
 import re
 import time
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
 import requests
 from scholarly import scholarly
 from tqdm import tqdm
+
 
 @dataclass(frozen=True)
 class Publications:
@@ -79,7 +80,9 @@ def _is_blank(s: Optional[str]) -> bool:
     return s in {"", "none", "nan", "na", "n/a", "null"}
 
 
-def _fetch_google_scholar_pubs(scholar_id: str, *, sleep_range=(1.0, 2.5)) -> List[dict]:
+def _fetch_google_scholar_pubs(
+    scholar_id: str, *, sleep_range=(1.0, 2.5)
+) -> List[dict]:
     for attempt in range(5):
         try:
             author = scholarly.search_author_id(scholar_id)
@@ -164,7 +167,10 @@ def scrape_all(
             used_source = "gs"
 
         if (used_source is None and not _is_blank(s2_id)) or (
-            fallback_semantic_if_empty and used_source == "gs" and len(pubs) == 0 and not _is_blank(s2_id)
+            fallback_semantic_if_empty
+            and used_source == "gs"
+            and len(pubs) == 0
+            and not _is_blank(s2_id)
         ):
             pubs = _fetch_semantic_scholar_pubs(s2_id)
             used_source = "s2"
@@ -181,7 +187,9 @@ def scrape_all(
                 seen.add(key)
                 normed.append({"title": raw, "norm_title": nt, "year": year})
 
-        cache_file.write_text(json.dumps(normed, ensure_ascii=False, indent=2), encoding="utf-8")
+        cache_file.write_text(
+            json.dumps(normed, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         out[name] = normed
 
     return Publications(

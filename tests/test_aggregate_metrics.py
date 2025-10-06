@@ -188,3 +188,24 @@ def test_build_with_author_publications_wrapper(sample_publications, sample_peop
     assert window["label_to_group"]["Alice Alpha"] == "Group 1"
     matrix = window["matrix"]
     assert matrix[0][1] == 1
+
+
+def test_cross_group_publications_save_json(tmp_path, sample_publications, sample_people):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+    out_file = tmp_path / "cross.json"
+    records = cross_group_publications(
+        grouped,
+        save_json=True,
+        out_path=out_file,
+    )
+    assert out_file.exists()
+    assert records == cross_group_publications(grouped)
+

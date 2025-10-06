@@ -308,7 +308,6 @@ def plot_panels(
             ]
             fig.legend(
                 handles=handles,
-                title=group_col_for_plot,
                 loc="lower center",
                 ncol=min(len(handles), 6),
                 frameon=False,

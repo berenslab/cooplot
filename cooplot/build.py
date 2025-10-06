@@ -106,4 +106,3 @@ def build_matrices(
         mats[win] = entry
 
     return mats
-

@@ -2,14 +2,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List
 
 from .aggregate import GroupedPublications, aggregate_publications
 from .build import build_matrices
 from .io import read_rows_with_header
-from .metrics import (
-    cross_group_publications,
-)
+from .metrics import cross_group_publications
 from .scrape import Publications, scrape_all
 from .viz import plot_panels
 

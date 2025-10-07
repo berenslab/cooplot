@@ -352,6 +352,44 @@ def test_cross_group_publications_env_defaults(
     assert records[0]["pubmed_journal"] == "Env Journal"
 
 
+def test_cross_group_publications_norm_title_fallback(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    calls: list[str] = []
+
+    class FallbackLookup:
+        def __init__(self, *, api_key, email, min_delay, session=None):
+            pass
+
+        def identifiers_for_title(self, title, year):
+            calls.append(title)
+            if title == "shared paper":
+                return _PubMedDetails(
+                    pubmed_id="PMLOWER",
+                    doi="DOILOWER",
+                    authors=None,
+                    journal=None,
+                )
+            return None
+
+    monkeypatch.setattr("cooplot.metrics._PubMedLookup", FallbackLookup)
+
+    records = cross_group_publications(grouped, enrich_pubmed=True)
+    assert records[0]["pubmed_id"] == "PMLOWER"
+    assert "Shared Paper" in calls
+    assert "shared paper" in calls
+
+
 def test_grouped_publications_exclude_groups(tmp_path, sample_publications, sample_people):
     grouped = aggregate_publications(
         sample_publications,

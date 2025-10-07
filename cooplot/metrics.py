@@ -276,8 +276,24 @@ def cross_group_publications(
             key = (record["norm_title"], record["year"])
             details = cache.get(key)
             if details is None:
-                title = record.get("title") or record.get("norm_title")
-                details = lookup.identifiers_for_title(title, record.get("year"))
+                year_value = record.get("year")
+                titles_to_try: List[str] = []
+                title_value = record.get("title")
+                if isinstance(title_value, str) and title_value.strip():
+                    titles_to_try.append(title_value.strip())
+                norm_value = record.get("norm_title")
+                if (
+                    isinstance(norm_value, str)
+                    and norm_value.strip()
+                    and norm_value.strip() not in {t.strip() for t in titles_to_try}
+                ):
+                    titles_to_try.append(norm_value.strip())
+
+                for candidate in titles_to_try:
+                    details = lookup.identifiers_for_title(candidate, year_value)
+                    if details is not None:
+                        break
+
                 if details is None:
                     details = empty_details
                 cache[key] = details
@@ -387,12 +403,25 @@ class _PubMedLookup:
         if not title:
             return None
         try:
-            pubmed_id = self._search_pubmed(title, year)
-            if not pubmed_id:
-                return None
-            return self._fetch_summary(pubmed_id)
+            attempts: List[Tuple[str, Optional[int]]] = []
+            attempts.append((title, year))
+            if year is not None:
+                attempts.append((title, None))
+            seen: set[Tuple[str, Optional[int]]] = set()
+            for attempt_title, attempt_year in attempts:
+                key = (attempt_title, attempt_year)
+                if key in seen:
+                    continue
+                seen.add(key)
+                pubmed_id = self._search_pubmed(attempt_title, attempt_year)
+                if not pubmed_id:
+                    continue
+                summary = self._fetch_summary(pubmed_id)
+                if summary is not None:
+                    return summary
         except Exception:
             return None
+        return None
 
     def _search_pubmed(self, title: str, year: Optional[int]) -> Optional[str]:
         term = f"{title}[Title]"

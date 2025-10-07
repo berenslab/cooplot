@@ -233,6 +233,94 @@ def test_publications_exclude_authors(sample_publications, sample_people):
     assert "Alice Alpha" in remaining_names
 
 
+def test_cross_group_publications_enrich_pubmed(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    calls = []
+
+    def fake_identifiers(self, title, year):
+        calls.append((title, year))
+        return ("PM12345", "10.1000/example")
+
+    monkeypatch.setattr(
+        "cooplot.metrics._PubMedLookup.identifiers_for_title",
+        fake_identifiers,
+    )
+
+    out_csv = tmp_path / "cross_enriched.csv"
+    records = cross_group_publications(
+        grouped,
+        enrich_pubmed=True,
+        out_path=out_csv,
+    )
+
+    assert calls == [("Shared Paper", 2020)]
+
+    assert records
+    record = records[0]
+    assert record["pubmed_id"] == "PM12345"
+    assert record["doi"] == "10.1000/example"
+
+    lines = out_csv.read_text(encoding="utf-8").splitlines()
+    assert lines[0] == "title,norm_title,year,groups,authors,pubmed_id,doi"
+    assert "PM12345" in lines[1]
+
+
+def test_cross_group_publications_env_defaults(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    project_dir = tmp_path / "env_project"
+    project_dir.mkdir()
+    env_text = "NCBI_API_KEY=ENV_KEY\nNCBI_EMAIL=env@example.com\n"
+    (project_dir / ".env").write_text(env_text, encoding="utf-8")
+
+    monkeypatch.delenv("NCBI_API_KEY", raising=False)
+    monkeypatch.delenv("NCBI_EMAIL", raising=False)
+    monkeypatch.chdir(project_dir)
+    monkeypatch.setattr("cooplot.metrics._DOTENV_LOADED", False)
+
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=project_dir / "cache",
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    captured = {}
+
+    class DummyLookup:
+        def __init__(self, *, api_key, email, min_delay, session=None):
+            captured["api_key"] = api_key
+            captured["email"] = email
+
+        def identifiers_for_title(self, title, year):
+            captured["title"] = title
+            captured["year"] = year
+            return ("PMENV", "DOIENV")
+
+    monkeypatch.setattr("cooplot.metrics._PubMedLookup", DummyLookup)
+
+    records = cross_group_publications(grouped, enrich_pubmed=True)
+
+    assert captured["api_key"] == "ENV_KEY"
+    assert captured["email"] == "env@example.com"
+    assert records[0]["pubmed_id"] == "PMENV"
+    assert records[0]["doi"] == "DOIENV"
+
+
 def test_grouped_publications_exclude_groups(tmp_path, sample_publications, sample_people):
     grouped = aggregate_publications(
         sample_publications,

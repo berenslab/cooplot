@@ -2,14 +2,25 @@ from __future__ import annotations
 
 import csv
 import json
+import os
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+import requests
+
+try:  # pragma: no cover - optional dependency should already be installed
+    from dotenv import load_dotenv
+except Exception:  # pragma: no cover
+    load_dotenv = None
 
 from .aggregate import GroupedPublications
 from .build import _prepare_labels_and_groups, _titles_for_windows
 
 _UNLABELED = "Unlabeled"
+
+_DOTENV_LOADED = False
 
 
 def _ensure_group_mapping(
@@ -111,6 +122,10 @@ def cross_group_publications(
     min_group_count: int = 2,
     out_path: str | Path | None = None,
     ensure_ascii: bool = False,
+    enrich_pubmed: bool = False,
+    ncbi_api_key: str | None = None,
+    ncbi_email: str | None = None,
+    ncbi_min_delay: Optional[float] = None,
 ) -> List[dict]:
     """Identify publications that include authors from multiple groups.
 
@@ -136,12 +151,29 @@ def cross_group_publications(
         export format (``.json`` or ``.csv``).
     ensure_ascii
         Controls :func:`json.dumps(ensure_ascii=...)` when exporting to JSON.
+    enrich_pubmed
+        When ``True`` each record is augmented with ``pubmed_id`` and ``doi``
+        values fetched from the NCBI PubMed E-utilities API. Network errors are
+        ignored and represented as ``None`` values.
+    ncbi_api_key
+        Optional API key to include with NCBI requests. When ``None`` a value is
+        resolved from the ``NCBI_API_KEY`` environment variable, allowing usage
+        with ``.env`` files. When present the client respects the higher
+        throughput limits supported by the service.
+    ncbi_email
+        Optional contact email forwarded to the NCBI endpoints per their usage
+        guidelines. Falls back to the ``NCBI_EMAIL`` environment variable when
+        not provided.
+    ncbi_min_delay
+        Minimum delay between successive NCBI requests in seconds. Defaults to
+        ``0.34`` seconds without an API key or ``0.11`` seconds with a key.
 
     Returns
     -------
     List[dict]
         Each dict contains ``title``, ``norm_title``, ``year``, ``groups`` and an
-        ``authors`` mapping keyed by group name.
+        ``authors`` mapping keyed by group name. When ``enrich_pubmed`` is ``True``
+        the records also provide ``pubmed_id`` and ``doi`` keys.
     """
 
     grouped = _ensure_group_mapping(grouped_publications)
@@ -219,6 +251,30 @@ def cross_group_publications(
         )
 
     results.sort(key=_publication_sort_key)
+
+    if enrich_pubmed and results:
+        _ensure_env_loaded()
+        resolved_api_key = ncbi_api_key or os.getenv("NCBI_API_KEY")
+        resolved_email = ncbi_email or os.getenv("NCBI_EMAIL")
+        lookup = _PubMedLookup(
+            api_key=resolved_api_key,
+            email=resolved_email,
+            min_delay=ncbi_min_delay,
+        )
+        cache: Dict[Tuple[str, Optional[int]], Tuple[Optional[str], Optional[str]]] = {}
+        for record in results:
+            key = (record["norm_title"], record["year"])
+            if key in cache:
+                cached_pubmed_id, cached_doi = cache[key]
+                record["pubmed_id"] = cached_pubmed_id
+                record["doi"] = cached_doi
+                continue
+            title = record.get("title") or record.get("norm_title")
+            pubmed_id, doi = lookup.identifiers_for_title(title, record.get("year"))
+            record["pubmed_id"] = pubmed_id
+            record["doi"] = doi
+            cache[key] = (pubmed_id, doi)
+
     if out_path is None:
         return results
 
@@ -232,24 +288,28 @@ def cross_group_publications(
             encoding="utf-8",
         )
     elif suffix == ".csv":
-        fieldnames = ["title", "norm_title", "year", "groups", "authors"]
+        base_fields = ["title", "norm_title", "year", "groups", "authors"]
+        include_ids = bool(results and "pubmed_id" in results[0])
+        fieldnames = base_fields + (["pubmed_id", "doi"] if include_ids else [])
         with out_file.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.DictWriter(fh, fieldnames=fieldnames)
             writer.writeheader()
             for record in results:
-                writer.writerow(
-                    {
-                        "title": record["title"],
-                        "norm_title": record["norm_title"],
-                        "year": "" if record["year"] is None else record["year"],
-                        "groups": ";".join(record["groups"]),
-                        "authors": json.dumps(
-                            record["authors"],
-                            ensure_ascii=ensure_ascii,
-                            separators=(",", ":"),
-                        ),
-                    }
-                )
+                row = {
+                    "title": record["title"],
+                    "norm_title": record["norm_title"],
+                    "year": "" if record["year"] is None else record["year"],
+                    "groups": ";".join(record["groups"]),
+                    "authors": json.dumps(
+                        record["authors"],
+                        ensure_ascii=ensure_ascii,
+                        separators=(",", ":"),
+                    ),
+                }
+                if include_ids:
+                    row["pubmed_id"] = record.get("pubmed_id") or ""
+                    row["doi"] = record.get("doi") or ""
+                writer.writerow(row)
     else:
         raise ValueError(
             f"Unsupported export format for {out_file}. Expected .json or .csv",
@@ -268,3 +328,116 @@ def cross_group_summary(
         **kwargs,
     )
     return CrossGroupSummary(publications=publications)
+
+
+class _PubMedLookup:
+    """Lightweight PubMed helper that follows NCBI rate limits."""
+
+    _SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+    _SUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
+
+    def __init__(
+        self,
+        *,
+        api_key: str | None = None,
+        email: str | None = None,
+        min_delay: Optional[float] = None,
+        session: Optional[requests.Session] = None,
+    ) -> None:
+        self.api_key = api_key
+        self.email = email
+        default_delay = 0.11 if api_key else 0.34
+        self.min_delay = default_delay if min_delay is None else max(min_delay, 0.0)
+        self._last_request = 0.0
+        self._session = session or requests.Session()
+
+    def identifiers_for_title(
+        self,
+        title: Optional[str],
+        year: Optional[int],
+    ) -> Tuple[Optional[str], Optional[str]]:
+        if not title:
+            return None, None
+        try:
+            pubmed_id = self._search_pubmed(title, year)
+            if not pubmed_id:
+                return None, None
+            doi = self._fetch_doi(pubmed_id)
+            return pubmed_id, doi
+        except Exception:
+            return None, None
+
+    def _search_pubmed(self, title: str, year: Optional[int]) -> Optional[str]:
+        term = f"{title}[Title]"
+        params = {
+            "db": "pubmed",
+            "retmode": "json",
+            "retmax": "1",
+            "sort": "relevance",
+            "term": term,
+        }
+        if year is not None:
+            params["mindate"] = str(year)
+            params["maxdate"] = str(year)
+        data = self._request_json(self._SEARCH_URL, params)
+        idlist = data.get("esearchresult", {}).get("idlist", [])
+        return idlist[0] if idlist else None
+
+    def _fetch_doi(self, pubmed_id: str) -> Optional[str]:
+        params = {
+            "db": "pubmed",
+            "retmode": "json",
+            "id": pubmed_id,
+        }
+        data = self._request_json(self._SUMMARY_URL, params)
+        result = data.get("result", {})
+        record = result.get(pubmed_id)
+        if not isinstance(record, dict):
+            return None
+        article_ids = record.get("articleids", [])
+        if not isinstance(article_ids, list):
+            return None
+        for item in article_ids:
+            if not isinstance(item, dict):
+                continue
+            if item.get("idtype") == "doi":
+                value = item.get("value")
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+        return None
+
+    def _request_json(self, url: str, params: Dict[str, str]) -> dict:
+        if self.api_key:
+            params.setdefault("api_key", self.api_key)
+        if self.email:
+            params.setdefault("email", self.email)
+        self._respect_rate_limit()
+        response = self._session.get(url, params=params, timeout=15)
+        response.raise_for_status()
+        return response.json()
+
+    def _respect_rate_limit(self) -> None:
+        if self.min_delay <= 0:
+            self._last_request = time.monotonic()
+            return
+        now = time.monotonic()
+        elapsed = now - self._last_request
+        if elapsed < self.min_delay:
+            time.sleep(self.min_delay - elapsed)
+        self._last_request = time.monotonic()
+
+
+def _ensure_env_loaded() -> None:
+    global _DOTENV_LOADED
+    if _DOTENV_LOADED:
+        return
+    if load_dotenv is not None:
+        try:
+            cwd_env = Path(".env")
+            if cwd_env.exists():
+                load_dotenv(dotenv_path=cwd_env)
+            else:
+                load_dotenv()
+        except Exception:
+            pass
+    _DOTENV_LOADED = True

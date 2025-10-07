@@ -4,7 +4,12 @@ import pytest
 
 from cooplot import api
 from cooplot.aggregate import aggregate_publications
-from cooplot.metrics import _PubMedDetails, cross_group_publications, cross_group_report
+from cooplot.metrics import (
+    _CitationFetcher,
+    _PubMedDetails,
+    cross_group_publications,
+    cross_group_report,
+)
 from cooplot.scrape import Publications
 
 
@@ -218,6 +223,38 @@ def test_cross_group_publications_export(tmp_path, sample_publications, sample_p
         assert len(rows) == len(records)
 
 
+def test_cross_group_publications_reuses_existing_file(
+    tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    out_path = tmp_path / "cross.json"
+    cross_group_publications(grouped, out_path=out_path, include_unlabeled=True)
+    assert out_path.exists()
+
+    override_data = [
+        {
+            "title": "From Cache",
+            "norm_title": "from cache",
+            "year": 2022,
+            "groups": ["Group 1", "Group 2"],
+            "authors": {"Group 1": ["Alice Alpha"], "Group 2": ["Cara Gamma"]},
+        }
+    ]
+    out_path.write_text(json.dumps(override_data), encoding="utf-8")
+
+    reused = cross_group_publications(grouped, out_path=out_path, include_unlabeled=True)
+    assert reused and reused[0]["title"] == "From Cache"
+    assert json.loads(out_path.read_text(encoding="utf-8")) == override_data
+
 
 def test_publications_exclude_authors(sample_publications, sample_people):
     pubs = Publications.from_data(
@@ -428,12 +465,15 @@ def test_cross_group_report_from_json(monkeypatch, tmp_path, capsys):
         lambda self, pmid: None,
     )
 
-    report = cross_group_report(path, verbose=True)
+    out_file = tmp_path / "report.txt"
+    report = cross_group_report(path, verbose=True, out_path=out_file)
     assert "Citation for 10.1234/example" in report
     assert "Collaborated between Group A (Alice Alpha) and Group B (Bob Beta)." in report
     captured = capsys.readouterr().out
     assert "Processing record" in captured
     assert "Retrieved citation" in captured
+    data = out_file.read_bytes()
+    assert data.startswith(b"\xef\xbb\xbf")  # UTF-8 BOM
 
 
 def test_cross_group_report_from_csv(monkeypatch, tmp_path):
@@ -482,3 +522,23 @@ def test_cross_group_report_from_csv(monkeypatch, tmp_path):
     assert "Citation from PubMed 32132905" in report
     assert "Collaborated between Group X (Xavier) and Group Y (Yara)." in report
     assert out_file.read_text(encoding="ascii") == report
+
+def test_citation_fetcher_decodes_utf8(monkeypatch):
+    fetcher = _CitationFetcher(
+        style="apa",
+        locale="en-US",
+        pubmed_min_delay=None,
+        verbose=False,
+        printer=None,
+    )
+
+    def fake_get(url, headers=None, timeout=None):
+        class Dummy:
+            status_code = 200
+            content = "Kühlewein, L. (2025).".encode("utf-8")
+
+        return Dummy()
+
+    monkeypatch.setattr(fetcher._session, "get", fake_get)
+    citation = fetcher._fetch_via_doi("10.1000/test")
+    assert citation == "Kühlewein, L. (2025)."

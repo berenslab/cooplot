@@ -1,47 +1,47 @@
 [
-  {
-    "title": "A multimodal cell census and atlas of the mammalian primary motor cortex",
-    "norm_title": "a multimodal cell census and atlas of the mammalian primary motor cortex",
-    "year": 2021
-  },
-  {
-    "title": "Phenotypic variation of transcriptomic cell types in mouse motor cortex",
-    "norm_title": "phenotypic variation of transcriptomic cell types in mouse motor cortex",
-    "year": 2021
-  },
-  {
-    "title": "Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
-    "norm_title": "layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
-    "year": 2019
-  },
-  {
-    "title": "Sparse reduced-rank regression for exploratory visualisation of paired multivariate data",
-    "norm_title": "sparse reduced rank regression for exploratory visualisation of paired multivariate data",
-    "year": 2021
-  },
-  {
-    "title": "Combined statistical-mechanistic modeling links ion channel genes to physiology of cortical neuron types.",
-    "norm_title": "combined statistical mechanistic modeling links ion channel genes to physiology of cortical neuron types",
-    "year": 2025
-  },
-  {
-    "title": "Efficient identification of informative features in simulation-based inference",
-    "norm_title": "efficient identification of informative features in simulation based inference",
-    "year": 2022
-  },
-  {
-    "title": "Sparse bottleneck networks for exploratory analysis and visualization of neural Patch-seq data",
-    "norm_title": "sparse bottleneck networks for exploratory analysis and visualization of neural patch seq data",
-    "year": 2020
-  },
-  {
-    "title": "Real-Time Machine Learning Strategies for a New Kind of Neuroscience Experiments",
-    "norm_title": "real time machine learning strategies for a new kind of neuroscience experiments",
-    "year": 2024
-  },
-  {
-    "title": "Computational Approaches to Bridge Experimental and Simulation Viewpoints in Neuroscience",
-    "norm_title": "computational approaches to bridge experimental and simulation viewpoints in neuroscience",
-    "year": 2023
-  }
+    {
+        "title": "A multimodal cell census and atlas of the mammalian primary motor cortex",
+        "norm_title": "a multimodal cell census and atlas of the mammalian primary motor cortex",
+        "year": 2021
+    },
+    {
+        "title": "Phenotypic variation of transcriptomic cell types in mouse motor cortex",
+        "norm_title": "phenotypic variation of transcriptomic cell types in mouse motor cortex",
+        "year": 2021
+    },
+    {
+        "title": "Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
+        "norm_title": "layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas",
+        "year": 2019
+    },
+    {
+        "title": "Sparse reduced-rank regression for exploratory visualisation of paired multivariate data",
+        "norm_title": "sparse reduced rank regression for exploratory visualisation of paired multivariate data",
+        "year": 2021
+    },
+    {
+        "title": "Combined statistical-biophysical modeling links ion channel genes to physiology of cortical neuron types.",
+        "norm_title": "combined statistical biophysical modeling links ion channel genes to physiology of cortical neuron types",
+        "year": 2025
+    },
+    {
+        "title": "Efficient identification of informative features in simulation-based inference",
+        "norm_title": "efficient identification of informative features in simulation based inference",
+        "year": 2022
+    },
+    {
+        "title": "Sparse bottleneck networks for exploratory analysis and visualization of neural Patch-seq data",
+        "norm_title": "sparse bottleneck networks for exploratory analysis and visualization of neural patch seq data",
+        "year": 2020
+    },
+    {
+        "title": "Real-Time Machine Learning Strategies for a New Kind of Neuroscience Experiments",
+        "norm_title": "real time machine learning strategies for a new kind of neuroscience experiments",
+        "year": 2024
+    },
+    {
+        "title": "Computational Approaches to Bridge Experimental and Simulation Viewpoints in Neuroscience",
+        "norm_title": "computational approaches to bridge experimental and simulation viewpoints in neuroscience",
+        "year": 2023
+    }
 ]

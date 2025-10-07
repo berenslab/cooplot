@@ -208,6 +208,14 @@ def cross_group_publications(
 
     grouped = _ensure_group_mapping(grouped_publications)
 
+    out_file: Optional[Path] = None
+    if out_path is not None:
+        out_file = Path(out_path)
+        if out_file.exists():
+            existing = _load_cross_group_records(out_file)
+            existing.sort(key=_publication_sort_key)
+            return existing
+
     combined: Dict[str, dict] = {}
 
     for group_label, records in grouped.items():
@@ -326,7 +334,7 @@ def cross_group_publications(
     if out_path is None:
         return results
 
-    out_file = Path(out_path)
+    assert out_file is not None
     out_file.parent.mkdir(parents=True, exist_ok=True)
     suffix = out_file.suffix.lower()
 
@@ -479,7 +487,8 @@ def cross_group_report(
     if out_path is not None:
         out_file = Path(out_path)
         out_file.parent.mkdir(parents=True, exist_ok=True)
-        out_file.write_text(report, encoding="ascii" if ensure_ascii else "utf-8")
+        encoding = "ascii" if ensure_ascii else "utf-8-sig"
+        out_file.write_text(report, encoding=encoding)
 
     return report
 
@@ -674,7 +683,7 @@ class _CitationFetcher:
         try:
             response = self._session.get(url, headers=headers, timeout=20)
             if response.status_code == 200:
-                citation = response.text.strip()
+                citation = response.content.decode("utf-8", errors="replace").strip()
                 self._doi_cache[cache_key] = citation
                 if self._printer:
                     self._emit(f"Resolved DOI {clean} via doi.org")

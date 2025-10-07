@@ -424,20 +424,48 @@ class _PubMedLookup:
         return None
 
     def _search_pubmed(self, title: str, year: Optional[int]) -> Optional[str]:
-        term = f"{title}[Title]"
-        params = {
-            "db": "pubmed",
-            "retmode": "json",
-            "retmax": "1",
-            "sort": "relevance",
-            "term": term,
-        }
+        clean_title = title.replace('"', " ").strip()
+        if not clean_title:
+            return None
+
+        def _build_params(term: str, use_title_field: bool) -> Dict[str, str]:
+            params: Dict[str, str] = {
+                "db": "pubmed",
+                "retmode": "json",
+                "retmax": "1",
+                "sort": "relevance",
+                "term": term,
+            }
+            if use_title_field:
+                params["field"] = "ti"
+            if year is not None:
+                params["mindate"] = str(year)
+                params["maxdate"] = str(year)
+            return params
+
+        queries = [
+            _build_params(f'"{clean_title}"', True),
+            _build_params(clean_title, True),
+            _build_params(clean_title, False),
+        ]
+
+        for params in queries:
+            data = self._request_json(self._SEARCH_URL, params)
+            idlist = data.get("esearchresult", {}).get("idlist", [])
+            if idlist:
+                return idlist[0]
+
         if year is not None:
-            params["mindate"] = str(year)
-            params["maxdate"] = str(year)
-        data = self._request_json(self._SEARCH_URL, params)
-        idlist = data.get("esearchresult", {}).get("idlist", [])
-        return idlist[0] if idlist else None
+            # Final fallback: drop the year restriction entirely.
+            params = _build_params(clean_title, True)
+            params.pop("mindate", None)
+            params.pop("maxdate", None)
+            data = self._request_json(self._SEARCH_URL, params)
+            idlist = data.get("esearchresult", {}).get("idlist", [])
+            if idlist:
+                return idlist[0]
+
+        return None
 
     def _fetch_summary(self, pubmed_id: str) -> _PubMedDetails | None:
         params = {
@@ -489,10 +517,27 @@ class _PubMedLookup:
             params.setdefault("api_key", self.api_key)
         if self.email:
             params.setdefault("email", self.email)
-        self._respect_rate_limit()
-        response = self._session.get(url, params=params, timeout=15)
-        response.raise_for_status()
-        return response.json()
+        retries = 3
+        for attempt in range(retries):
+            self._respect_rate_limit()
+            response = self._session.get(url, params=params, timeout=15)
+            try:
+                response.raise_for_status()
+            except requests.HTTPError as exc:  # pragma: no cover - network dependent
+                status = exc.response.status_code if exc.response else None
+                if status == 429 and attempt < retries - 1:
+                    time.sleep(max(self.min_delay, 1.0))
+                    continue
+                raise
+            data = response.json()
+            if isinstance(data, dict) and "error" in data:
+                message = str(data.get("error", ""))
+                if "rate limit" in message.lower() and attempt < retries - 1:
+                    # Back off a bit longer before retrying
+                    time.sleep(max(self.min_delay, 0.5))
+                    continue
+            return data
+        return data
 
     def _respect_rate_limit(self) -> None:
         if self.min_delay <= 0:

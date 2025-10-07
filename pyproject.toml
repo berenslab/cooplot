@@ -30,3 +30,8 @@ dev = [
 [tool.setuptools]
 packages = {find = {}}
 include-package-data = true
+
+[tool.pytest.ini_options]
+markers = [
+    "network: tests that require network access",
+]

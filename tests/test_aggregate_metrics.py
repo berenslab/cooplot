@@ -1,10 +1,11 @@
+import csv
 import json
 
 import pytest
 
 from cooplot import api
 from cooplot.aggregate import aggregate_publications
-from cooplot.metrics import cross_group_publications
+from cooplot.metrics import _PubMedDetails, cross_group_publications
 from cooplot.scrape import Publications
 
 
@@ -250,7 +251,12 @@ def test_cross_group_publications_enrich_pubmed(
 
     def fake_identifiers(self, title, year):
         calls.append((title, year))
-        return ("PM12345", "10.1000/example")
+        return _PubMedDetails(
+            pubmed_id="PM12345",
+            doi="10.1000/example",
+            authors=["Author One", "Author Two"],
+            journal="Journal of Testing",
+        )
 
     monkeypatch.setattr(
         "cooplot.metrics._PubMedLookup.identifiers_for_title",
@@ -270,10 +276,28 @@ def test_cross_group_publications_enrich_pubmed(
     record = records[0]
     assert record["pubmed_id"] == "PM12345"
     assert record["doi"] == "10.1000/example"
+    assert record["pubmed_authors"] == ["Author One", "Author Two"]
+    assert record["pubmed_journal"] == "Journal of Testing"
 
-    lines = out_csv.read_text(encoding="utf-8").splitlines()
-    assert lines[0] == "title,norm_title,year,groups,authors,pubmed_id,doi"
-    assert "PM12345" in lines[1]
+    with out_csv.open(newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        row = next(reader)
+
+    assert reader.fieldnames == [
+        "title",
+        "norm_title",
+        "year",
+        "groups",
+        "authors",
+        "pubmed_id",
+        "doi",
+        "pubmed_authors",
+        "pubmed_journal",
+    ]
+    assert row["pubmed_id"] == "PM12345"
+    assert row["doi"] == "10.1000/example"
+    assert json.loads(row["pubmed_authors"]) == ["Author One", "Author Two"]
+    assert row["pubmed_journal"] == "Journal of Testing"
 
 
 def test_cross_group_publications_env_defaults(
@@ -309,7 +333,12 @@ def test_cross_group_publications_env_defaults(
         def identifiers_for_title(self, title, year):
             captured["title"] = title
             captured["year"] = year
-            return ("PMENV", "DOIENV")
+            return _PubMedDetails(
+                pubmed_id="PMENV",
+                doi="DOIENV",
+                authors=["Env Author"],
+                journal="Env Journal",
+            )
 
     monkeypatch.setattr("cooplot.metrics._PubMedLookup", DummyLookup)
 
@@ -319,6 +348,8 @@ def test_cross_group_publications_env_defaults(
     assert captured["email"] == "env@example.com"
     assert records[0]["pubmed_id"] == "PMENV"
     assert records[0]["doi"] == "DOIENV"
+    assert records[0]["pubmed_authors"] == ["Env Author"]
+    assert records[0]["pubmed_journal"] == "Env Journal"
 
 
 def test_grouped_publications_exclude_groups(tmp_path, sample_publications, sample_people):

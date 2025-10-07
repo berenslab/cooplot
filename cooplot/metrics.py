@@ -23,6 +23,14 @@ _UNLABELED = "Unlabeled"
 _DOTENV_LOADED = False
 
 
+@dataclass(frozen=True)
+class _PubMedDetails:
+    pubmed_id: Optional[str]
+    doi: Optional[str]
+    authors: Optional[List[str]]
+    journal: Optional[str]
+
+
 def _ensure_group_mapping(
     grouped: GroupedPublications | Dict[str, List[dict]],
 ) -> Dict[str, List[dict]]:
@@ -173,7 +181,8 @@ def cross_group_publications(
     List[dict]
         Each dict contains ``title``, ``norm_title``, ``year``, ``groups`` and an
         ``authors`` mapping keyed by group name. When ``enrich_pubmed`` is ``True``
-        the records also provide ``pubmed_id`` and ``doi`` keys.
+        the records also provide ``pubmed_id``, ``doi``, ``pubmed_authors`` (NCBI
+        author order) and ``pubmed_journal``.
     """
 
     grouped = _ensure_group_mapping(grouped_publications)
@@ -261,19 +270,21 @@ def cross_group_publications(
             email=resolved_email,
             min_delay=ncbi_min_delay,
         )
-        cache: Dict[Tuple[str, Optional[int]], Tuple[Optional[str], Optional[str]]] = {}
+        cache: Dict[Tuple[str, Optional[int]], _PubMedDetails] = {}
+        empty_details = _PubMedDetails(None, None, None, None)
         for record in results:
             key = (record["norm_title"], record["year"])
-            if key in cache:
-                cached_pubmed_id, cached_doi = cache[key]
-                record["pubmed_id"] = cached_pubmed_id
-                record["doi"] = cached_doi
-                continue
-            title = record.get("title") or record.get("norm_title")
-            pubmed_id, doi = lookup.identifiers_for_title(title, record.get("year"))
-            record["pubmed_id"] = pubmed_id
-            record["doi"] = doi
-            cache[key] = (pubmed_id, doi)
+            details = cache.get(key)
+            if details is None:
+                title = record.get("title") or record.get("norm_title")
+                details = lookup.identifiers_for_title(title, record.get("year"))
+                if details is None:
+                    details = empty_details
+                cache[key] = details
+            record["pubmed_id"] = details.pubmed_id
+            record["doi"] = details.doi
+            record["pubmed_authors"] = details.authors
+            record["pubmed_journal"] = details.journal
 
     if out_path is None:
         return results
@@ -289,8 +300,14 @@ def cross_group_publications(
         )
     elif suffix == ".csv":
         base_fields = ["title", "norm_title", "year", "groups", "authors"]
-        include_ids = bool(results and "pubmed_id" in results[0])
-        fieldnames = base_fields + (["pubmed_id", "doi"] if include_ids else [])
+        include_pubmed = bool(results and "pubmed_id" in results[0])
+        extra_fields = [
+            "pubmed_id",
+            "doi",
+            "pubmed_authors",
+            "pubmed_journal",
+        ]
+        fieldnames = base_fields + (extra_fields if include_pubmed else [])
         with out_file.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.DictWriter(fh, fieldnames=fieldnames)
             writer.writeheader()
@@ -306,9 +323,20 @@ def cross_group_publications(
                         separators=(",", ":"),
                     ),
                 }
-                if include_ids:
+                if include_pubmed:
                     row["pubmed_id"] = record.get("pubmed_id") or ""
                     row["doi"] = record.get("doi") or ""
+                    authors_list = record.get("pubmed_authors")
+                    row["pubmed_authors"] = (
+                        json.dumps(
+                            authors_list,
+                            ensure_ascii=ensure_ascii,
+                            separators=(",", ":"),
+                        )
+                        if authors_list
+                        else ""
+                    )
+                    row["pubmed_journal"] = record.get("pubmed_journal") or ""
                 writer.writerow(row)
     else:
         raise ValueError(
@@ -355,17 +383,16 @@ class _PubMedLookup:
         self,
         title: Optional[str],
         year: Optional[int],
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> _PubMedDetails | None:
         if not title:
-            return None, None
+            return None
         try:
             pubmed_id = self._search_pubmed(title, year)
             if not pubmed_id:
-                return None, None
-            doi = self._fetch_doi(pubmed_id)
-            return pubmed_id, doi
+                return None
+            return self._fetch_summary(pubmed_id)
         except Exception:
-            return None, None
+            return None
 
     def _search_pubmed(self, title: str, year: Optional[int]) -> Optional[str]:
         term = f"{title}[Title]"
@@ -383,7 +410,7 @@ class _PubMedLookup:
         idlist = data.get("esearchresult", {}).get("idlist", [])
         return idlist[0] if idlist else None
 
-    def _fetch_doi(self, pubmed_id: str) -> Optional[str]:
+    def _fetch_summary(self, pubmed_id: str) -> _PubMedDetails | None:
         params = {
             "db": "pubmed",
             "retmode": "json",
@@ -394,17 +421,39 @@ class _PubMedLookup:
         record = result.get(pubmed_id)
         if not isinstance(record, dict):
             return None
+        doi: Optional[str] = None
         article_ids = record.get("articleids", [])
-        if not isinstance(article_ids, list):
-            return None
-        for item in article_ids:
-            if not isinstance(item, dict):
-                continue
-            if item.get("idtype") == "doi":
-                value = item.get("value")
-                if isinstance(value, str) and value.strip():
-                    return value.strip()
-        return None
+        if isinstance(article_ids, list):
+            for item in article_ids:
+                if not isinstance(item, dict):
+                    continue
+                if item.get("idtype") == "doi":
+                    value = item.get("value")
+                    if isinstance(value, str) and value.strip():
+                        doi = value.strip()
+                        break
+
+        raw_authors = record.get("authors", [])
+        authors: List[str] = []
+        if isinstance(raw_authors, list):
+            for author in raw_authors:
+                if isinstance(author, dict):
+                    name = author.get("name")
+                    if isinstance(name, str) and name.strip():
+                        authors.append(name.strip())
+
+        journal = record.get("fulljournalname") or record.get("source")
+        if isinstance(journal, str):
+            journal = journal.strip() or None
+        else:
+            journal = None
+
+        return _PubMedDetails(
+            pubmed_id=pubmed_id,
+            doi=doi,
+            authors=authors or None,
+            journal=journal,
+        )
 
     def _request_json(self, url: str, params: Dict[str, str]) -> dict:
         if self.api_key:

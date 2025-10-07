@@ -90,20 +90,18 @@ def _flatten_authors(authors_map: Dict[str, Iterable[str]]) -> List[str]:
 
 
 def _authors_match(local_authors: Iterable[str], pubmed_authors: Iterable[str]) -> bool:
-    local_list = [name for name in local_authors if isinstance(name, str) and name.strip()]
-    pubmed_list = [name for name in pubmed_authors if isinstance(name, str) and name.strip()]
-    if not local_list or not pubmed_list:
-        return True
+    local_lists = [
+        _author_tokens(name)
+        for name in local_authors
+        if isinstance(name, str) and name.strip()
+    ]
     pubmed_tokens = set()
-    for name in pubmed_list:
-        pubmed_tokens.update(_author_tokens(name))
-    if not pubmed_tokens:
+    for name in pubmed_authors:
+        if isinstance(name, str) and name.strip():
+            pubmed_tokens.update(_author_tokens(name))
+    if not local_lists or not pubmed_tokens:
         return True
-    for name in local_list:
-        tokens = _author_tokens(name)
-        if tokens and tokens.isdisjoint(pubmed_tokens):
-            return False
-    return True
+    return any(tokens and not tokens.isdisjoint(pubmed_tokens) for tokens in local_lists)
 
 
 @dataclass(frozen=True)

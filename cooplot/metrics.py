@@ -8,7 +8,7 @@ import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Tuple
 from urllib.parse import quote
 
 import requests
@@ -69,6 +69,41 @@ def _extract_year(value: Optional[str]) -> Optional[int]:
         return int(match.group(0))
     except ValueError:
         return None
+
+
+def _author_tokens(name: str) -> set[str]:
+    tokens = [tok.strip(".,") for tok in (name or "").split() if tok.strip(".,")]
+    lowered = {tok.lower() for tok in tokens if len(tok) > 1}
+    if len(tokens) >= 2:
+        lowered.add(tokens[0].lower())
+        lowered.add(tokens[-1].lower())
+    return lowered
+
+
+def _flatten_authors(authors_map: Dict[str, Iterable[str]]) -> List[str]:
+    flattened: List[str] = []
+    for names in authors_map.values():
+        for name in names:
+            if isinstance(name, str) and name.strip():
+                flattened.append(name.strip())
+    return flattened
+
+
+def _authors_match(local_authors: Iterable[str], pubmed_authors: Iterable[str]) -> bool:
+    local_list = [name for name in local_authors if isinstance(name, str) and name.strip()]
+    pubmed_list = [name for name in pubmed_authors if isinstance(name, str) and name.strip()]
+    if not local_list or not pubmed_list:
+        return True
+    pubmed_tokens = set()
+    for name in pubmed_list:
+        pubmed_tokens.update(_author_tokens(name))
+    if not pubmed_tokens:
+        return True
+    for name in local_list:
+        tokens = _author_tokens(name)
+        if tokens and tokens.isdisjoint(pubmed_tokens):
+            return False
+    return True
 
 
 @dataclass(frozen=True)
@@ -324,6 +359,17 @@ def cross_group_publications(
                         break
 
                 if details is None:
+                    details = empty_details
+                local_authors = _flatten_authors(record.get("authors") or {})
+                if (
+                    details is not empty_details
+                    and details.authors
+                    and not _authors_match(local_authors, details.authors)
+                ):
+                    _LOG.warning(
+                        "Skipping PubMed enrichment for '%s' due to author mismatch",
+                        record.get("title") or record.get("norm_title"),
+                    )
                     details = empty_details
                 cache[key] = details
             record["pubmed_id"] = details.pubmed_id

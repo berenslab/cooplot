@@ -290,7 +290,7 @@ def test_cross_group_publications_enrich_pubmed(
         return _PubMedDetails(
             pubmed_id="PM12345",
             doi="10.1000/example",
-            authors=["Author One", "Author Two"],
+            authors=["Alice Alpha", "Bob Beta", "Cara Gamma"],
             journal="Journal of Testing",
         )
 
@@ -312,7 +312,11 @@ def test_cross_group_publications_enrich_pubmed(
     record = records[0]
     assert record["pubmed_id"] == "PM12345"
     assert record["doi"] == "10.1000/example"
-    assert record["pubmed_authors"] == ["Author One", "Author Two"]
+    assert record["pubmed_authors"] == [
+        "Alice Alpha",
+        "Bob Beta",
+        "Cara Gamma",
+    ]
     assert record["pubmed_journal"] == "Journal of Testing"
 
     with out_csv.open(newline="", encoding="utf-8") as fh:
@@ -332,7 +336,11 @@ def test_cross_group_publications_enrich_pubmed(
     ]
     assert row["pubmed_id"] == "PM12345"
     assert row["doi"] == "10.1000/example"
-    assert json.loads(row["pubmed_authors"]) == ["Author One", "Author Two"]
+    assert json.loads(row["pubmed_authors"]) == [
+        "Alice Alpha",
+        "Bob Beta",
+        "Cara Gamma",
+    ]
     assert row["pubmed_journal"] == "Journal of Testing"
 
 
@@ -372,7 +380,7 @@ def test_cross_group_publications_env_defaults(
             return _PubMedDetails(
                 pubmed_id="PMENV",
                 doi="DOIENV",
-                authors=["Env Author"],
+                authors=["Alice Alpha", "Bob Beta", "Cara Gamma"],
                 journal="Env Journal",
             )
 
@@ -384,8 +392,47 @@ def test_cross_group_publications_env_defaults(
     assert captured["email"] == "env@example.com"
     assert records[0]["pubmed_id"] == "PMENV"
     assert records[0]["doi"] == "DOIENV"
-    assert records[0]["pubmed_authors"] == ["Env Author"]
+    assert records[0]["pubmed_authors"] == [
+        "Alice Alpha",
+        "Bob Beta",
+        "Cara Gamma",
+    ]
     assert records[0]["pubmed_journal"] == "Env Journal"
+
+
+def test_cross_group_publications_enrich_pubmed_mismatch(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    class MismatchLookup:
+        def __init__(self, *, api_key, email, min_delay, session=None):
+            pass
+
+        def identifiers_for_title(self, title, year):
+            return _PubMedDetails(
+                pubmed_id="PMBAD",
+                doi="10.9999/mismatch",
+                authors=["Different Person"],
+                journal="Mismatch Journal",
+            )
+
+    monkeypatch.setattr("cooplot.metrics._PubMedLookup", MismatchLookup)
+
+    records = cross_group_publications(grouped, enrich_pubmed=True)
+    record = records[0]
+    assert record["pubmed_id"] is None
+    assert record["doi"] is None
+    assert record["pubmed_authors"] is None
+    assert record["pubmed_journal"] is None
 
 
 def test_cross_group_publications_norm_title_fallback(

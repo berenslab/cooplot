@@ -5,7 +5,7 @@ import pytest
 
 from cooplot import api
 from cooplot.aggregate import aggregate_publications
-from cooplot.metrics import _PubMedDetails, cross_group_publications
+from cooplot.metrics import _PubMedDetails, cross_group_publications, cross_group_report
 from cooplot.scrape import Publications
 
 
@@ -403,3 +403,79 @@ def test_grouped_publications_exclude_groups(tmp_path, sample_publications, samp
     filtered = grouped.exclude_groups(["Unlabeled"])
     assert "Unlabeled" not in filtered.by_group
     assert all(g != "Unlabeled" for g in filtered.sorted_groups())
+
+
+def test_cross_group_report_from_json(monkeypatch, tmp_path):
+    data = [
+        {
+            "title": "Shared Discoveries",
+            "norm_title": "shared discoveries",
+            "year": 2021,
+            "groups": ["Group A", "Group B"],
+            "authors": {"Group A": ["Alice Alpha"], "Group B": ["Bob Beta"]},
+            "doi": "10.1234/example",
+        }
+    ]
+    path = tmp_path / "cross.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    monkeypatch.setattr(
+        "cooplot.metrics._CitationFetcher._fetch_via_doi",
+        lambda self, doi: f"Citation for {doi}",
+    )
+    monkeypatch.setattr(
+        "cooplot.metrics._CitationFetcher._fetch_from_pubmed",
+        lambda self, pmid: None,
+    )
+
+    report = cross_group_report(path)
+    assert "Citation for 10.1234/example" in report
+    assert "Collaborated between Group A (Alice Alpha) and Group B (Bob Beta)." in report
+
+
+def test_cross_group_report_from_csv(monkeypatch, tmp_path):
+    csv_path = tmp_path / "cross.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(
+            [
+                "title",
+                "norm_title",
+                "year",
+                "groups",
+                "authors",
+                "pubmed_id",
+                "doi",
+                "pubmed_authors",
+                "pubmed_journal",
+            ]
+        )
+        writer.writerow(
+            [
+                "Neural Collaboration",
+                "neural collaboration",
+                "2020",
+                "Group X;Group Y",
+                json.dumps({"Group X": ["Xavier"], "Group Y": ["Yara"]}),
+                "32132905",
+                "",
+                "[]",
+                "Journal",
+            ]
+        )
+
+    monkeypatch.setattr(
+        "cooplot.metrics._CitationFetcher._fetch_via_doi",
+        lambda self, doi: None,
+    )
+
+    monkeypatch.setattr(
+        "cooplot.metrics._CitationFetcher._fetch_from_pubmed",
+        lambda self, pmid: f"Citation from PubMed {pmid}",
+    )
+
+    out_file = tmp_path / "report.txt"
+    report = cross_group_report(csv_path, out_path=out_file, ensure_ascii=True)
+    assert "Citation from PubMed 32132905" in report
+    assert "Collaborated between Group X (Xavier) and Group Y (Yara)." in report
+    assert out_file.read_text(encoding="ascii") == report

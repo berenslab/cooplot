@@ -1,23 +1,23 @@
 ﻿Scala, F., Kobak, D., Shan, S., Bernaerts, Y., Laturnus, S., Cadwell, C. R., Hartmanis, L., Froudarakis, E., Castro, J. R., Tan, Z. H., Papadopoulos, S., Patel, S. S., Sandberg, R., Berens, P., Jiang, X., & Tolias, A. S. (2019). Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas. Nature Communications, 10(1). https://doi.org/10.1038/s41467-019-12058-z
-Collaborated between Embedding (Dmitry Kobak) and Neural (Yves Bernaerts, Sophie Laturnus).
+Collaboration: Embedding (Dmitry Kobak) and Neural (Yves Bernaerts, Sophie Laturnus).
 
 Laturnus, S., Kobak, D., & Berens, P. (2020). A Systematic Evaluation of Interneuron Morphology Representations for Cell Type Discrimination. Neuroinformatics, 18(4), 591–609. https://doi.org/10.1007/s12021-020-09461-z
-Collaborated between Embedding (Dmitry Kobak) and Neural (Sophie Laturnus).
+Collaboration: Embedding (Dmitry Kobak) and Neural (Sophie Laturnus).
 
 Scala, F., Kobak, D., Bernabucci, M., Bernaerts, Y., Cadwell, C. R., Castro, J. R., Hartmanis, L., Jiang, X., Laturnus, S., Miranda, E., Mulherkar, S., Tan, Z. H., Yao, Z., Zeng, H., Sandberg, R., Berens, P., & Tolias, A. S. (2020). Phenotypic variation of transcriptomic cell types in mouse motor cortex. Nature, 598(7879), 144–150. https://doi.org/10.1038/s41586-020-2907-3
-Collaborated between Embedding (Dmitry Kobak) and Neural (Yves Bernaerts, Sophie Laturnus).
+Collaboration: Embedding (Dmitry Kobak) and Neural (Yves Bernaerts, Sophie Laturnus).
 
 Behrens, C., Yadav, S. C., Korympidou, M. M., Zhang, Y., Haverkamp, S., Irsen, S., Schaedler, A., Lu, X., Liu, Z., Lause, J., St-Pierre, F., Franke, K., Vlasits, A., Dedek, K., Smith, R. G., Euler, T., Berens, P., & Schubert, T. (2022). Retinal horizontal cells use different synaptic sites for global feedforward and local feedback signaling. Current Biology, 32(3), 545-558.e5. https://doi.org/10.1016/j.cub.2021.11.055
-Collaborated between Embedding (Jan Lause) and Neural (Christian Behrens).
+Collaboration: Embedding (Jan Lause) and Neural (Christian Behrens).
 
 Djoumessi, K., Huang, Z., Kühlewein, L., Rickmann, A., Simon, N., Koch, L. M., & Berens, P. (2025). An inherently interpretable AI model improves screening speed and accuracy for early diabetic retinopathy. PLOS Digital Health, 4(5), e0000831. https://doi.org/10.1371/journal.pdig.0000831
-Collaborated between All (Ziwei Huang) and MedML (Kerol Djoumessi, Lisa Koch).
+Collaboration: All (Ziwei Huang) and MedML (Kerol Djoumessi, Lisa Koch).
 
 Bernaerts, Y., Deistler, M., Gonçalves, P. J., Beck, J., Stimberg, M., Scala, F., Tolias, A. S., Macke, J., Kobak, D., & Berens, P. (2023). Combined statistical-biophysical modeling links ion channel genes to physiology of cortical neuron types. https://doi.org/10.1101/2023.03.02.530774
-Collaborated between Embedding (Dmitry Kobak) and Neural (Jonas Beck, Yves Bernaerts).
+Collaboration: Embedding (Dmitry Kobak) and Neural (Jonas Beck, Yves Bernaerts).
 
 Ilanchezian, I., Boreiko, V., Kühlewein, L., Huang, Z., Seçkin Ayhan, M., Hein, M., Koch, L., & Berens, P. (2025). Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models. PLOS Digital Health, 4(5), e0000853. https://doi.org/10.1371/journal.pdig.0000853
-Collaborated between All (Ziwei Huang) and MedML (Murat Seçkin Ayhan, Indu Ilanchezian, Lisa Koch).
+Collaboration: All (Ziwei Huang) and MedML (Murat Seçkin Ayhan, Indu Ilanchezian, Lisa Koch).
 
 Schmors, L., Kotkat, A. H., Bauer, Y., Huang, Z., Crombie, D., Meyerolbersleben, L. S., Sokoloski, S., Berens, P., & Busse, L. (2025). Effects of corticothalamic feedback depend on visual responsiveness and stimulus type. IScience, 28(6), 112481. https://doi.org/10.1016/j.isci.2025.112481
-Collaborated between All (Ziwei Huang) and Neural (Lisa Schmors, Sacha Sokoloski).
+Collaboration: All (Ziwei Huang) and Neural (Lisa Schmors, Sacha Sokoloski).

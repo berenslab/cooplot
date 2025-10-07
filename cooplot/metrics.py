@@ -101,7 +101,9 @@ def _authors_match(local_authors: Iterable[str], pubmed_authors: Iterable[str]) 
             pubmed_tokens.update(_author_tokens(name))
     if not local_lists or not pubmed_tokens:
         return True
-    return any(tokens and not tokens.isdisjoint(pubmed_tokens) for tokens in local_lists)
+    return any(
+        tokens and not tokens.isdisjoint(pubmed_tokens) for tokens in local_lists
+    )
 
 
 @dataclass(frozen=True)
@@ -626,7 +628,7 @@ def _format_collaboration_line(record: dict) -> str:
             segments.append(f"{group} ({', '.join(names)})")
         else:
             segments.append(group)
-    return f"Collaborated between {_format_series(segments)}."
+    return f"Collaboration: {_format_series(segments)}."
 
 
 def _format_series(items: List[str]) -> str:

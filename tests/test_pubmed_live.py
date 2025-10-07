@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from cooplot.metrics import _PubMedLookup
@@ -7,8 +5,7 @@ from cooplot.metrics import _PubMedLookup
 
 @pytest.mark.network
 def test_pubmed_lookup_real_cases():
-    api_key = os.getenv("NCBI_API_KEY")
-    lookup = _PubMedLookup(api_key=api_key, min_delay=0.5)
+    lookup = _PubMedLookup(min_delay=0.5)
 
     cases = [
         (

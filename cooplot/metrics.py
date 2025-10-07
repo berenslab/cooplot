@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 import os
 import time
 from dataclasses import dataclass
@@ -21,6 +22,7 @@ from .build import _prepare_labels_and_groups, _titles_for_windows
 _UNLABELED = "Unlabeled"
 
 _DOTENV_LOADED = False
+_LOG = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -388,12 +390,22 @@ class _PubMedLookup:
         min_delay: Optional[float] = None,
         session: Optional[requests.Session] = None,
     ) -> None:
-        self.api_key = api_key
-        self.email = email
-        default_delay = 0.11 if api_key else 0.34
+        _ensure_env_loaded()
+        env_api_key = os.getenv("NCBI_API_KEY") or os.getenv("NCIB_API_KEY")
+        self.api_key = api_key if api_key is not None else env_api_key
+        self.email = email if email is not None else os.getenv("NCBI_EMAIL")
+        default_delay = 0.11 if self.api_key else 0.34
         self.min_delay = default_delay if min_delay is None else max(min_delay, 0.0)
         self._last_request = 0.0
         self._session = session or requests.Session()
+        if api_key is None and not os.getenv("NCBI_API_KEY") and os.getenv("NCIB_API_KEY"):
+            _LOG.warning(
+                "NCIB_API_KEY environment variable detected; please rename to NCBI_API_KEY for consistency",
+            )
+        if self.api_key:
+            _LOG.info("PubMed lookup will use NCBI API key with min_delay=%s", self.min_delay)
+        else:
+            _LOG.info("PubMed lookup running without NCBI API key; min_delay=%s", self.min_delay)
 
     def identifiers_for_title(
         self,

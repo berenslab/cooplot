@@ -4,12 +4,12 @@ import csv
 import json
 import logging
 import os
-import time
-from urllib.parse import quote
 import re
+import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
+from urllib.parse import quote
 
 import requests
 
@@ -403,6 +403,7 @@ def cross_group_report(
     out_path: str | Path | None = None,
     ensure_ascii: bool = False,
     pubmed_min_delay: Optional[float] = None,
+    verbose: bool = False,
 ) -> str:
     """Generate a formatted collaboration report based on saved cross-group output.
 
@@ -424,6 +425,9 @@ def cross_group_report(
     pubmed_min_delay
         Optional override for the PubMed client rate limit delay. When ``None``
         the default behaviour (0.11s with API key, 0.34s otherwise) is used.
+    verbose
+        When ``True`` progress information and retrieved citations are printed to
+        stdout as the report is generated.
 
     Returns
     -------
@@ -436,16 +440,35 @@ def cross_group_report(
     if not records:
         report = ""
     else:
+        printer: Optional[Callable[[str], None]] = print if verbose else None
         fetcher = _CitationFetcher(
             style=citation_style,
             locale=citation_locale,
             pubmed_min_delay=pubmed_min_delay,
+            verbose=verbose,
+            printer=printer,
         )
         entries: List[str] = []
-        for record in records:
+        total = len(records)
+        for index, record in enumerate(records, start=1):
+            title = record.get("title") or record.get("norm_title") or "Untitled"
+            doi = _clean_doi(record.get("doi") or record.get("DOI"))
+            pmid = record.get("pubmed_id") or record.get("pmid")
+            if not doi or not pmid:
+                if printer:
+                    printer(
+                        f"Skipping record {index}/{total}: '{title}' (missing DOI or PubMed ID)",
+                    )
+                continue
+            if printer:
+                printer(f"Processing record {index}/{total}: {title}")
             citation = fetcher.citation_for(record)
             if not citation:
                 citation = record.get("title") or record.get("norm_title") or "Untitled"
+                if printer:
+                    printer(f"Citation unavailable for '{title}'; using fallback text.")
+            elif printer:
+                printer(f"Retrieved citation for '{title}': {citation}")
             collab = _format_collaboration_line(record)
             entries.append(f"{citation}\n{collab}")
         report = "\n\n".join(entries)
@@ -605,6 +628,8 @@ class _CitationFetcher:
         style: str,
         locale: str,
         pubmed_min_delay: Optional[float],
+        verbose: bool,
+        printer: Optional[Callable[[str], None]],
     ) -> None:
         self.style = style
         self.locale = locale
@@ -612,6 +637,15 @@ class _CitationFetcher:
         self._pubmed = _PubMedLookup(min_delay=pubmed_min_delay)
         self._doi_cache: Dict[str, Optional[str]] = {}
         self._pubmed_cache: Dict[str, Optional[str]] = {}
+        self._printer = printer if verbose else None
+        self._verbose = verbose
+
+    def _emit(self, message: str) -> None:
+        if self._printer is not None:
+            try:
+                self._printer(message)
+            except Exception:
+                pass
 
     def citation_for(self, record: dict) -> Optional[str]:
         doi = _clean_doi(record.get("doi") or record.get("DOI"))
@@ -642,9 +676,13 @@ class _CitationFetcher:
             if response.status_code == 200:
                 citation = response.text.strip()
                 self._doi_cache[cache_key] = citation
+                if self._printer:
+                    self._emit(f"Resolved DOI {clean} via doi.org")
                 return citation
         except Exception:
             pass
+        if self._printer:
+            self._emit(f"Failed to resolve DOI {clean} via doi.org")
         self._doi_cache[cache_key] = None
         return None
 
@@ -656,6 +694,8 @@ class _CitationFetcher:
         details = self._pubmed.summary_by_pmid(pmid)
         if details is None:
             self._pubmed_cache[pmid] = None
+            if self._printer:
+                self._emit(f"Unable to retrieve PubMed summary for PMID {pmid}")
             return None
         doi = _clean_doi(details.doi)
         if doi:
@@ -665,6 +705,8 @@ class _CitationFetcher:
                 return citation
         citation = _format_summary_citation(details)
         self._pubmed_cache[pmid] = citation
+        if self._printer:
+            self._emit(f"Formatted citation from PubMed summary for PMID {pmid}")
         return citation
 
 
@@ -690,14 +732,23 @@ class _PubMedLookup:
         self.min_delay = default_delay if min_delay is None else max(min_delay, 0.0)
         self._last_request = 0.0
         self._session = session or requests.Session()
-        if api_key is None and not os.getenv("NCBI_API_KEY") and os.getenv("NCIB_API_KEY"):
+        if (
+            api_key is None
+            and not os.getenv("NCBI_API_KEY")
+            and os.getenv("NCIB_API_KEY")
+        ):
             _LOG.warning(
                 "NCIB_API_KEY environment variable detected; please rename to NCBI_API_KEY for consistency",
             )
         if self.api_key:
-            _LOG.info("PubMed lookup will use NCBI API key with min_delay=%s", self.min_delay)
+            _LOG.info(
+                "PubMed lookup will use NCBI API key with min_delay=%s", self.min_delay
+            )
         else:
-            _LOG.info("PubMed lookup running without NCBI API key; min_delay=%s", self.min_delay)
+            _LOG.info(
+                "PubMed lookup running without NCBI API key; min_delay=%s",
+                self.min_delay,
+            )
 
     def identifiers_for_title(
         self,

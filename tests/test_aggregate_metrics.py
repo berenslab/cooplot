@@ -1,6 +1,5 @@
 import csv
 import json
-
 import pytest
 
 from cooplot import api
@@ -405,7 +404,7 @@ def test_grouped_publications_exclude_groups(tmp_path, sample_publications, samp
     assert all(g != "Unlabeled" for g in filtered.sorted_groups())
 
 
-def test_cross_group_report_from_json(monkeypatch, tmp_path):
+def test_cross_group_report_from_json(monkeypatch, tmp_path, capsys):
     data = [
         {
             "title": "Shared Discoveries",
@@ -414,6 +413,7 @@ def test_cross_group_report_from_json(monkeypatch, tmp_path):
             "groups": ["Group A", "Group B"],
             "authors": {"Group A": ["Alice Alpha"], "Group B": ["Bob Beta"]},
             "doi": "10.1234/example",
+            "pubmed_id": "PM12345",
         }
     ]
     path = tmp_path / "cross.json"
@@ -428,9 +428,12 @@ def test_cross_group_report_from_json(monkeypatch, tmp_path):
         lambda self, pmid: None,
     )
 
-    report = cross_group_report(path)
+    report = cross_group_report(path, verbose=True)
     assert "Citation for 10.1234/example" in report
     assert "Collaborated between Group A (Alice Alpha) and Group B (Bob Beta)." in report
+    captured = capsys.readouterr().out
+    assert "Processing record" in captured
+    assert "Retrieved citation" in captured
 
 
 def test_cross_group_report_from_csv(monkeypatch, tmp_path):
@@ -458,7 +461,7 @@ def test_cross_group_report_from_csv(monkeypatch, tmp_path):
                 "Group X;Group Y",
                 json.dumps({"Group X": ["Xavier"], "Group Y": ["Yara"]}),
                 "32132905",
-                "",
+                "10.5678/example",
                 "[]",
                 "Journal",
             ]

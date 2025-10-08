@@ -1,5 +1,6 @@
 import csv
 import json
+
 import pytest
 
 from cooplot import api
@@ -251,7 +252,9 @@ def test_cross_group_publications_reuses_existing_file(
     ]
     out_path.write_text(json.dumps(override_data), encoding="utf-8")
 
-    reused = cross_group_publications(grouped, out_path=out_path, include_unlabeled=True)
+    reused = cross_group_publications(
+        grouped, out_path=out_path, include_unlabeled=True
+    )
     assert reused and reused[0]["title"] == "From Cache"
     assert json.loads(out_path.read_text(encoding="utf-8")) == override_data
 
@@ -473,7 +476,9 @@ def test_cross_group_publications_norm_title_fallback(
     assert "shared paper" in calls
 
 
-def test_grouped_publications_exclude_groups(tmp_path, sample_publications, sample_people):
+def test_grouped_publications_exclude_groups(
+    tmp_path, sample_publications, sample_people
+):
     grouped = aggregate_publications(
         sample_publications,
         sample_people,
@@ -515,7 +520,7 @@ def test_cross_group_report_from_json(monkeypatch, tmp_path, capsys):
     out_file = tmp_path / "report.txt"
     report = cross_group_report(path, verbose=True, out_path=out_file)
     assert "Citation for 10.1234/example" in report
-    assert "Collaborated between Group A (Alice Alpha) and Group B (Bob Beta)." in report
+    assert "Collaboration: Group A (Alice Alpha) and Group B (Bob Beta)." in report
     captured = capsys.readouterr().out
     assert "Processing record" in captured
     assert "Retrieved citation" in captured
@@ -567,8 +572,9 @@ def test_cross_group_report_from_csv(monkeypatch, tmp_path):
     out_file = tmp_path / "report.txt"
     report = cross_group_report(csv_path, out_path=out_file, ensure_ascii=True)
     assert "Citation from PubMed 32132905" in report
-    assert "Collaborated between Group X (Xavier) and Group Y (Yara)." in report
+    assert "Collaboration: Group X (Xavier) and Group Y (Yara)." in report
     assert out_file.read_text(encoding="ascii") == report
+
 
 def test_citation_fetcher_decodes_utf8(monkeypatch):
     fetcher = _CitationFetcher(

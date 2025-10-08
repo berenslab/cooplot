@@ -660,6 +660,20 @@ def _clean_doi(raw: Optional[str]) -> Optional[str]:
     return doi or None
 
 
+_INLINE_NEWLINE_RE = re.compile(r"(?<!\n)\n(?!\n)")
+_MULTISPACE_RE = re.compile(r"[ \t]{2,}")
+
+
+def _clean_citation_text(value: str) -> str:
+    """Normalize inline line breaks while keeping intentional paragraph spacing."""
+
+    text = value.strip()
+    text = _INLINE_NEWLINE_RE.sub(" ", text)
+    text = re.sub(r"\n[ \t]+", "\n", text)
+    text = _MULTISPACE_RE.sub(" ", text)
+    return text
+
+
 def _format_summary_citation(details: _PubMedDetails) -> str:
     parts: List[str] = []
     if details.authors:
@@ -729,7 +743,8 @@ class _CitationFetcher:
         try:
             response = self._session.get(url, headers=headers, timeout=20)
             if response.status_code == 200:
-                citation = response.content.decode("utf-8", errors="replace").strip()
+                raw = response.content.decode("utf-8", errors="replace")
+                citation = _clean_citation_text(raw)
                 self._doi_cache[cache_key] = citation
                 if self._printer:
                     self._emit(f"Resolved DOI {clean} via doi.org")

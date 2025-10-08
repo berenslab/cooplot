@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -43,9 +44,7 @@ class GroupedPublications:
             if group not in to_remove
         }
         filtered_paths = {
-            group: path
-            for group, path in self.paths.items()
-            if group not in to_remove
+            group: path for group, path in self.paths.items() if group not in to_remove
         }
         return GroupedPublications(by_group=filtered_by_group, paths=filtered_paths)
 
@@ -194,3 +193,103 @@ def aggregate_publications(
             paths[group_label] = out_path
 
     return GroupedPublications(by_group=grouped_lists, paths=paths)
+
+
+def aggregate_cross_group_data(
+    records: Iterable[dict],
+    *,
+    filter: Optional[str] = None,
+) -> GroupedPublications:
+    """Construct a :class:`GroupedPublications` from cross-group collaboration records.
+
+    Parameters
+    ----------
+    records
+        Iterable of dicts as returned by :func:`cooplot.metrics.cross_group_publications`
+        (or compatible structure) where each record contains ``title``, ``norm_title``,
+        ``year``, ``groups`` and ``authors`` entries.
+    filter
+        Optional string selecting records that contain identifiers. Supported values are
+        ``"doi"``, ``"pubmed"`` (or ``"pubmed_id"`` / ``"pmid"``), and ``"identifier"``
+        (alias ``"any"``) which keeps entries having either DOI or PubMed identifiers.
+        When ``None`` (default) no filtering is applied.
+    """
+
+    filter_normalized = (filter or "").strip().lower()
+    if filter_normalized and filter_normalized not in {
+        "doi",
+        "pubmed",
+        "pubmed_id",
+        "pmid",
+        "identifier",
+        "any",
+    }:
+        raise ValueError(
+            "filter must be one of None, 'doi', 'pubmed', 'pubmed_id', 'pmid', "
+            "'identifier', or 'any'",
+        )
+
+    def _has_doi(record: dict) -> bool:
+        doi = record.get("doi") or record.get("DOI")
+        return bool(isinstance(doi, str) and doi.strip())
+
+    def _has_pubmed(record: dict) -> bool:
+        pmid = record.get("pubmed_id") or record.get("pmid")
+        return bool(isinstance(pmid, str) and pmid.strip())
+
+    def _passes_filter(record: dict) -> bool:
+        if not filter_normalized:
+            return True
+        if filter_normalized == "doi":
+            return _has_doi(record)
+        if filter_normalized in {"pubmed", "pubmed_id", "pmid"}:
+            return _has_pubmed(record)
+        if filter_normalized in {"identifier", "any"}:
+            return _has_doi(record) or _has_pubmed(record)
+        return True
+
+    by_group: Dict[str, List[dict]] = defaultdict(list)
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        if not _passes_filter(record):
+            continue
+        title = record.get("title")
+        norm_title = record.get("norm_title")
+        if not isinstance(norm_title, str) or not norm_title.strip():
+            continue
+        year = record.get("year")
+        authors_by_group = record.get("authors") or {}
+        groups = record.get("groups") or list(authors_by_group.keys())
+        if not groups:
+            continue
+        base = {
+            "title": title or norm_title,
+            "norm_title": norm_title,
+            "year": year if isinstance(year, int) else None,
+        }
+        for group in groups:
+            if not isinstance(group, str):
+                continue
+            group_name = group.strip()
+            if not group_name:
+                continue
+            authors = authors_by_group.get(group) or authors_by_group.get(
+                group_name, []
+            )
+            if not isinstance(authors, list):
+                authors = list(authors)  # tolerate iterables/sets
+            filtered_authors = [
+                author
+                for author in authors
+                if isinstance(author, str) and author.strip()
+            ]
+            formatted = dict(base)
+            formatted["authors"] = sorted(filtered_authors, key=_lastname)
+            by_group[group_name].append(formatted)
+
+    grouped_lists = {
+        group: sorted(pubs, key=_publication_sort_key)
+        for group, pubs in by_group.items()
+    }
+    return GroupedPublications(by_group=grouped_lists, paths={})

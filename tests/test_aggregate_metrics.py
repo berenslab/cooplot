@@ -347,6 +347,74 @@ def test_cross_group_publications_enrich_pubmed(
     assert row["pubmed_journal"] == "Journal of Testing"
 
 
+def test_cross_group_publications_deduplicates_pubmed_preprints(monkeypatch, tmp_path):
+    people = [
+        {"name": "Alice Alpha", "team": "Group 1"},
+        {"name": "Cara Gamma", "team": "Group 2"},
+    ]
+    publications = {
+        "Alice Alpha": [
+            {"title": "Joint Study", "norm_title": "joint study", "year": 2020},
+            {
+                "title": "Joint Study (Preprint)",
+                "norm_title": "joint study (preprint)",
+                "year": 2019,
+            },
+        ],
+        "Cara Gamma": [
+            {"title": "Joint Study", "norm_title": "joint study", "year": 2020},
+            {
+                "title": "Joint Study (Preprint)",
+                "norm_title": "joint study (preprint)",
+                "year": 2019,
+            },
+        ],
+    }
+
+    grouped = aggregate_publications(
+        publications,
+        people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=False,
+        save_json=False,
+    )
+
+    baseline = cross_group_publications(grouped)
+    assert {record["norm_title"] for record in baseline} == {
+        "joint study",
+        "joint study (preprint)",
+    }
+
+    call_titles: list[str] = []
+
+    class DuplicateLookup:
+        def __init__(self, *, api_key, email, min_delay, session=None):
+            pass
+
+        def identifiers_for_title(self, title, year):
+            call_titles.append(title)
+            return _PubMedDetails(
+                pubmed_id="PMSHARED",
+                doi=None,
+                authors=None,
+                journal="Testing Journal",
+                title="Joint Study",
+                year=2020,
+            )
+
+    monkeypatch.setattr("cooplot.metrics._PubMedLookup", DuplicateLookup)
+
+    records = cross_group_publications(grouped, enrich_pubmed=True)
+    assert len(records) == 1
+    record = records[0]
+    assert record["norm_title"] == "joint study"
+    assert record["pubmed_id"] == "PMSHARED"
+    assert record.get("pubmed_title") == "Joint Study"
+    assert any("joint study (preprint)" in title.lower() for title in call_titles)
+
+
 def test_cross_group_publications_env_defaults(
     monkeypatch, tmp_path, sample_publications, sample_people
 ):

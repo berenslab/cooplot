@@ -106,6 +106,88 @@ def _authors_match(local_authors: Iterable[str], pubmed_authors: Iterable[str]) 
     )
 
 
+def _normalise_title_text(value: Optional[str]) -> str:
+    if not isinstance(value, str):
+        return ""
+    normalised = re.sub(r"\s+", " ", value.strip().lower())
+    return normalised
+
+
+def _title_looks_like_preprint(record: dict) -> bool:
+    text_parts = [
+        _normalise_title_text(record.get("title")),
+        _normalise_title_text(record.get("norm_title")),
+    ]
+    combined = " ".join(part for part in text_parts if part)
+    if not combined:
+        return False
+    for marker in ("preprint", "biorxiv", "medrxiv", "arxiv"):
+        if marker in combined:
+            return True
+    return False
+
+
+def _select_pubmed_candidate(
+    items: List[Tuple[int, dict]],
+) -> dict:
+    if len(items) == 1:
+        return items[0][1]
+
+    pubmed_titles = {
+        _normalise_title_text(record.get("pubmed_title"))
+        for _, record in items
+        if record.get("pubmed_title")
+    }
+    pubmed_titles.discard("")
+
+    candidates = items
+    if pubmed_titles:
+        matching = [
+            item
+            for item in items
+            if _normalise_title_text(item[1].get("title")) in pubmed_titles
+            or _normalise_title_text(item[1].get("norm_title")) in pubmed_titles
+        ]
+        if matching:
+            candidates = matching
+
+    non_preprints = [item for item in candidates if not _title_looks_like_preprint(item[1])]
+    if non_preprints:
+        candidates = non_preprints
+
+    candidates_sorted = sorted(candidates, key=lambda pair: pair[0])
+    return candidates_sorted[0][1]
+
+
+def _deduplicate_pubmed_records(records: List[dict]) -> List[dict]:
+    grouped: Dict[str, List[Tuple[int, dict]]] = {}
+    for index, record in enumerate(records):
+        pubmed_id = record.get("pubmed_id")
+        if not pubmed_id:
+            continue
+        grouped.setdefault(str(pubmed_id), []).append((index, record))
+
+    if not grouped:
+        return records
+
+    remove_ids: set[int] = set()
+    for items in grouped.values():
+        if len(items) <= 1:
+            continue
+        keep_record = _select_pubmed_candidate(items)
+        for _, record in items:
+            if record is keep_record:
+                continue
+            remove_ids.add(id(record))
+
+    if not remove_ids:
+        return records
+
+    filtered = [record for record in records if id(record) not in remove_ids]
+    filtered.sort(key=_publication_sort_key)
+    return filtered
+
+
 @dataclass(frozen=True)
 class CrossGroupSummary:
     publications: List[dict]
@@ -376,6 +458,9 @@ def cross_group_publications(
             record["doi"] = details.doi
             record["pubmed_authors"] = details.authors
             record["pubmed_journal"] = details.journal
+            record["pubmed_title"] = details.title
+
+        results = _deduplicate_pubmed_records(results)
 
     if out_path is None:
         return results

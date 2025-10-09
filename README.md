@@ -61,10 +61,13 @@ _ = cooplot.cross_group_publications(groups, year_from=2016, year_to=2025, out_p
 cooplot.cross_group_report(".cache/agberens-coop.csv", out_path=".cache/agberens-coop-ref.txt", verbose=True)
 ```
 
-which will give you
+which will give you 
 
 ```
 ...
+
+Schmors, L., Kotkat, A. H., Bauer, Y., Huang, Z., Crombie, D., Meyerolbersleben, L. S., Sokoloski, S., Berens, P., & Busse, L. (2025). Effects of corticothalamic feedback depend on visual responsiveness and stimulus type. IScience, 28(6), 112481. https://doi.org/10.1016/j.isci.2025.112481
+Collaboration: All (Philipp Berens, Ziwei Huang) and Neural (Lisa Schmors, Sacha Sokoloski).
 
 Gervelmeyer, J., Müller, S., Huang, Z., & Berens, P. (2025). Fundus Image Toolbox: A Python package for fundus image processing. Journal of Open Source Software, 10(108), 7101. https://doi.org/10.21105/joss.07101
 Collaboration: All (Philipp Berens, Ziwei Huang) and MedML (Julius Gervelmeyer, Sarah Müller).

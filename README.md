@@ -53,7 +53,7 @@ fig = cooplot.show(mats, group_col="group", style="both", heatmap_counts=True, f
 
 ![](.github/agberens.png)
 
-## HZN 
+## Hertie-Zentrums für Neurologie
 
 ```python
 import cooplot

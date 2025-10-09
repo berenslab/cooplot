@@ -86,6 +86,14 @@ Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).
 ## Installation
 
 ```bash
+uv pip install cooplot
+```
+
+or
+
+```bash
+git clone git@github.com:berenslab/cooplot.git
+cd cooplot
 uv pip install -e ".[dev]"
 ```
 

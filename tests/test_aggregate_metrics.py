@@ -7,6 +7,7 @@ from cooplot import api
 from cooplot.aggregate import aggregate_publications
 from cooplot.metrics import (
     _CitationFetcher,
+    _CrossrefDetails,
     _PubMedDetails,
     cross_group_publications,
     cross_group_report,
@@ -259,6 +260,44 @@ def test_cross_group_publications_reuses_existing_file(
     assert json.loads(out_path.read_text(encoding="utf-8")) == override_data
 
 
+def test_cross_group_publications_overwrite_existing_file(
+    tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    out_path = tmp_path / "cross.json"
+    sentinel = [
+        {
+            "title": "Stale Record",
+            "norm_title": "stale record",
+            "year": 1999,
+            "groups": ["Old Group"],
+            "authors": {"Old Group": ["Old Author"]},
+        }
+    ]
+    out_path.write_text(json.dumps(sentinel), encoding="utf-8")
+
+    records = cross_group_publications(
+        grouped,
+        out_path=out_path,
+        include_unlabeled=True,
+        overwrite=True,
+    )
+
+    assert records
+    assert records[0]["title"] != "Stale Record"
+    saved = json.loads(out_path.read_text(encoding="utf-8"))
+    assert saved == records
+
+
 def test_publications_exclude_authors(sample_publications, sample_people):
     pubs = Publications.from_data(
         sample_publications,
@@ -345,6 +384,78 @@ def test_cross_group_publications_enrich_pubmed(
         "Cara Gamma",
     ]
     assert row["pubmed_journal"] == "Journal of Testing"
+
+
+def test_cross_group_publications_enrich_crossref(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    captured: dict = {"calls": []}
+
+    class DummyCrossrefLookup:
+        def __init__(self, *, mailto, min_delay, session=None):
+            captured["mailto"] = mailto
+            captured["min_delay"] = min_delay
+
+        def identifiers_for_title(self, title, year):
+            captured["calls"].append((title, year))
+            return _CrossrefDetails(
+                doi="10.2000/crossref",
+                title=title,
+                authors=["Alice Alpha", "Bob Beta"],
+                container="Testing Journal",
+                year=year,
+            )
+
+    monkeypatch.setattr("cooplot.metrics._CrossrefLookup", DummyCrossrefLookup)
+    monkeypatch.setenv("CROSSREF_MAILTO", "cross@example.com")
+    monkeypatch.setattr("cooplot.metrics._DOTENV_LOADED", False)
+
+    out_csv = tmp_path / "crossref.csv"
+    records = cross_group_publications(
+        grouped,
+        enrich_crossref=True,
+        out_path=out_csv,
+    )
+
+    assert captured["calls"] == [("Shared Paper", 2020)]
+    assert captured["mailto"] == "cross@example.com"
+    assert captured["min_delay"] is None
+
+    assert records
+    record = records[0]
+    assert record["doi"] == "10.2000/crossref"
+    assert record["crossref_title"] == "Shared Paper"
+    assert record["crossref_authors"] == ["Alice Alpha", "Bob Beta"]
+    assert record["crossref_container"] == "Testing Journal"
+
+    with out_csv.open(newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        row = next(reader)
+
+    assert reader.fieldnames == [
+        "title",
+        "norm_title",
+        "year",
+        "groups",
+        "authors",
+        "doi",
+        "crossref_title",
+        "crossref_authors",
+        "crossref_container",
+    ]
+    assert row["doi"] == "10.2000/crossref"
+    assert json.loads(row["crossref_authors"]) == ["Alice Alpha", "Bob Beta"]
+    assert row["crossref_container"] == "Testing Journal"
 
 
 def test_cross_group_publications_deduplicates_pubmed_preprints(monkeypatch, tmp_path):
@@ -642,6 +753,104 @@ def test_cross_group_report_from_csv(monkeypatch, tmp_path):
     assert "Citation from PubMed 32132905" in report
     assert "Collaboration: Group X (Xavier) and Group Y (Yara)." in report
     assert out_file.read_text(encoding="ascii") == report
+
+
+def test_cross_group_report_uses_crossref_fallback(monkeypatch, tmp_path):
+    data = [
+        {
+            "title": "Local Title",
+            "norm_title": "local title",
+            "year": 2022,
+            "groups": ["Group Crossref", "Group Other"],
+            "authors": {
+                "Group Crossref": ["Alice Alpha"],
+                "Group Other": ["Bob Beta"],
+            },
+            "doi": "10.4242/crossref",
+            "crossref_title": "Crossref Title",
+            "crossref_authors": ["Alice Alpha", "Bob Beta"],
+            "crossref_container": "Journal of Crossref",
+        }
+    ]
+    path = tmp_path / "cross.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    monkeypatch.setattr(
+        "cooplot.metrics._CitationFetcher._fetch_via_doi",
+        lambda self, doi: None,
+    )
+    monkeypatch.setattr(
+        "cooplot.metrics._CitationFetcher._fetch_from_pubmed",
+        lambda self, pmid: None,
+    )
+
+    report = cross_group_report(path)
+    assert "Crossref Title" in report
+    assert "Journal of Crossref" in report
+    assert "https://doi.org/10.4242/crossref" in report
+    assert "Collaboration: Group Crossref (Alice Alpha) and Group Other (Bob Beta)." in report
+
+
+def test_cross_group_report_skips_when_output_exists(monkeypatch, tmp_path):
+    input_path = tmp_path / "cross.json"
+    input_path.write_text("[]", encoding="utf-8")
+
+    out_file = tmp_path / "report.txt"
+    out_file.write_text("Existing report content", encoding="utf-8")
+
+    def boom(path):
+        raise AssertionError("Should not load records")
+
+    monkeypatch.setattr("cooplot.metrics._load_cross_group_records", boom)
+
+    report = cross_group_report(
+        input_path,
+        out_path=out_file,
+        overwrite=False,
+    )
+
+    assert report == "Existing report content"
+    assert out_file.read_text(encoding="utf-8") == "Existing report content"
+
+
+def test_cross_group_report_overwrite_existing_file(monkeypatch, tmp_path):
+    data = [
+        {
+            "title": "Example Title",
+            "norm_title": "example title",
+            "groups": ["Group 1", "Group 2"],
+            "authors": {"Group 1": ["Alice"], "Group 2": ["Bob"]},
+            "doi": "10.5555/example",
+        }
+    ]
+    input_path = tmp_path / "cross.json"
+    input_path.write_text(json.dumps(data), encoding="utf-8")
+
+    out_file = tmp_path / "report.txt"
+    out_file.write_text("Stale report", encoding="utf-8")
+
+    calls = {"count": 0}
+
+    class DummyFetcher:
+        def __init__(self, *, style, locale, pubmed_min_delay, verbose, printer):
+            calls["count"] += 1
+
+        def citation_for(self, record):
+            return "Dummy Citation"
+
+    monkeypatch.setattr("cooplot.metrics._CitationFetcher", DummyFetcher)
+
+    report = cross_group_report(
+        input_path,
+        out_path=out_file,
+        overwrite=True,
+    )
+
+    assert calls["count"] == 1
+    assert "Dummy Citation" in report
+    assert "Collaboration: Group 1 (Alice) and Group 2 (Bob)." in report
+    saved = out_file.read_text(encoding="utf-8-sig")
+    assert saved == report
 
 
 def test_citation_fetcher_decodes_utf8(monkeypatch):

@@ -1,0 +1,179 @@
+﻿Behrens, C., Schubert, T., Haverkamp, S., Euler, T., & Berens, P. (2016). Connectivity map of bipolar cells and photoreceptors in the mouse retina. https://doi.org/10.1101/065722
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens).
+
+Rogerson, L. E., Behrens, C., Euler, T., Berens, P., & Schubert, T. (2017). Connectomics of synaptic microcircuits: lessons from the outer retina. The Journal of Physiology, 595(16), 5517–5524. Portico. https://doi.org/10.1113/jp273671
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens, Luke Rogerson).
+
+Leibig, C., Allken, V., Ayhan, M. S., Berens, P., & Wahl, S. (2017). Leveraging uncertainty information from deep neural networks for disease detection. Scientific Reports, 7(1). https://doi.org/10.1038/s41598-017-17876-z
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
+
+Chapot, C. A., Behrens, C., Rogerson, L. E., Baden, T., Pop, S., Berens, P., Euler, T., & Schubert, T. (2017). Local signals in mouse horizontal cell dendrites. https://doi.org/10.1101/143909
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens, Luke Rogerson).
+
+Nonnenmacher, M., Behrens, C., Berens, P., Bethge, M., & Macke, J. H. (2017). Signatures of criticality arise from random subsampling in simple population models. PLOS Computational Biology, 13(10), e1005718. https://doi.org/10.1371/journal.pcbi.1005718
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens).
+
+Berens, P., Freeman, J., Deneux, T., Chenkov, N., McColgan, T., Speiser, A., Macke, J. H., Turaga, S. C., Mineault, P., Rupprecht, P., Gerhard, S., Friedrich, R. W., Friedrich, J., Paninski, L., Pachitariu, M., Harris, K. D., Bolte, B., Machado, T. A., Ringach, D., … Bethge, M. (2018). Community-based benchmarking improves spike rate inference from two-photon calcium imaging data. PLOS Computational Biology, 14(5), e1006157. https://doi.org/10.1371/journal.pcbi.1006157
+Collaboration: All (Philipp Berens) and Neural (Luke Rogerson).
+
+Diamantaki, M., Coletta, S., Nasr, K., Zeraati, R., Laturnus, S., Berens, P., Preston-Ferrer, P., & Burgalossi, A. (2018). Manipulating Hippocampal Place Cell Activity by Single-Cell Stimulation in Freely Moving Mice. Cell Reports, 23(1), 32–38. https://doi.org/10.1016/j.celrep.2018.03.031
+Collaboration: All (Philipp Berens) and Neural (Sophie Laturnus).
+
+Rogerson, L. E., Zhao, Z., Franke, K., Euler, T., & Berens, P. (2019). Bayesian hypothesis testing and experimental design for two-photon imaging data. PLOS Computational Biology, 15(8), e1007205. https://doi.org/10.1371/journal.pcbi.1007205
+Collaboration: All (Philipp Berens) and Neural (Luke Rogerson).
+
+(2019). SNE Simulation Notes Europe, 29(2). https://doi.org/10.11128/sne.29.2.1047
+Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak).
+
+Scala, F., Kobak, D., Shan, S., Bernaerts, Y., Laturnus, S., Cadwell, C. R., Hartmanis, L., Froudarakis, E., Castro, J. R., Tan, Z. H., Papadopoulos, S., Patel, S. S., Sandberg, R., Berens, P., Jiang, X., & Tolias, A. S. (2019). Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas. Nature Communications, 10(1). https://doi.org/10.1038/s41467-019-12058-z
+Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Yves Bernaerts, Sophie Laturnus).
+
+Berens, P., & Ayhan, M. S. (2019). Proprietary data formats block health research. Nature, 565(7740), 429–429. https://doi.org/10.1038/d41586-019-00231-9
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
+
+Kobak, D., & Berens, P. (2019). The art of using t-SNE for single-cell transcriptomics. Nature Communications, 10(1). https://doi.org/10.1038/s41467-019-13056-x
+Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak).
+
+Laturnus, S., Kobak, D., & Berens, P. (2020). A Systematic Evaluation of Interneuron Morphology Representations for Cell Type Discrimination. Neuroinformatics, 18(4), 591–609. https://doi.org/10.1007/s12021-020-09461-z
+Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Sophie Laturnus).
+
+Oesterle, J., Behrens, C., Schröder, C., Herrmann, T., Euler, T., Franke, K., Smith, R. G., Zeck, G., & Berens, P. (2020). Bayesian inference for biophysical neuron models enables stimulus optimization for retinal neuroprosthetics. https://doi.org/10.1101/2020.01.08.898759
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens, Jonathan Oesterle).
+
+Cadwell, C. R., Scala, F., Fahey, P. G., Kobak, D., Mulherkar, S., Sinz, F. H., Papadopoulos, S., Tan, Z. H., Johnsson, P., Hartmanis, L., Li, S., Cotton, R. J., Tolias, K. F., Sandberg, R., Berens, P., Jiang, X., & Tolias, A. S. (2020). Cell type composition and circuit organization of clonally related excitatory neurons in the juvenile mouse neocortex. ELife, 9. CLOCKSS. https://doi.org/10.7554/elife.52951
+Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak).
+
+Ayhan, M. S., Kühlewein, L., Aliyeva, G., Inhoffen, W., Ziemssen, F., & Berens, P. (2020). Expert-validated estimation of diagnostic uncertainty for deep neural networks in diabetic retinopathy detection. Medical Image Analysis, 64, 101724. https://doi.org/10.1016/j.media.2020.101724
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
+
+Laturnus, S., von Daranyi, A., Huang, Z., & Berens, P. (2020). MorphoPy: A python package for feature extraction of neural morphologies. Journal of Open Source Software, 5(52), 2339. https://doi.org/10.21105/joss.02339
+Collaboration: All (Philipp Berens, Ziwei Huang) and Neural (Sophie Laturnus).
+
+Höfling, L., Oesterle, J., Berens, P., & Zeck, G. (2020). Probing and predicting ganglion cell responses to smooth electrical stimulation in healthy and blind mouse retina. Scientific Reports, 10(1). https://doi.org/10.1038/s41598-020-61899-y
+Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).
+
+Schröder, C., Klindt, D., Strauss, S., Franke, K., Bethge, M., Euler, T., & Berens, P. (2020). System Identification with Biophysical Constraints: A Circuit Model of the Inner Retina. https://doi.org/10.1101/2020.06.16.154203
+Collaboration: All (Philipp Berens) and Neural (Sarah Strauß).
+
+Zhao, Z., Klindt, D. A., Maia Chagas, A., Szatko, K. P., Rogerson, L., Protti, D. A., Behrens, C., Dalkara, D., Schubert, T., Bethge, M., Franke, K., Berens, P., Ecker, A. S., & Euler, T. (2020). The temporal structure of the inner retina at a single glance. Scientific Reports, 10(1). https://doi.org/10.1038/s41598-020-60214-z
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens, Luke Rogerson).
+
+Lause, J., Berens, P., & Kobak, D. (2021). Analytic Pearson residuals for normalization of single-cell RNA-seq UMI data. Genome Biology, 22(1). https://doi.org/10.1186/s13059-021-02451-7
+Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak, Jan Lause).
+
+Strauss, S., Korympidou, M. M., Ran, Y., Franke, K., Schubert, T., Baden, T., Berens, P., Euler, T., & Vlasits, A. L. (2021). Center-surround interactions underlie bipolar cell motion sensing in the mouse retina. https://doi.org/10.1101/2021.05.31.446404
+Collaboration: All (Philipp Berens) and Neural (Sarah Strauß).
+
+Schröder, C., Oesterle, J., Berens, P., Yoshimatsu, T., & Baden, T. (2021). Distinct Synaptic Transfer Functions in Same-Type Photoreceptors. https://doi.org/10.1101/2021.02.24.432674
+Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).
+
+Huang, Z., Ran, Y., Euler, T., & Berens, P. (2021). Estimating smooth and sparse neural receptive fields with a flexible spline basis. https://doi.org/10.1101/2021.03.31.437831
+Collaboration: All (Philipp Berens, Ziwei Huang) and Neural (Jonathan Oesterle).
+
+Ilanchezian, I., Kobak, D., Faber, H., Ziemssen, F., Berens, P., & Ayhan, M. S. (2021). Interpretable gender classification from retinal fundus images using BagNets. https://doi.org/10.1101/2021.06.21.21259243
+Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and MedML (Murat Seçkin Ayhan, Indu Ilanchezian).
+
+Laturnus, S., & Berens, P. (2021). MorphVAE: Generating Neural Morphologies from 3D-Walks using a Variational Autoencoder with Spherical Latent Space. https://doi.org/10.1101/2021.06.14.448271
+Collaboration: All (Philipp Berens) and Neural (Sophie Laturnus).
+
+Kobak, D., Bernaerts, Y., Weis, M. A., Scala, F., Tolias, A. S., & Berens, P. (2021). Sparse Reduced-Rank Regression for Exploratory Visualisation of Paired Multivariate Data. Journal of the Royal Statistical Society Series C: Applied Statistics, 70(4), 980–1000. https://doi.org/10.1111/rssc.12494
+Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Yves Bernaerts).
+
+3. Attraction or repulsion: a mysterious but all important sign. (2022). Quantum Field Theory, as Simply as Possible, 123–134. https://doi.org/10.1515/9780691239279-016
+Collaboration: All (Philipp Berens) and Embedding (Jan Niklas Böhm, Dmitry Kobak).
+
+Strauss, S., Korympidou, M. M., Ran, Y., Franke, K., Schubert, T., Baden, T., Berens, P., Euler, T., & Vlasits, A. L. (2022). Center-surround interactions underlie bipolar cell motion sensitivity in the mouse retina. Nature Communications, 13(1). https://doi.org/10.1038/s41467-022-32762-7
+Collaboration: All (Philipp Berens) and Neural (Sarah Strauß).
+
+Ayhan, M. S., Kümmerle, L. B., Kühlewein, L., Inhoffen, W., Aliyeva, G., Ziemssen, F., & Berens, P. (2022). Clinical validation of saliency maps for understanding deep neural networks in ophthalmology. Medical Image Analysis, 77, 102364. https://doi.org/10.1016/j.media.2022.102364
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
+
+Agner, J., & Pollack, H. (Eds.). (2022). Eudora Welty and Mystery. https://doi.org/10.14325/mississippi/9781496842701.001.0001
+Collaboration: All (Philipp Berens) and MedML (Lisa Koch).
+
+Oesterle, J., Krämer, N., Hennig, P., & Berens, P. (2022). Probabilistic solvers enable a straight-forward exploration of numerical uncertainty in neuroscience models. Journal of Computational Neuroscience, 50(4), 485–503. https://doi.org/10.1007/s10827-022-00827-7
+Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).
+
+Behrens, C., Yadav, S. C., Korympidou, M. M., Zhang, Y., Haverkamp, S., Irsen, S., Schaedler, A., Lu, X., Liu, Z., Lause, J., St-Pierre, F., Franke, K., Vlasits, A., Dedek, K., Smith, R. G., Euler, T., Berens, P., & Schubert, T. (2022). Retinal horizontal cells use different synaptic sites for global feedforward and local feedback signaling. Current Biology, 32(3), 545-558.e5. https://doi.org/10.1016/j.cub.2021.11.055
+Collaboration: All (Philipp Berens), Embedding (Jan Lause), and Neural (Christian Behrens).
+
+Boreiko, V., Ilanchezian, I., Seçkin Ayhan, M., Müller, S., Koch, L. M., Faber, H., Berens, P., & Hein, M. (2022). Visual explanations for the detection of diabetic retinopathy from retinal fundus images. https://doi.org/10.1101/2022.07.06.22276633
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan, Indu Ilanchezian, Lisa Koch, Sarah Müller).
+
+Ayhan, M. S., Faber, H., Kühlewein, L., Inhoffen, W., Aliyeva, G., Ziemssen, F., & Berens, P. (2023). Multitask Learning for Activity Detection in Neovascular Age-Related Macular Degeneration. Translational Vision Science &amp; Technology, 12(4), 12. https://doi.org/10.1167/tvst.12.4.12
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
+
+Congiu, M., Mondoloni, S., Zouridis, I. S., Schmors, L., Lecca, S., Lalive, A. L., Ginggen, K., Deng, F., Berens, P., Paolicelli, R. C., Li, Y., Burgalossi, A., & Mameli, M. (2023). Plasticity of neuronal dynamics in the lateral habenula for cue-punishment associative learning. Molecular Psychiatry, 28(12), 5118–5127. https://doi.org/10.1038/s41380-023-02155-3
+Collaboration: All (Philipp Berens) and Neural (Lisa Schmors).
+
+Donteu Djoumessi, K. R., Ilanchezian, I., Kühlewein, L., Faber, H., Baumgartner, C. F., Bah, B., Berens, P., & Koch, L. M. (2023). Sparse Activations for Interpretable Disease Grading. https://doi.org/10.1101/2023.03.07.23286895
+Collaboration: All (Philipp Berens) and MedML (Kerol Djoumessi, Indu Ilanchezian, Lisa Koch).
+
+Höfling, L., Szatko, K. P., Behrens, C., Deng, Y., Qiu, Y., Klindt, D. A., Jessen, Z., Schwartz, G. W., Bethge, M., Berens, P., Franke, K., Ecker, A. S., & Euler, T. (2024). A chromatic feature detector in the retina signals visual context changes. ELife, 13. CLOCKSS. https://doi.org/10.7554/elife.86860
+Collaboration: All (Philipp Berens) and Neural (Christian Behrens).
+
+Zouridis, I. S., Schmors, L., Lecca, S., Congiu, M., Mameli, M., Berens, P., & Burgalossi, A. (2024). Aversion encoding and behavioral state modulation of lateral habenula neurons. https://doi.org/10.1101/2024.09.09.612004
+Collaboration: All (Philipp Berens) and Neural (Lisa Schmors).
+
+Müller, S., Fay, L., Koch, L. M., Gatidis, S., Küstner, T., & Berens, P. (2024). Benchmarking Dependence Measures to Prevent Shortcut Learning in Medical Imaging. Machine Learning in Medical Imaging, 53–62. https://doi.org/10.1007/978-3-031-73290-4_6
+Collaboration: All (Philipp Berens) and MedML (Lisa Koch, Sarah Müller).
+
+Deistler, M., Kadhim, K. L., Pals, M., Beck, J., Huang, Z., Gloeckler, M., Lappalainen, J. K., Schröder, C., Berens, P., Gonçalves, P. J., & Macke, J. H. (2024). Jaxley: Differentiable simulation enables large-scale training of detailed biophysical models of neural dynamics. https://doi.org/10.1101/2024.08.21.608979
+Collaboration: All (Philipp Berens, Ziwei Huang) and Neural (Jonas Beck, Kyra Kadhim).
+
+Koch, L. M., Baumgartner, C. F., & Berens, P. (2024). Distribution shift detection for the postmarket surveillance of medical AI algorithms: a retrospective simulation study. Npj Digital Medicine, 7(1). https://doi.org/10.1038/s41746-024-01085-w
+Collaboration: All (Philipp Berens) and MedML (Lisa Koch).
+
+Varghese, J., Schuster, A., Poschkamp, B., Yildirim, K., Oehm, J., Berens, P., Müller, S., Gervelmeyer, J., Koch, L., Hoffmann, K., Sedlmayr, M., Kakkassery, V., Kohlbacher, O., Merle, D., Bartz-Schmidt, K. U., Ueffing, M., Stahl, D., Leddig, T., Bialke, M., … Eter, N. (2024). EyeMatics: An Ophthalmology Use Case Within the German Medical Informatics Initiative. JMIR Medical Informatics, 12, e60851–e60851. https://doi.org/10.2196/60851
+Collaboration: All (Philipp Berens) and MedML (Julius Gervelmeyer, Lisa Koch, Sarah Müller).
+
+Gervelmeyer, J., Müller, S., Djoumessi, K., Merle, D., Clark, S. J., Koch, L., & Berens, P. (2024). Interpretable-by-design Deep Survival Analysis for Disease Progression Modeling. https://doi.org/10.1101/2024.07.11.24310270
+Collaboration: All (Philipp Berens) and MedML (Kerol Djoumessi, Julius Gervelmeyer, Lisa Koch, Sarah Müller).
+
+Ayhan, M. S., Neubauer, J., Uzel, M. M., Gelisken, F., & Berens, P. (2024). Interpretable detection of epiretinal membrane from optical coherence tomography with deep neural networks. Scientific Reports, 14(1). https://doi.org/10.1038/s41598-024-57798-1
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
+
+González-Márquez, R., Berens, P., & Kobak, D. (2024). Meet the authors: Rita González-Márquez, Philipp Berens, and Dmitry Kobak. Patterns, 5(6), 100993. https://doi.org/10.1016/j.patter.2024.100993
+Collaboration: All (Philipp Berens) and Embedding (Rita González Márquez).
+
+Multivariate Analytics Based on High-Dimensional Data: Concepts and Misconceptions. (2024). Multivariate Biomarker Discovery, 16–24. https://doi.org/10.1017/9781009006767.004
+Collaboration: All (Philipp Berens) and Embedding (Sebastian Damrich, Dmitry Kobak).
+
+Lause, J., Kobak, D., & Berens, P. (2024). The art of seeing the elephant in the room: 2D embeddings of single-cell data do make sense. https://doi.org/10.1101/2024.03.26.586728
+Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak, Jan Lause).
+
+Djoumessi, K., Bah, B., Kühlewein, L., Berens, P., & Koch, L. (2024). This Actually Looks Like that: Proto-BagNets for Local and Global Interpretability-by-Design. Medical Image Computing and Computer Assisted Intervention – MICCAI 2024, 718–728. https://doi.org/10.1007/978-3-031-72117-5_67
+Collaboration: All (Philipp Berens) and MedML (Kerol Djoumessi, Lisa Koch).
+
+Damrich, S., Klockow, M. V., Berens, P., Hamprecht, F. A., & Kobak, D. (2024). Visualizing single-cell data with the neighbor embedding spectrum. https://doi.org/10.1101/2024.04.26.590867
+Collaboration: All (Philipp Berens) and Embedding (Sebastian Damrich, Dmitry Kobak).
+
+Djoumessi, K., Huang, Z., Kühlewein, L., Rickmann, A., Simon, N., Koch, L. M., & Berens, P. (2025). An inherently interpretable AI model improves screening speed and accuracy for early diabetic retinopathy. PLOS Digital Health, 4(5), e0000831. https://doi.org/10.1371/journal.pdig.0000831
+Collaboration: All (Philipp Berens, Ziwei Huang) and MedML (Kerol Djoumessi, Lisa Koch).
+
+Mensah, S. O., Neubauer, J., Ayhan, M. S., Djoumessi, K., Koch, L., Uzel, M. M., Gelisken, F., & Berens, P. (2025). Clinically Interpretable Deep Learning via Sparse BagNets for Epiretinal Membrane and Related Pathology Detection. https://doi.org/10.1101/2025.06.05.25329045
+Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan, Kerol Djoumessi, Lisa Koch, Samuel Ofosu Mensah).
+
+Bernaerts, Y., Deistler, M., Gonçalves, P. J., Beck, J., Stimberg, M., Scala, F., Tolias, A. S., Macke, J. H., Kobak, D., & Berens, P. (2025). Combined statistical-biophysical modeling links ion channel genes to physiology of cortical neuron types. Patterns, 101323. https://doi.org/10.1016/j.patter.2025.101323
+Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Jonas Beck).
+
+Ilanchezian, I., Boreiko, V., Kühlewein, L., Huang, Z., Seçkin Ayhan, M., Hein, M., Koch, L., & Berens, P. (2025). Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models. PLOS Digital Health, 4(5), e0000853. https://doi.org/10.1371/journal.pdig.0000853
+Collaboration: All (Philipp Berens, Ziwei Huang) and MedML (Murat Seçkin Ayhan, Indu Ilanchezian, Lisa Koch).
+
+Müller, S., Koch, L. M., Lensch, H. P. A., & Berens, P. (2025). Disentangling representations of retinal images with generative models. Medical Image Analysis, 105, 103628. https://doi.org/10.1016/j.media.2025.103628
+Collaboration: All (Philipp Berens) and MedML (Lisa Koch, Sarah Müller).
+
+Schmors, L., Kotkat, A. H., Bauer, Y., Huang, Z., Crombie, D., Meyerolbersleben, L. S., Sokoloski, S., Berens, P., & Busse, L. (2025). Effects of corticothalamic feedback depend on visual responsiveness and stimulus type. IScience, 28(6), 112481. https://doi.org/10.1016/j.isci.2025.112481
+Collaboration: All (Philipp Berens, Ziwei Huang) and Neural (Lisa Schmors, Sacha Sokoloski).
+
+Gervelmeyer, J., Müller, S., Huang, Z., & Berens, P. (2025). Fundus Image Toolbox: A Python package for fundus image processing. Journal of Open Source Software, 10(108), 7101. https://doi.org/10.21105/joss.07101
+Collaboration: All (Philipp Berens, Ziwei Huang) and MedML (Julius Gervelmeyer, Sarah Müller).
+
+Schmidt, G., Heidrich, H., Berens, P., & Müller, S. (2025). Learning Disease State from Noisy Ordinal Disease Progression Labels. Medical Image Computing and Computer Assisted Intervention – MICCAI 2025, 284–293. https://doi.org/10.1007/978-3-032-04971-1_27
+Collaboration: All (Philipp Berens) and MedML (Sarah Müller).
+
+Ofosu Mensah, S., Djoumessi, K., & Berens, P. (2025). Prototype-Guided and Lightweight Adapters for Inherent Interpretation and Generalisation in Federated Learning. Medical Image Computing and Computer Assisted Intervention – MICCAI 2025, 464–473. https://doi.org/10.1007/978-3-032-04981-0_44
+Collaboration: All (Philipp Berens) and MedML (Kerol Djoumessi, Samuel Ofosu Mensah).
+
+Oesterle, J., Ran, Y., Stahr, P., Kerr, J. N. D., Schubert, T., Berens, P., & Euler, T. (2025). Task-specific regional circuit adaptations in distinct mouse retinal ganglion cells. Science Advances, 11(17). https://doi.org/10.1126/sciadv.adp7075
+Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).

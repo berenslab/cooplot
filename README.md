@@ -53,6 +53,32 @@ fig = cooplot.show(mats, group_col="group", style="both", heatmap_counts=True, f
 
 ![](.github/agberens.png)
 
+You can also generate a list of reference highlighting the cross-group collaboration:
+
+```python
+groups = cooplot.aggregate(pubs, name_col="name", cache_dir=".cache/agberens-group")
+_ = cooplot.cross_group_publications(groups, year_from=2016, year_to=2025, out_path=".cache/agberens-coop.csv", enrich_crossref=True)
+cooplot.cross_group_report(".cache/agberens-coop.csv", out_path=".cache/agberens-coop-ref.txt", verbose=True)
+```
+
+which will give you
+
+```
+...
+
+Gervelmeyer, J., Müller, S., Huang, Z., & Berens, P. (2025). Fundus Image Toolbox: A Python package for fundus image processing. Journal of Open Source Software, 10(108), 7101. https://doi.org/10.21105/joss.07101
+Collaboration: All (Philipp Berens, Ziwei Huang) and MedML (Julius Gervelmeyer, Sarah Müller).
+
+Schmidt, G., Heidrich, H., Berens, P., & Müller, S. (2025). Learning Disease State from Noisy Ordinal Disease Progression Labels. Medical Image Computing and Computer Assisted Intervention – MICCAI 2025, 284–293. https://doi.org/10.1007/978-3-032-04971-1_27
+Collaboration: All (Philipp Berens) and MedML (Sarah Müller).
+
+Ofosu Mensah, S., Djoumessi, K., & Berens, P. (2025). Prototype-Guided and Lightweight Adapters for Inherent Interpretation and Generalisation in Federated Learning. Medical Image Computing and Computer Assisted Intervention – MICCAI 2025, 464–473. https://doi.org/10.1007/978-3-032-04981-0_44
+Collaboration: All (Philipp Berens) and MedML (Kerol Djoumessi, Samuel Ofosu Mensah).
+
+Oesterle, J., Ran, Y., Stahr, P., Kerr, J. N. D., Schubert, T., Berens, P., & Euler, T. (2025). Task-specific regional circuit adaptations in distinct mouse retinal ganglion cells. Science Advances, 11(17). https://doi.org/10.1126/sciadv.adp7075
+Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).
+```
+
 
 ## Installation
 

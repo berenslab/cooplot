@@ -37,6 +37,15 @@ class _PubMedDetails:
     year: Optional[int] = None
 
 
+@dataclass(frozen=True)
+class _CrossrefDetails:
+    doi: Optional[str]
+    title: Optional[str]
+    authors: Optional[List[str]]
+    container: Optional[str]
+    year: Optional[int]
+
+
 def _ensure_group_mapping(
     grouped: GroupedPublications | Dict[str, List[dict]],
 ) -> Dict[str, List[dict]]:
@@ -267,11 +276,15 @@ def cross_group_publications(
     include_unlabeled: bool = False,
     min_group_count: int = 2,
     out_path: str | Path | None = None,
+    overwrite: bool = False,
     ensure_ascii: bool = False,
     enrich_pubmed: bool = False,
     ncbi_api_key: str | None = None,
     ncbi_email: str | None = None,
     ncbi_min_delay: Optional[float] = None,
+    enrich_crossref: bool = False,
+    crossref_mailto: str | None = None,
+    crossref_min_delay: Optional[float] = None,
 ) -> List[dict]:
     """Identify publications that include authors from multiple groups.
 
@@ -295,6 +308,10 @@ def cross_group_publications(
     out_path
         Optional destination file. When provided, the extension determines the
         export format (``.json`` or ``.csv``).
+    overwrite
+        When ``True`` and ``out_path`` exists any cached data is ignored and the
+        file is regenerated. When ``False`` (default) an existing ``out_path`` is
+        reused without recomputing results.
     ensure_ascii
         Controls :func:`json.dumps(ensure_ascii=...)` when exporting to JSON.
     enrich_pubmed
@@ -313,6 +330,16 @@ def cross_group_publications(
     ncbi_min_delay
         Minimum delay between successive NCBI requests in seconds. Defaults to
         ``0.34`` seconds without an API key or ``0.11`` seconds with a key.
+    enrich_crossref
+        When ``True`` missing ``doi`` values are resolved via the Crossref Works
+        API. Network errors are ignored and represented as ``None`` values.
+    crossref_mailto
+        Optional contact email forwarded to Crossref when making requests.
+        Falls back to the ``CROSSREF_MAILTO`` environment variable when not
+        supplied. Including a contact email is recommended by Crossref.
+    crossref_min_delay
+        Minimum delay between successive Crossref requests in seconds. Defaults
+        to ``1.0`` to follow the polite rate limit suggested by Crossref.
 
     Returns
     -------
@@ -320,7 +347,9 @@ def cross_group_publications(
         Each dict contains ``title``, ``norm_title``, ``year``, ``groups`` and an
         ``authors`` mapping keyed by group name. When ``enrich_pubmed`` is ``True``
         the records also provide ``pubmed_id``, ``doi``, ``pubmed_authors`` (NCBI
-        author order) and ``pubmed_journal``.
+        author order) and ``pubmed_journal``. When ``enrich_crossref`` is ``True``
+        the results may include ``doi``, ``crossref_title``, ``crossref_authors``
+        and ``crossref_container`` fields sourced from Crossref.
     """
 
     grouped = _ensure_group_mapping(grouped_publications)
@@ -328,7 +357,7 @@ def cross_group_publications(
     out_file: Optional[Path] = None
     if out_path is not None:
         out_file = Path(out_path)
-        if out_file.exists():
+        if out_file.exists() and not overwrite:
             existing = _load_cross_group_records(out_file)
             existing.sort(key=_publication_sort_key)
             return existing
@@ -407,8 +436,10 @@ def cross_group_publications(
 
     results.sort(key=_publication_sort_key)
 
-    if enrich_pubmed and results:
+    if results and (enrich_pubmed or enrich_crossref):
         _ensure_env_loaded()
+
+    if enrich_pubmed and results:
         resolved_api_key = ncbi_api_key or os.getenv("NCBI_API_KEY")
         resolved_email = ncbi_email or os.getenv("NCBI_EMAIL")
         lookup = _PubMedLookup(
@@ -462,6 +493,68 @@ def cross_group_publications(
 
         results = _deduplicate_pubmed_records(results)
 
+    if enrich_crossref and results:
+        resolved_mailto = crossref_mailto or os.getenv("CROSSREF_MAILTO")
+        lookup = _CrossrefLookup(
+            mailto=resolved_mailto,
+            min_delay=crossref_min_delay,
+        )
+        cache: Dict[Tuple[str, Optional[int]], _CrossrefDetails] = {}
+        empty_details = _CrossrefDetails(None, None, None, None, None)
+        for record in results:
+            if record.get("doi"):
+                continue
+            key = (record["norm_title"], record["year"])
+            details = cache.get(key)
+            if details is None:
+                year_value = record.get("year")
+                titles_to_try: List[str] = []
+                title_value = record.get("title")
+                if isinstance(title_value, str) and title_value.strip():
+                    titles_to_try.append(title_value.strip())
+                norm_value = record.get("norm_title")
+                if (
+                    isinstance(norm_value, str)
+                    and norm_value.strip()
+                    and norm_value.strip() not in {t.strip() for t in titles_to_try}
+                ):
+                    titles_to_try.append(norm_value.strip())
+
+                for candidate in titles_to_try:
+                    details = lookup.identifiers_for_title(candidate, year_value)
+                    if details is not None:
+                        break
+
+                if details is None:
+                    details = empty_details
+                local_authors = _flatten_authors(record.get("authors") or {})
+                if (
+                    details is not empty_details
+                    and details.authors
+                    and not _authors_match(local_authors, details.authors)
+                ):
+                    _LOG.warning(
+                        "Skipping Crossref enrichment for '%s' due to author mismatch",
+                        record.get("title") or record.get("norm_title"),
+                    )
+                    details = empty_details
+                cache[key] = details
+            if details is empty_details:
+                continue
+            if details.doi and not record.get("doi"):
+                record["doi"] = details.doi
+            if details.title and not record.get("crossref_title"):
+                record["crossref_title"] = details.title
+            if details.authors and not record.get("crossref_authors"):
+                record["crossref_authors"] = details.authors
+            if details.container and not record.get("crossref_container"):
+                record["crossref_container"] = details.container
+            if (
+                details.year is not None
+                and record.get("year") is None
+            ):
+                record["year"] = details.year
+
     if out_path is None:
         return results
 
@@ -476,14 +569,28 @@ def cross_group_publications(
         )
     elif suffix == ".csv":
         base_fields = ["title", "norm_title", "year", "groups", "authors"]
-        include_pubmed = bool(results and "pubmed_id" in results[0])
-        extra_fields = [
-            "pubmed_id",
-            "doi",
-            "pubmed_authors",
-            "pubmed_journal",
-        ]
-        fieldnames = base_fields + (extra_fields if include_pubmed else [])
+        include_pubmed = any(record.get("pubmed_id") for record in results)
+        include_crossref = any(
+            record.get("crossref_title")
+            or record.get("crossref_authors")
+            or record.get("crossref_container")
+            for record in results
+        )
+        include_doi = include_pubmed or include_crossref or any(
+            record.get("doi") for record in results
+        )
+        extra_fields: List[str] = []
+        if include_pubmed:
+            extra_fields.extend(["pubmed_id", "doi", "pubmed_authors", "pubmed_journal"])
+        elif include_doi:
+            extra_fields.append("doi")
+        if include_crossref:
+            if "doi" not in extra_fields and include_doi:
+                extra_fields.append("doi")
+            extra_fields.extend(
+                ["crossref_title", "crossref_authors", "crossref_container"]
+            )
+        fieldnames = base_fields + extra_fields
         with out_file.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.DictWriter(fh, fieldnames=fieldnames)
             writer.writeheader()
@@ -499,9 +606,10 @@ def cross_group_publications(
                         separators=(",", ":"),
                     ),
                 }
+                if "doi" in extra_fields:
+                    row["doi"] = record.get("doi") or ""
                 if include_pubmed:
                     row["pubmed_id"] = record.get("pubmed_id") or ""
-                    row["doi"] = record.get("doi") or ""
                     authors_list = record.get("pubmed_authors")
                     row["pubmed_authors"] = (
                         json.dumps(
@@ -513,6 +621,19 @@ def cross_group_publications(
                         else ""
                     )
                     row["pubmed_journal"] = record.get("pubmed_journal") or ""
+                if include_crossref:
+                    row["crossref_title"] = record.get("crossref_title") or ""
+                    crossref_authors = record.get("crossref_authors")
+                    row["crossref_authors"] = (
+                        json.dumps(
+                            crossref_authors,
+                            ensure_ascii=ensure_ascii,
+                            separators=(",", ":"),
+                        )
+                        if crossref_authors
+                        else ""
+                    )
+                    row["crossref_container"] = record.get("crossref_container") or ""
                 writer.writerow(row)
     else:
         raise ValueError(
@@ -540,6 +661,7 @@ def cross_group_report(
     citation_style: str = "apa",
     citation_locale: str = "en-US",
     out_path: str | Path | None = None,
+    overwrite: bool = False,
     ensure_ascii: bool = False,
     pubmed_min_delay: Optional[float] = None,
     verbose: bool = False,
@@ -558,6 +680,10 @@ def cross_group_report(
     out_path
         Optional destination file. When provided the report text is also written
         to this location.
+    overwrite
+        When ``True`` and ``out_path`` exists the report is regenerated regardless
+        of any existing content. When ``False`` (default) an existing file is
+        returned without recomputing citations.
     ensure_ascii
         When ``True`` the generated text is normalised to ASCII before returning
         or writing to ``out_path``.
@@ -572,9 +698,17 @@ def cross_group_report(
     -------
     str
         Multi-line report containing citations and collaboration summaries.
+        Records without a DOI or PubMed ID are skipped; when PubMed information
+        is missing Crossref metadata (if provided) is used to format fallback
+        citations.
     """
 
     path = Path(input_path)
+    out_file: Optional[Path] = None
+    if out_path is not None:
+        out_file = Path(out_path)
+        if out_file.exists() and not overwrite:
+            return out_file.read_text(encoding="utf-8-sig")
     records = _load_cross_group_records(path)
     if not records:
         report = ""
@@ -593,19 +727,33 @@ def cross_group_report(
             title = record.get("title") or record.get("norm_title") or "Untitled"
             doi = _clean_doi(record.get("doi") or record.get("DOI"))
             pmid = record.get("pubmed_id") or record.get("pmid")
-            if not doi or not pmid:
+            has_doi = bool(doi)
+            has_pmid = bool(pmid)
+            if not (has_doi or has_pmid):
                 if printer:
                     printer(
-                        f"Skipping record {index}/{total}: '{title}' (missing DOI or PubMed ID)",
+                        f"Skipping record {index}/{total}: '{title}' (missing DOI and PubMed ID)",
                     )
                 continue
             if printer:
                 printer(f"Processing record {index}/{total}: {title}")
             citation = fetcher.citation_for(record)
             if not citation:
-                citation = record.get("title") or record.get("norm_title") or "Untitled"
-                if printer:
-                    printer(f"Citation unavailable for '{title}'; using fallback text.")
+                crossref_text = _format_crossref_citation(record)
+                if crossref_text:
+                    citation = crossref_text
+                    if printer:
+                        printer(
+                            f"Citation unavailable via DOI/PubMed for '{title}'; using Crossref metadata.",
+                        )
+                else:
+                    citation = (
+                        record.get("title") or record.get("norm_title") or "Untitled"
+                    )
+                    if printer:
+                        printer(
+                            f"Citation unavailable for '{title}'; using fallback text.",
+                        )
             elif printer:
                 printer(f"Retrieved citation for '{title}': {citation}")
             collab = _format_collaboration_line(record)
@@ -616,7 +764,7 @@ def cross_group_report(
         report = report.encode("ascii", "ignore").decode("ascii")
 
     if out_path is not None:
-        out_file = Path(out_path)
+        assert out_file is not None
         out_file.parent.mkdir(parents=True, exist_ok=True)
         encoding = "ascii" if ensure_ascii else "utf-8-sig"
         out_file.write_text(report, encoding=encoding)
@@ -775,6 +923,38 @@ def _format_summary_citation(details: _PubMedDetails) -> str:
     return " ".join(parts).strip()
 
 
+def _format_crossref_citation(record: dict) -> str:
+    title = (
+        record.get("crossref_title")
+        or record.get("title")
+        or record.get("norm_title")
+        or "Untitled"
+    )
+    authors = record.get("crossref_authors") or []
+    container = record.get("crossref_container")
+    year = record.get("year")
+    doi = _clean_doi(record.get("doi") or record.get("DOI"))
+
+    has_crossref_details = any([record.get("crossref_title"), authors, container])
+    if not has_crossref_details and not doi:
+        return ""
+
+    parts: List[str] = []
+    if authors:
+        parts.append(", ".join(authors))
+    if year:
+        parts.append(f"({year}).")
+    if title:
+        clean_title = title.rstrip(".")
+        parts.append(f"{clean_title}.")
+    if container:
+        container_clean = container.rstrip(".")
+        parts.append(f"{container_clean}.")
+    if doi:
+        parts.append(f"https://doi.org/{doi}")
+    return " ".join(parts).strip()
+
+
 class _CitationFetcher:
     def __init__(
         self,
@@ -863,6 +1043,190 @@ class _CitationFetcher:
         if self._printer:
             self._emit(f"Formatted citation from PubMed summary for PMID {pmid}")
         return citation
+
+
+class _CrossrefLookup:
+    """Lookup helper for resolving DOIs via the Crossref Works API."""
+
+    _SEARCH_URL = "https://api.crossref.org/works"
+
+    def __init__(
+        self,
+        *,
+        mailto: Optional[str] = None,
+        min_delay: Optional[float] = None,
+        session: Optional[requests.Session] = None,
+    ) -> None:
+        self.mailto = mailto if mailto is not None else os.getenv("CROSSREF_MAILTO")
+        default_delay = 1.0
+        self.min_delay = default_delay if min_delay is None else max(min_delay, 0.0)
+        self._last_request = 0.0
+        self._session = session or requests.Session()
+        base_agent = "cooplot-doi-lookup/1.0"
+        if self.mailto:
+            self._headers = {"User-Agent": f"{base_agent} (mailto:{self.mailto})"}
+        else:
+            self._headers = {"User-Agent": base_agent}
+
+    def identifiers_for_title(
+        self,
+        title: Optional[str],
+        year: Optional[int],
+    ) -> _CrossrefDetails | None:
+        if not title:
+            return None
+        try:
+            items = self._search(title, year)
+        except Exception:
+            return None
+        if not items:
+            return None
+        target_norm = _normalise_title_text(title)
+        exact: List[Tuple[float, _CrossrefDetails]] = []
+        fallback: List[Tuple[float, _CrossrefDetails]] = []
+        for item in items:
+            details = self._parse_item(item)
+            if details is None:
+                continue
+            if year is not None and details.year is not None and details.year != year:
+                continue
+            score = 0.0
+            raw_score = item.get("score")
+            if isinstance(raw_score, (int, float)):
+                score = float(raw_score)
+            if details.title and _normalise_title_text(details.title) == target_norm:
+                exact.append((score, details))
+            else:
+                fallback.append((score, details))
+        if exact:
+            exact.sort(key=lambda pair: pair[0], reverse=True)
+            return exact[0][1]
+        if fallback:
+            fallback.sort(key=lambda pair: pair[0], reverse=True)
+            return fallback[0][1]
+        return None
+
+    def _search(self, title: str, year: Optional[int]) -> List[dict]:
+        clean_title = title.strip()
+        if not clean_title:
+            return []
+        params: Dict[str, str] = {
+            "query.bibliographic": clean_title,
+            "rows": "5",
+            "select": "DOI,title,author,container-title,issued,published-print,published-online,score",
+        }
+        filters: List[str] = []
+        if year is not None:
+            filters.append(f"from-pub-date:{year}")
+            filters.append(f"until-pub-date:{year}")
+        if filters:
+            params["filter"] = ",".join(filters)
+        data = self._request_json(self._SEARCH_URL, params)
+        message = data.get("message", {})
+        items = message.get("items")
+        if isinstance(items, list):
+            return items
+        return []
+
+    def _parse_item(self, item: dict) -> _CrossrefDetails | None:
+        if not isinstance(item, dict):
+            return None
+        doi = item.get("DOI")
+        if not isinstance(doi, str) or not doi.strip():
+            return None
+        doi = doi.strip()
+        titles = item.get("title")
+        title: Optional[str] = None
+        if isinstance(titles, list):
+            for entry in titles:
+                if isinstance(entry, str) and entry.strip():
+                    title = entry.strip()
+                    break
+        authors_data = item.get("author")
+        authors: List[str] = []
+        if isinstance(authors_data, list):
+            for author in authors_data:
+                if not isinstance(author, dict):
+                    continue
+                given = author.get("given")
+                family = author.get("family")
+                parts: List[str] = []
+                if isinstance(given, str) and given.strip():
+                    parts.append(given.strip())
+                if isinstance(family, str) and family.strip():
+                    parts.append(family.strip())
+                if not parts and isinstance(author.get("name"), str):
+                    name = author["name"].strip()
+                    if name:
+                        parts.append(name)
+                name_combined = " ".join(parts).strip()
+                if name_combined:
+                    authors.append(name_combined)
+        container_list = item.get("container-title")
+        container: Optional[str] = None
+        if isinstance(container_list, list):
+            for entry in container_list:
+                if isinstance(entry, str) and entry.strip():
+                    container = entry.strip()
+                    break
+        year = self._extract_year(item)
+        return _CrossrefDetails(
+            doi=doi,
+            title=title,
+            authors=authors or None,
+            container=container,
+            year=year,
+        )
+
+    def _extract_year(self, item: dict) -> Optional[int]:
+        for key in ("issued", "published-print", "published-online"):
+            block = item.get(key)
+            if isinstance(block, dict):
+                parts = block.get("date-parts")
+                if isinstance(parts, list) and parts:
+                    first = parts[0]
+                    if isinstance(first, (list, tuple)) and first:
+                        try:
+                            return int(first[0])
+                        except Exception:
+                            return None
+        return None
+
+    def _request_json(self, url: str, params: Dict[str, str]) -> dict:
+        if self.mailto:
+            params.setdefault("mailto", self.mailto)
+        retries = 3
+        for attempt in range(retries):
+            self._respect_rate_limit()
+            response = self._session.get(
+                url,
+                params=params,
+                headers=self._headers,
+                timeout=20,
+            )
+            try:
+                response.raise_for_status()
+            except requests.HTTPError as exc:  # pragma: no cover - network dependent
+                status = exc.response.status_code if exc.response else None
+                if status in {429, 503} and attempt < retries - 1:
+                    time.sleep(max(self.min_delay, 1.0))
+                    continue
+                raise
+            try:
+                return response.json()
+            except ValueError:
+                return {}
+        return {}
+
+    def _respect_rate_limit(self) -> None:
+        if self.min_delay <= 0:
+            self._last_request = time.monotonic()
+            return
+        now = time.monotonic()
+        elapsed = now - self._last_request
+        if elapsed < self.min_delay:
+            time.sleep(self.min_delay - elapsed)
+        self._last_request = time.monotonic()
 
 
 class _PubMedLookup:

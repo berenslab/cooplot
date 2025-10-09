@@ -67,7 +67,7 @@ pubs = cp.scrape(
 )
 groups = cooplot.aggregate(pubs, name_col="name", cache_dir=".cache/hzn-group")
 res = cooplot.cross_group_publications(groups, year_from=2020, year_to=2025, out_path="./output/hzn-coop.csv", enrich_pubmed=True)
-cooplot.metrics.cross_group_report("./output/hzn-coop.csv", out_path="./output/hzn-coop-ref.txt", verbose=True)
+cooplot.cross_group_report("./output/hzn-coop.csv", out_path="./output/hzn-coop-ref.txt", verbose=True)
 ```
 
 Reference List:

@@ -7,7 +7,7 @@ from typing import Dict, Iterable, List
 from .aggregate import GroupedPublications, aggregate_publications
 from .build import build_matrices
 from .io import read_rows_with_header
-from .metrics import cross_group_publications
+from .metrics import cross_group_publications, cross_group_report as _cross_group_report
 from .scrape import Publications, scrape_all
 from .viz import plot_panels
 
@@ -183,3 +183,8 @@ def show(
         heatmap_counts=heatmap_counts,
         figsize=figsize,
     )
+
+
+def cross_group_report(*args, **kwargs):
+    """Wrapper for :func:`cooplot.metrics.cross_group_report` for convenience."""
+    return _cross_group_report(*args, **kwargs)

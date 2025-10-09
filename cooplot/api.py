@@ -145,7 +145,7 @@ def show(
     mats,
     *,
     group_col=None,
-    style="circle",
+    style=None,
     vmax=None,
     palette=None,
     cap_weights=None,
@@ -155,13 +155,25 @@ def show(
     heatmap_counts=False,
     figsize=None,
 ):
+    if style is None:
+        try:
+            win_count = len(mats)
+        except TypeError:
+            win_count = len(list(mats.keys()))
+        if win_count == 1:
+            resolved_style = "both"
+        else:
+            resolved_style = "circle"
+    else:
+        resolved_style = style
+
     return plot_panels(
         mats,
         out_path=None,
         group_col=group_col,
         palette=palette,
         vmax=vmax,
-        style=style,
+        style=resolved_style,
         show=True,
         return_fig=True,
         cap_weights=cap_weights,

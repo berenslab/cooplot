@@ -133,6 +133,19 @@ def plot_panels(
     if not wins:
         raise ValueError("No matrices to plot.")
 
+    style_requested = (style or "circle").lower()
+    allowed_styles = {"circle", "heatmap", "both"}
+    if style_requested not in allowed_styles:
+        raise ValueError(
+            f"Unsupported style '{style}'. Expected one of {sorted(allowed_styles)}."
+        )
+    if not HAVE_CIRCLE and style_requested in {"circle", "both"}:
+        style_mode = "heatmap"
+    else:
+        style_mode = style_requested
+    if style_mode == "both" and len(wins) != 1:
+        raise ValueError("Style 'both' is only supported when a single window is provided.")
+
     base_labels = mats[wins[0]]["labels"]
     label_to_group_map = mats[wins[0]].get("label_to_group", {}) or {}
     group_col_for_plot = group_col or ("Group" if label_to_group_map else None)
@@ -159,7 +172,9 @@ def plot_panels(
         if k not in unique_groups:
             unique_groups.append(k)
 
-    if style == "heatmap" or not HAVE_CIRCLE:
+    if style_mode == "both":
+        default_figsize = (15, 9)
+    elif style_mode == "heatmap":
         default_figsize = (6 * len(wins), 6)
     else:
         default_figsize = (9 * len(wins), 9)
@@ -179,9 +194,17 @@ def plot_panels(
     legend_font = _scaled(9, 6)
 
     legend_title_font = _scaled(10, 7)
+    heatmap_title_font = _scaled(12, 9)
+    tick_pad = max(1.0, 3.0 * scale)
+    tick_box_pad = max(0.2, 0.2 * scale)
+    count_font = _scaled(6, 4)
+    stroke_width = max(0.6, 0.8 * scale)
+    circle_title_font = _scaled(18, 10)
+    circle_name_font = _scaled(10, 6)
+    label_box_pad = max(0.3, 0.4 * scale)
 
     # Heatmap path
-    if style == "heatmap" or not HAVE_CIRCLE:
+    if style_mode == "heatmap":
         fig, axes = plt.subplots(
             1,
             len(wins),
@@ -192,11 +215,6 @@ def plot_panels(
         last_im = None
         right_margin = 0.88 if legend_counts else 0.96
         bottom_margin = 0.25 if legend_groups and group_col_for_plot else 0.15
-        heatmap_title_font = _scaled(12, 9)
-        tick_pad = max(1.0, 3.0 * scale)
-        tick_box_pad = max(0.2, 0.2 * scale)
-        count_font = _scaled(6, 4)
-        stroke_width = max(0.6, 0.8 * scale)
 
         for i, w in enumerate(wins):
             M = np.array(mats[w]["matrix"], dtype=int)
@@ -330,6 +348,179 @@ def plot_panels(
             plt.close(fig)
         return None
 
+    if style_mode == "both":
+        fig = plt.figure(figsize=figsize_used)
+        gs = fig.add_gridspec(1, 2, width_ratios=[1.05, 1.0])
+        ax_heat = fig.add_subplot(gs[0, 0])
+        ax_circle = fig.add_subplot(gs[0, 1], projection="polar")
+        axs = [ax_heat, ax_circle]
+        w = wins[0]
+        M = np.array(mats[w]["matrix"], dtype=int)
+        M = M[np.ix_(perm, perm)]
+        if cap_weights is not None:
+            M = np.minimum(M, cap_weights)
+
+        ax_heat.imshow(M, vmin=0, vmax=vmax_used, cmap=cmap, interpolation="nearest")
+        ax_heat.set_title(w, loc="left", fontsize=heatmap_title_font)
+        tick_positions = np.arange(len(ordered_labels))
+        x_locator = FixedLocator(tick_positions)
+        y_locator = FixedLocator(tick_positions)
+        ax_heat.xaxis.set_major_locator(x_locator)
+        ax_heat.yaxis.set_major_locator(y_locator)
+        ax_heat.xaxis.set_major_formatter(FixedFormatter(ordered_labels))
+        ax_heat.yaxis.set_major_formatter(FixedFormatter(ordered_labels))
+        ax_heat.tick_params(axis="x", labelsize=tick_font, labelrotation=90, pad=tick_pad)
+        ax_heat.tick_params(axis="y", labelsize=tick_font, pad=tick_pad)
+
+        for tick_label, color in zip(ax_heat.get_xticklabels(), node_colors):
+            tick_label.set_color("white")
+            tick_label.set_bbox(
+                dict(facecolor=color, edgecolor=color, pad=tick_box_pad)
+            )
+            tick_label.set_rotation_mode("anchor")
+            tick_label.set_ha("right")
+            tick_label.set_va("center")
+
+        for tick_label, color in zip(ax_heat.get_yticklabels(), node_colors):
+            tick_label.set_color("white")
+            tick_label.set_bbox(
+                dict(facecolor=color, edgecolor=color, pad=tick_box_pad)
+            )
+            tick_label.set_va("center")
+            tick_label.set_ha("right")
+
+        if heatmap_counts:
+            vmax_for_text = float(vmax_used) if vmax_used else 0.0
+            threshold = vmax_for_text * 0.5
+            for r in range(M.shape[0]):
+                for c in range(M.shape[1]):
+                    val = M[r, c]
+                    try:
+                        val_float = float(val)
+                    except Exception:
+                        continue
+                    if np.isnan(val_float):
+                        continue
+                    try:
+                        disp = int(round(val_float))
+                    except Exception:
+                        disp = val_float
+                    if disp == 0:
+                        continue
+                    color_choice = "black"
+                    if vmax_for_text > 0 and val_float >= threshold:
+                        color_choice = "white"
+                    txt = ax_heat.text(
+                        c,
+                        r,
+                        f"{disp}",
+                        ha="center",
+                        va="center",
+                        fontsize=count_font,
+                        color=color_choice,
+                    )
+                    stroke = "black" if color_choice == "white" else "white"
+                    txt.set_path_effects(
+                        [
+                            patheffects.withStroke(
+                                linewidth=stroke_width, foreground=stroke
+                            )
+                        ]
+                    )
+
+        _circle(
+            M,
+            node_names=ordered_labels,
+            node_colors=node_colors,
+            vmin=0,
+            vmax=vmax_used,
+            colorbar=False,
+            facecolor="white",
+            textcolor="black",
+            colormap=cmap,
+            node_edgecolor="white",
+            fig=fig,
+            ax=ax_circle,
+            show=False,
+            fontsize_title=circle_title_font,
+            fontsize_names=circle_name_font,
+        )
+        for j, label in enumerate(ax_circle.texts):
+            label.set_color("white")
+            label.set_fontsize(circle_name_font)
+            label.set_bbox(
+                dict(
+                    facecolor=node_colors[j],
+                    edgecolor=node_colors[j],
+                    pad=label_box_pad,
+                )
+            )
+            rot = label.get_rotation()
+            if 90 <= rot < 270:
+                label.set_rotation(rot - 180)
+                label.set_va("center")
+                label.set_ha("left")
+
+        right_margin = 0.88
+        bottom_margin = 0.22 if legend_groups and group_col_for_plot else 0.12
+        fig.subplots_adjust(right=right_margin, bottom=bottom_margin, wspace=0.35)
+
+        if legend_counts:
+            norm = mcolors.Normalize(vmin=0, vmax=vmax_used)
+            sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
+            fig.canvas.draw()
+            ax_positions = [ax.get_position() for ax in axs]
+            right_edge = max(pos.x1 for pos in ax_positions)
+            bottom_edge = min(pos.y0 for pos in ax_positions)
+            top_edge = max(pos.y1 for pos in ax_positions)
+            available_width = max(1.0 - right_edge, 1e-3)
+            cbar_width = min(0.02, available_width * 0.9)
+            cbar_height = max((top_edge - bottom_edge) * 0.6, 0.05)
+            y0 = bottom_edge + (top_edge - bottom_edge - cbar_height) / 2
+            x0 = right_edge + (available_width - cbar_width) / 2
+            cax = fig.add_axes([x0, y0, cbar_width, cbar_height])
+            cb = fig.colorbar(sm, cax=cax)
+            label = counts_label + (
+                f" (capped at {cap_weights})" if cap_weights is not None else ""
+            )
+            cb.set_label(label, fontsize=cb_label_font)
+            cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+            cb.ax.tick_params(labelsize=cb_tick_font)
+
+        if legend_groups and group_col_for_plot:
+            handles = [
+                Patch(
+                    facecolor=used_palette.get(g, "#808080"),
+                    edgecolor="none",
+                    label=g or "Unlabeled",
+                )
+                for g in unique_groups
+            ]
+            fig.legend(
+                handles=handles,
+                title=group_col_for_plot,
+                loc="lower center",
+                ncol=min(len(handles), 6),
+                frameon=False,
+                prop={"size": legend_font},
+                title_fontsize=legend_title_font,
+            )
+
+        if out_path:
+            Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+            fig.savefig(out_path, dpi=300, bbox_inches="tight")
+            if save_pdf and str(out_path).lower().endswith(".png"):
+                fig.savefig(
+                    Path(out_path).with_suffix(".pdf"), dpi=300, bbox_inches="tight"
+                )
+        if show and not out_path:
+            plt.show()
+        if return_fig:
+            return fig
+        if out_path and not return_fig:
+            plt.close(fig)
+        return None
+
     # Circos path
     fig, axes = plt.subplots(
         1,
@@ -345,9 +536,6 @@ def plot_panels(
     right_margin = 0.88
     bottom_margin = 0.18 if legend_groups and group_col_for_plot else 0.08
     fig.subplots_adjust(right=right_margin, bottom=bottom_margin)
-    circle_title_font = _scaled(18, 10)
-    circle_name_font = _scaled(10, 6)
-    label_box_pad = max(0.3, 0.4 * scale)
 
     for i, w in enumerate(wins):
         M = np.array(mats[w]["matrix"], dtype=int)

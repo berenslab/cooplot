@@ -528,16 +528,19 @@ def cross_group_publications(
                 if details is None:
                     details = empty_details
                 local_authors = _flatten_authors(record.get("authors") or {})
-                if (
-                    details is not empty_details
-                    and details.authors
-                    and not _authors_match(local_authors, details.authors)
-                ):
-                    _LOG.warning(
-                        "Skipping Crossref enrichment for '%s' due to author mismatch",
-                        record.get("title") or record.get("norm_title"),
-                    )
-                    details = empty_details
+                if details is not empty_details:
+                    if not details.authors:
+                        _LOG.warning(
+                            "Skipping Crossref enrichment for '%s' due to missing author metadata",
+                            record.get("title") or record.get("norm_title"),
+                        )
+                        details = empty_details
+                    elif not _authors_match(local_authors, details.authors):
+                        _LOG.warning(
+                            "Skipping Crossref enrichment for '%s' due to author mismatch",
+                            record.get("title") or record.get("norm_title"),
+                        )
+                        details = empty_details
                 cache[key] = details
             if details is empty_details:
                 continue
@@ -1067,6 +1070,39 @@ class _CrossrefLookup:
             self._headers = {"User-Agent": f"{base_agent} (mailto:{self.mailto})"}
         else:
             self._headers = {"User-Agent": base_agent}
+        self._doi_author_cache: Dict[str, Optional[List[str]]] = {}
+
+    @staticmethod
+    def _extract_names(entries: Optional[List[dict]]) -> List[str]:
+        names: List[str] = []
+        if not isinstance(entries, list):
+            return names
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            given = entry.get("given")
+            family = entry.get("family")
+            parts: List[str] = []
+            if isinstance(given, str) and given.strip():
+                parts.append(given.strip())
+            if isinstance(family, str) and family.strip():
+                parts.append(family.strip())
+            if not parts and isinstance(entry.get("name"), str):
+                name = entry["name"].strip()
+                if name:
+                    parts.append(name)
+            name_combined = " ".join(parts).strip()
+            if name_combined:
+                names.append(name_combined)
+        return names
+
+    def _authors_for_item(self, item: dict, doi: str) -> Optional[List[str]]:
+        authors = self._extract_names(item.get("author"))
+        if not authors:
+            authors = self._extract_names(item.get("editor"))
+        if authors:
+            return authors
+        return self._authors_from_doi(doi)
 
     def identifiers_for_title(
         self,
@@ -1142,26 +1178,7 @@ class _CrossrefLookup:
                 if isinstance(entry, str) and entry.strip():
                     title = entry.strip()
                     break
-        authors_data = item.get("author")
-        authors: List[str] = []
-        if isinstance(authors_data, list):
-            for author in authors_data:
-                if not isinstance(author, dict):
-                    continue
-                given = author.get("given")
-                family = author.get("family")
-                parts: List[str] = []
-                if isinstance(given, str) and given.strip():
-                    parts.append(given.strip())
-                if isinstance(family, str) and family.strip():
-                    parts.append(family.strip())
-                if not parts and isinstance(author.get("name"), str):
-                    name = author["name"].strip()
-                    if name:
-                        parts.append(name)
-                name_combined = " ".join(parts).strip()
-                if name_combined:
-                    authors.append(name_combined)
+        authors = self._authors_for_item(item, doi) or None
         container_list = item.get("container-title")
         container: Optional[str] = None
         if isinstance(container_list, list):
@@ -1177,6 +1194,30 @@ class _CrossrefLookup:
             container=container,
             year=year,
         )
+
+    def _authors_from_doi(self, doi: str) -> Optional[List[str]]:
+        if not doi:
+            return None
+        if doi in self._doi_author_cache:
+            return self._doi_author_cache[doi]
+        url = f"{self._SEARCH_URL}/{quote(doi, safe='/')}"
+        try:
+            data = self._request_json(url, {})
+        except Exception:
+            self._doi_author_cache[doi] = None
+            return None
+        message = data.get("message")
+        authors: Optional[List[str]] = None
+        if isinstance(message, dict):
+            authors = self._extract_names(message.get("author"))
+            if not authors:
+                authors = self._extract_names(message.get("editor"))
+            if authors:
+                authors = [name for name in authors if name.strip()]
+                if not authors:
+                    authors = None
+        self._doi_author_cache[doi] = authors
+        return authors
 
     def _extract_year(self, item: dict) -> Optional[int]:
         for key in ("issued", "published-print", "published-online"):

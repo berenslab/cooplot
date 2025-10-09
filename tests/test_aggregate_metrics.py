@@ -4,6 +4,7 @@ import json
 import pytest
 
 from cooplot import api
+import cooplot.metrics
 from cooplot.aggregate import aggregate_publications
 from cooplot.metrics import (
     _CitationFetcher,
@@ -458,6 +459,137 @@ def test_cross_group_publications_enrich_crossref(
     assert row["crossref_container"] == "Testing Journal"
 
 
+def test_crossref_lookup_uses_editors_when_authors_missing():
+    lookup = cooplot.metrics._CrossrefLookup()
+    item = {
+        "DOI": "10.14325/mississippi/9781496842701.001.0001",
+        "title": ["Eudora Welty and Mystery"],
+        "editor": [
+            {"given": "Jane", "family": "Agner"},
+            {"given": "Henry", "family": "Pollack"},
+        ],
+    }
+
+    details = lookup._parse_item(item)
+
+    assert details is not None
+    assert details.doi == "10.14325/mississippi/9781496842701.001.0001"
+    assert details.authors == ["Jane Agner", "Henry Pollack"]
+
+
+def test_crossref_lookup_fetches_authors_via_doi(monkeypatch):
+    lookup = cooplot.metrics._CrossrefLookup()
+    captured = {"urls": []}
+
+    def fake_request(self, url, params):
+        captured["urls"].append(url)
+        return {
+            "message": {
+                "author": [
+                    {"given": "Philipp", "family": "Berens"},
+                    {"given": "Lisa", "family": "Koch"},
+                ]
+            }
+        }
+
+    monkeypatch.setattr(
+        cooplot.metrics._CrossrefLookup,
+        "_request_json",
+        fake_request,
+        raising=False,
+    )
+
+    item = {
+        "DOI": "10.1234/example",
+        "title": ["Shared Paper"],
+    }
+
+    details = lookup._parse_item(item)
+
+    assert details is not None
+    assert details.authors == ["Philipp Berens", "Lisa Koch"]
+    assert captured["urls"] == ["https://api.crossref.org/works/10.1234/example"]
+
+
+def test_cross_group_publications_enrich_crossref_skips_author_mismatch(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    captured: dict = {"calls": []}
+
+    class DummyCrossrefLookup:
+        def __init__(self, *, mailto, min_delay, session=None):
+            captured["init"] = (mailto, min_delay)
+
+        def identifiers_for_title(self, title, year):
+            captured["calls"].append((title, year))
+            return _CrossrefDetails(
+                doi="10.14325/mississippi/9781496842701.001.0001",
+                title="Eudora Welty and Mystery",
+                authors=["Jane Agner", "Henry Pollack"],
+                container=None,
+                year=year,
+            )
+
+    monkeypatch.setattr("cooplot.metrics._CrossrefLookup", DummyCrossrefLookup)
+
+    records = cross_group_publications(
+        grouped,
+        enrich_crossref=True,
+    )
+
+    assert captured["calls"] == [("Shared Paper", 2020)]
+    record = records[0]
+    assert record.get("doi") is None
+    assert record.get("crossref_title") is None
+    assert record.get("crossref_authors") is None
+
+
+def test_cross_group_publications_enrich_crossref_requires_author_metadata(
+    monkeypatch, tmp_path, sample_publications, sample_people
+):
+    grouped = aggregate_publications(
+        sample_publications,
+        sample_people,
+        name_col="name",
+        group_col="team",
+        cache_dir=tmp_path,
+        include_unlabeled=True,
+        save_json=False,
+    )
+
+    class DummyCrossrefLookup:
+        def __init__(self, *, mailto, min_delay, session=None):
+            pass
+
+        def identifiers_for_title(self, title, year):
+            return _CrossrefDetails(
+                doi="10.5555/noauthors",
+                title="Anonymous Work",
+                authors=None,
+                container=None,
+                year=year,
+            )
+
+    monkeypatch.setattr("cooplot.metrics._CrossrefLookup", DummyCrossrefLookup)
+
+    records = cross_group_publications(
+        grouped,
+        enrich_crossref=True,
+    )
+
+    assert records
+    record = records[0]
+    assert record.get("doi") is None
 def test_cross_group_publications_deduplicates_pubmed_preprints(monkeypatch, tmp_path):
     people = [
         {"name": "Alice Alpha", "team": "Group 1"},

@@ -22,9 +22,6 @@ Collaboration: All (Philipp Berens) and Neural (Sophie Laturnus).
 Rogerson, L. E., Zhao, Z., Franke, K., Euler, T., & Berens, P. (2019). Bayesian hypothesis testing and experimental design for two-photon imaging data. PLOS Computational Biology, 15(8), e1007205. https://doi.org/10.1371/journal.pcbi.1007205
 Collaboration: All (Philipp Berens) and Neural (Luke Rogerson).
 
-(2019). SNE Simulation Notes Europe, 29(2). https://doi.org/10.11128/sne.29.2.1047
-Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak).
-
 Scala, F., Kobak, D., Shan, S., Bernaerts, Y., Laturnus, S., Cadwell, C. R., Hartmanis, L., Froudarakis, E., Castro, J. R., Tan, Z. H., Papadopoulos, S., Patel, S. S., Sandberg, R., Berens, P., Jiang, X., & Tolias, A. S. (2019). Layer 4 of mouse neocortex differs in cell types and circuit organization between sensory areas. Nature Communications, 10(1). https://doi.org/10.1038/s41467-019-12058-z
 Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Yves Bernaerts, Sophie Laturnus).
 
@@ -79,17 +76,11 @@ Collaboration: All (Philipp Berens) and Neural (Sophie Laturnus).
 Kobak, D., Bernaerts, Y., Weis, M. A., Scala, F., Tolias, A. S., & Berens, P. (2021). Sparse Reduced-Rank Regression for Exploratory Visualisation of Paired Multivariate Data. Journal of the Royal Statistical Society Series C: Applied Statistics, 70(4), 980–1000. https://doi.org/10.1111/rssc.12494
 Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Yves Bernaerts).
 
-3. Attraction or repulsion: a mysterious but all important sign. (2022). Quantum Field Theory, as Simply as Possible, 123–134. https://doi.org/10.1515/9780691239279-016
-Collaboration: All (Philipp Berens) and Embedding (Jan Niklas Böhm, Dmitry Kobak).
-
 Strauss, S., Korympidou, M. M., Ran, Y., Franke, K., Schubert, T., Baden, T., Berens, P., Euler, T., & Vlasits, A. L. (2022). Center-surround interactions underlie bipolar cell motion sensitivity in the mouse retina. Nature Communications, 13(1). https://doi.org/10.1038/s41467-022-32762-7
 Collaboration: All (Philipp Berens) and Neural (Sarah Strauß).
 
 Ayhan, M. S., Kümmerle, L. B., Kühlewein, L., Inhoffen, W., Aliyeva, G., Ziemssen, F., & Berens, P. (2022). Clinical validation of saliency maps for understanding deep neural networks in ophthalmology. Medical Image Analysis, 77, 102364. https://doi.org/10.1016/j.media.2022.102364
 Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
-
-Agner, J., & Pollack, H. (Eds.). (2022). Eudora Welty and Mystery. https://doi.org/10.14325/mississippi/9781496842701.001.0001
-Collaboration: All (Philipp Berens) and MedML (Lisa Koch).
 
 Oesterle, J., Krämer, N., Hennig, P., & Berens, P. (2022). Probabilistic solvers enable a straight-forward exploration of numerical uncertainty in neuroscience models. Journal of Computational Neuroscience, 50(4), 485–503. https://doi.org/10.1007/s10827-022-00827-7
 Collaboration: All (Philipp Berens) and Neural (Jonathan Oesterle).
@@ -136,9 +127,6 @@ Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan).
 González-Márquez, R., Berens, P., & Kobak, D. (2024). Meet the authors: Rita González-Márquez, Philipp Berens, and Dmitry Kobak. Patterns, 5(6), 100993. https://doi.org/10.1016/j.patter.2024.100993
 Collaboration: All (Philipp Berens) and Embedding (Rita González Márquez).
 
-Multivariate Analytics Based on High-Dimensional Data: Concepts and Misconceptions. (2024). Multivariate Biomarker Discovery, 16–24. https://doi.org/10.1017/9781009006767.004
-Collaboration: All (Philipp Berens) and Embedding (Sebastian Damrich, Dmitry Kobak).
-
 Lause, J., Kobak, D., & Berens, P. (2024). The art of seeing the elephant in the room: 2D embeddings of single-cell data do make sense. https://doi.org/10.1101/2024.03.26.586728
 Collaboration: All (Philipp Berens) and Embedding (Dmitry Kobak, Jan Lause).
 
@@ -155,7 +143,7 @@ Mensah, S. O., Neubauer, J., Ayhan, M. S., Djoumessi, K., Koch, L., Uzel, M. M.,
 Collaboration: All (Philipp Berens) and MedML (Murat Seçkin Ayhan, Kerol Djoumessi, Lisa Koch, Samuel Ofosu Mensah).
 
 Bernaerts, Y., Deistler, M., Gonçalves, P. J., Beck, J., Stimberg, M., Scala, F., Tolias, A. S., Macke, J. H., Kobak, D., & Berens, P. (2025). Combined statistical-biophysical modeling links ion channel genes to physiology of cortical neuron types. Patterns, 101323. https://doi.org/10.1016/j.patter.2025.101323
-Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Jonas Beck).
+Collaboration: All (Philipp Berens), Embedding (Dmitry Kobak), and Neural (Jonas Beck, Yves Bernaerts).
 
 Ilanchezian, I., Boreiko, V., Kühlewein, L., Huang, Z., Seçkin Ayhan, M., Hein, M., Koch, L., & Berens, P. (2025). Development and validation of an AI algorithm to generate realistic and meaningful counterfactuals for retinal imaging based on diffusion models. PLOS Digital Health, 4(5), e0000853. https://doi.org/10.1371/journal.pdig.0000853
 Collaboration: All (Philipp Berens, Ziwei Huang) and MedML (Murat Seçkin Ayhan, Indu Ilanchezian, Lisa Koch).

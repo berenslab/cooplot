@@ -1,6 +1,6 @@
 # cooplot
 
-[![PyPI version](https://badge.fury.io/py/cooplot.svg)](https://badge.fury.io/py/skeliner)
+[![PyPI version](https://badge.fury.io/py/cooplot.svg)](https://badge.fury.io/py/cooplot)
 
 Analysis of co-op between members and subgroups.
 

@@ -160,6 +160,291 @@ def _draw_circle(
         )
 
 
+def _short_theta(target: float, anchor: float) -> float:
+    """Adjust ``target`` so linear interpolation from ``anchor`` to ``target``
+    in theta takes the shorter arc around the circle."""
+    diff = target - anchor
+    if diff > np.pi:
+        return target - 2 * np.pi
+    if diff < -np.pi:
+        return target + 2 * np.pi
+    return target
+
+
+def _chord_layout_sets(
+    n: int,
+    label_to_idx: Dict[str, int],
+    intersections: List[Dict],
+    *,
+    weights: Optional[np.ndarray] = None,
+    gap_frac: float = 0.02,
+) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
+    """Layout for a set-membership chord.
+
+    Each entry in ``intersections`` is ``{"labels": [...], "count": int}``
+    representing a *disjoint* cell — papers belonging to exactly that set
+    of labels. Each node's arc is partitioned into one segment per cell
+    that contains it, so segments sum exactly to the node's total.
+
+    Returns ``(starts, ends, cells)`` where each cell is
+    ``{"indices": (i, j, ...), "count": int, "segments": {i: (start, end), ...}}``.
+    """
+    if n == 0:
+        return np.empty(0), np.empty(0), []
+
+    if weights is None:
+        arc_basis = np.ones(n)
+    else:
+        arc_basis = np.asarray(weights, dtype=float)
+        if (
+            arc_basis.shape != (n,)
+            or not np.isfinite(arc_basis).all()
+            or arc_basis.sum() <= 0
+        ):
+            arc_basis = np.ones(n)
+
+    total_gap = min(max(gap_frac, 0.0), 0.5) * 2 * np.pi
+    available = max(0.0, 2 * np.pi - total_gap)
+    arc_widths = arc_basis / arc_basis.sum() * available
+    gap = (2 * np.pi - arc_widths.sum()) / n
+
+    starts = np.empty(n)
+    ends = np.empty(n)
+    cursor = 0.0
+    for i in range(n):
+        starts[i] = cursor
+        ends[i] = cursor + arc_widths[i]
+        cursor = ends[i] + gap
+
+    # Aggregate cells (in case the same signature appears multiple times)
+    cells_by_indices: Dict[Tuple[int, ...], int] = {}
+    for entry in intersections:
+        try:
+            cell_labels = entry["labels"]
+            count = int(entry["count"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        try:
+            cell_indices = tuple(
+                sorted(label_to_idx[lbl] for lbl in cell_labels if lbl in label_to_idx)
+            )
+        except KeyError:
+            continue
+        if not cell_indices or count <= 0:
+            continue
+        cells_by_indices[cell_indices] = cells_by_indices.get(cell_indices, 0) + count
+
+    # Group cells by node, ordered so connections fan toward their partners.
+    def _sort_key(cell_idx: Tuple[int, ...], i: int) -> float:
+        others = [j for j in cell_idx if j != i]
+        if not others:
+            return float("inf")  # solo cell at the CCW end of the arc
+        offsets = []
+        for j in others:
+            raw = (j - i) % n
+            if raw > n / 2:
+                raw -= n
+            offsets.append(raw)
+        return sum(offsets) / len(offsets)
+
+    cells_for_node: List[List[Tuple[Tuple[int, ...], int]]] = [[] for _ in range(n)]
+    for cell_idx, count in cells_by_indices.items():
+        for i in cell_idx:
+            cells_for_node[i].append((cell_idx, count))
+    for i in range(n):
+        cells_for_node[i].sort(key=lambda c: _sort_key(c[0], i))
+
+    # Allocate segments within each arc, in order
+    cell_segments: Dict[Tuple[int, ...], Dict[int, Tuple[float, float]]] = {
+        idx: {} for idx in cells_by_indices
+    }
+    for i in range(n):
+        cells = cells_for_node[i]
+        cell_sum = sum(c[1] for c in cells)
+        if cell_sum == 0 or arc_widths[i] == 0:
+            continue
+        seg_cursor = starts[i]
+        for cell_idx, count in cells:
+            seg_width = (count / cell_sum) * arc_widths[i]
+            cell_segments[cell_idx][i] = (seg_cursor, seg_cursor + seg_width)
+            seg_cursor += seg_width
+
+    cells_layout = [
+        {
+            "indices": cell_idx,
+            "count": count,
+            "segments": cell_segments.get(cell_idx, {}),
+        }
+        for cell_idx, count in cells_by_indices.items()
+    ]
+    return starts, ends, cells_layout
+
+
+def _build_ribbon_path(
+    segments: Dict[int, Tuple[float, float]],
+    indices: Tuple[int, ...],
+    R_inner: float,
+) -> mpath.Path:
+    """Closed bezier shape connecting one segment on each of ``indices``.
+
+    ``|indices|==2`` uses an end↔end / start↔start matchup so the two bezier
+    sides stay parallel (avoids the bowtie self-twist at the center).
+    ``|indices|>=3`` uses the CCW perimeter — bezier from each segment's end
+    to the next segment's start, plus a closing bezier with the destination
+    theta wrapped by +2π so interpolation goes the short way.
+    """
+    if len(indices) == 2:
+        i1, i2 = indices
+        a1, a2 = segments[i1]
+        b1, b2 = segments[i2]
+        a2_eff = _short_theta(a2, a1)
+        b2_eff = _short_theta(b2, a2_eff)
+        b1_eff = _short_theta(b1, b2_eff)
+        a1_close = _short_theta(a1, b1_eff)
+        verts = [
+            (a1, R_inner),
+            (a2_eff, R_inner),
+            (a2_eff, 0.0), (b2_eff, 0.0), (b2_eff, R_inner),
+            (b1_eff, R_inner),
+            (b1_eff, 0.0), (a1_close, 0.0), (a1_close, R_inner),
+        ]
+        codes = [
+            mpath.Path.MOVETO,
+            mpath.Path.LINETO,
+            mpath.Path.CURVE4, mpath.Path.CURVE4, mpath.Path.CURVE4,
+            mpath.Path.LINETO,
+            mpath.Path.CURVE4, mpath.Path.CURVE4, mpath.Path.CURVE4,
+        ]
+        return mpath.Path(verts, codes)
+
+    # |indices| >= 3 : CCW perimeter
+    k = len(indices)
+    pts = [segments[idx] for idx in indices]
+    # Walk endpoints so each is the short way from the previous
+    adj: List[Tuple[float, float]] = []
+    anchor = pts[0][0]
+    for s_raw, e_raw in pts:
+        s = _short_theta(s_raw, anchor)
+        e = _short_theta(e_raw, s)
+        adj.append((s, e))
+        anchor = e
+    close_start = _short_theta(pts[0][0], adj[-1][1])
+
+    verts: List[Tuple[float, float]] = [(adj[0][0], R_inner)]
+    codes: List[int] = [mpath.Path.MOVETO]
+    verts.append((adj[0][1], R_inner))
+    codes.append(mpath.Path.LINETO)
+    for i in range(k):
+        is_last = i == k - 1
+        next_start = close_start if is_last else adj[i + 1][0]
+        verts.append((adj[i][1], 0.0))
+        verts.append((next_start, 0.0))
+        verts.append((next_start, R_inner))
+        codes.extend([mpath.Path.CURVE4, mpath.Path.CURVE4, mpath.Path.CURVE4])
+        if not is_last:
+            verts.append((adj[i + 1][1], R_inner))
+            codes.append(mpath.Path.LINETO)
+    return mpath.Path(verts, codes)
+
+
+def _draw_chord(
+    ax,
+    labels: List[str],
+    node_colors: List[str],
+    *,
+    intersections: List[Dict],
+    cmap,
+    vmin: float,
+    vmax: float,
+    weights: Optional[np.ndarray] = None,
+    rotate: float = 0.0,
+    fontsize_names: float = 8.0,
+    label_box_pad: float = 0.4,
+    node_height: float = 1.0,
+    node_linewidth: float = 2.0,
+    node_edgecolor: str = "white",
+    padding: float = 6.0,
+    ribbon_alpha: float = 0.7,
+) -> None:
+    """Draw a set-membership chord on a polar axes.
+
+    Each non-empty cell from ``intersections`` becomes one shape: a 2-way
+    ribbon for ``|S|=2`` or a curved n-gon for ``|S|>=3``. Singleton cells
+    (``|S|=1``) show as colored arc only — that arc length tells you how
+    many papers belong to that node but to no shown collaboration.
+    """
+    n = len(labels)
+    if n == 0:
+        return
+    label_to_idx = {label: i for i, label in enumerate(labels)}
+
+    starts, ends, cells = _chord_layout_sets(
+        n, label_to_idx, intersections, weights=weights
+    )
+    centers = (starts + ends) / 2
+    widths = ends - starts
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_ylim(0, 10 + padding)
+    ax.spines["polar"].set_visible(False)
+    if rotate:
+        ax.set_theta_offset(np.deg2rad(rotate))
+
+    vrange = (vmax - vmin) if vmax > vmin else 1.0
+    R_inner = 9.0
+
+    multi = [c for c in cells if len(c["indices"]) >= 2 and c["segments"]]
+    multi.sort(key=lambda c: c["count"])  # weakest first, strongest on top
+    for cell in multi:
+        path = _build_ribbon_path(cell["segments"], cell["indices"], R_inner)
+        color = cmap((float(cell["count"]) - vmin) / vrange)
+        ax.add_patch(
+            mpatches.PathPatch(
+                path,
+                facecolor=color,
+                edgecolor="none",
+                linewidth=0,
+                alpha=ribbon_alpha,
+            )
+        )
+
+    bars = ax.bar(
+        centers,
+        np.full(n, node_height),
+        width=widths,
+        bottom=R_inner,
+        edgecolor=node_edgecolor,
+        lw=node_linewidth,
+        align="center",
+    )
+    for bar, color in zip(bars, node_colors):
+        bar.set_facecolor(color)
+
+    label_r = R_inner + 0.4 + node_height
+    angles_deg = np.rad2deg(centers)
+    for name, theta, deg, color in zip(labels, centers, angles_deg, node_colors):
+        screen_angle = (deg + rotate) % 360
+        if 90 <= screen_angle < 270:
+            text_rot = screen_angle - 180
+            ha = "right"
+        else:
+            text_rot = screen_angle
+            ha = "left"
+        ax.text(
+            theta,
+            label_r,
+            name,
+            rotation=text_rot,
+            rotation_mode="anchor",
+            ha=ha,
+            va="center",
+            size=fontsize_names,
+            color="white",
+            bbox=dict(facecolor=color, edgecolor=color, pad=label_box_pad),
+        )
+
+
 def _casefold(s: str) -> str:
     # robust, locale-agnostic lowercase (handles ß, accents, etc.)
     return (s or "").casefold()
@@ -274,7 +559,7 @@ def plot_panels(
         raise ValueError("No matrices to plot.")
 
     style_requested = (style or "circle").lower()
-    allowed_styles = {"circle", "heatmap", "both"}
+    allowed_styles = {"circle", "heatmap", "both", "chord"}
     if style_requested not in allowed_styles:
         raise ValueError(
             f"Unsupported style '{style}'. Expected one of {sorted(allowed_styles)}."
@@ -284,7 +569,7 @@ def plot_panels(
         raise ValueError("Style 'both' is only supported when a single window is provided.")
 
     bin_width_mode = (bin_width or "uniform").lower()
-    allowed_bin_widths = {"uniform", "total"}
+    allowed_bin_widths = {"uniform", "count"}
     if bin_width_mode not in allowed_bin_widths:
         raise ValueError(
             f"Unsupported bin_width '{bin_width}'. Expected one of {sorted(allowed_bin_widths)}."
@@ -592,7 +877,7 @@ def plot_panels(
                     )
 
         weights = None
-        if bin_width_mode == "total":
+        if bin_width_mode == "count":
             totals = mats[w].get("totals")
             if totals is not None:
                 weights = np.asarray(totals, dtype=float)[perm]
@@ -693,25 +978,61 @@ def plot_panels(
         if cap_weights is not None:
             M = np.minimum(M, cap_weights)
 
-        weights = None
-        if bin_width_mode == "total":
-            totals = mats[w].get("totals")
-            if totals is not None:
-                weights = np.asarray(totals, dtype=float)[perm]
-        _draw_circle(
-            axs[i],
-            M,
-            ordered_labels,
-            node_colors,
-            cmap=cmap,
-            vmin=0,
-            vmax=vmax_used,
-            weights=weights,
-            rotate=rotate,
-            fontsize_names=circle_name_font,
-            label_box_pad=label_box_pad,
-            edge_width=edge_width_mode,
-        )
+        if style_mode == "chord":
+            weights = None
+            if bin_width_mode == "count":
+                totals = mats[w].get("totals")
+                if totals is not None:
+                    weights = np.asarray(totals, dtype=float)[perm]
+            intersections = mats[w].get("intersections")
+            if not intersections:
+                # Fallback for older mats: build pairwise-only cells from M.
+                # This loses higher-order overlap; users should re-run build
+                # to get the full set decomposition.
+                intersections = []
+                M_full = np.array(mats[w]["matrix"], dtype=int)
+                for ii in range(len(base_labels)):
+                    for jj in range(ii + 1, len(base_labels)):
+                        if M_full[ii, jj] > 0:
+                            intersections.append(
+                                {
+                                    "labels": [base_labels[ii], base_labels[jj]],
+                                    "count": int(M_full[ii, jj]),
+                                }
+                            )
+            _draw_chord(
+                axs[i],
+                ordered_labels,
+                node_colors,
+                intersections=intersections,
+                cmap=cmap,
+                vmin=0,
+                vmax=vmax_used,
+                weights=weights,
+                rotate=rotate,
+                fontsize_names=circle_name_font,
+                label_box_pad=label_box_pad,
+            )
+        else:
+            weights = None
+            if bin_width_mode == "count":
+                totals = mats[w].get("totals")
+                if totals is not None:
+                    weights = np.asarray(totals, dtype=float)[perm]
+            _draw_circle(
+                axs[i],
+                M,
+                ordered_labels,
+                node_colors,
+                cmap=cmap,
+                vmin=0,
+                vmax=vmax_used,
+                weights=weights,
+                rotate=rotate,
+                fontsize_names=circle_name_font,
+                label_box_pad=label_box_pad,
+                edge_width=edge_width_mode,
+            )
         axs[i].set_title(
             w,
             fontsize=circle_title_font,

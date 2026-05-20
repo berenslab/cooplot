@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter, defaultdict
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -118,7 +119,28 @@ def build_matrices(
         totals = np.diagonal(M).astype(int).tolist()
         np.fill_diagonal(M, 0)
 
-        entry = {"labels": labels, "matrix": M.tolist(), "totals": totals}
+        # Per-paper membership signatures: for each unique title, which labels
+        # own it. Each non-empty signature is a disjoint cell — these counts
+        # sum cleanly (the pairwise M double-counts triples and higher).
+        paper_to_labels: Dict[str, set] = defaultdict(set)
+        for label, titles in title_sets.items():
+            for title in titles:
+                paper_to_labels[title].add(label)
+        sig_counter: Counter = Counter()
+        for owners in paper_to_labels.values():
+            if owners:
+                sig_counter[tuple(sorted(owners))] += 1
+        intersections = [
+            {"labels": list(sig), "count": int(count)}
+            for sig, count in sorted(sig_counter.items())
+        ]
+
+        entry = {
+            "labels": labels,
+            "matrix": M.tolist(),
+            "totals": totals,
+            "intersections": intersections,
+        }
         if group_col:
             entry["label_to_group"] = {
                 label: group_map.get(label, "Unlabeled") for label in labels

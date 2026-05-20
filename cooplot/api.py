@@ -156,6 +156,7 @@ def show(
     legend_groups=True,
     heatmap_counts=False,
     figsize=None,
+    rotate=0.0,
 ):
     if style is None:
         try:
@@ -184,6 +185,7 @@ def show(
         legend_groups=legend_groups,
         heatmap_counts=heatmap_counts,
         figsize=figsize,
+        rotate=rotate,
     )
 
 

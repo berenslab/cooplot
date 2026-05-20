@@ -128,6 +128,7 @@ def plot_panels(
     legend_groups: bool = True,
     heatmap_counts: bool = False,
     figsize: Optional[tuple] = None,
+    rotate: float = 0.0,
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
@@ -457,6 +458,8 @@ def plot_panels(
             fontsize_title=circle_title_font,
             fontsize_names=circle_name_font,
         )
+        if rotate:
+            ax_circle.set_theta_offset(np.deg2rad(rotate))
         for j, label in enumerate(ax_circle.texts):
             label.set_color("white")
             label.set_fontsize(circle_name_font)
@@ -467,7 +470,8 @@ def plot_panels(
                     pad=label_box_pad,
                 )
             )
-            rot = label.get_rotation()
+            rot = (label.get_rotation() + rotate) % 360
+            label.set_rotation(rot)
             if 90 <= rot < 270:
                 label.set_rotation(rot - 180)
                 label.set_va("center")
@@ -579,6 +583,8 @@ def plot_panels(
             pad=20 * scale,
             color="black",
         )
+        if rotate:
+            axs[i].set_theta_offset(np.deg2rad(rotate))
         # label backgrounds
         for j, label in enumerate(axs[i].texts):
             label.set_color("white")
@@ -590,7 +596,8 @@ def plot_panels(
                     pad=label_box_pad,
                 )
             )
-            rot = label.get_rotation()
+            rot = (label.get_rotation() + rotate) % 360
+            label.set_rotation(rot)
             if 90 <= rot < 270:
                 label.set_rotation(rot - 180)
                 label.set_va("center")

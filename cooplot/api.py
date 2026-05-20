@@ -100,7 +100,7 @@ def aggregate(
 
 def build(
     pubs: PublicationInput | GroupedPublications,
-    windows: List[str],
+    windows: List[str] | None = None,
     *,
     people: List[dict] | None = None,
     name_col: str = "name",
@@ -111,7 +111,9 @@ def build(
     When ``pubs`` is a :class:`Publications` or :class:`GroupedPublications`
     instance the people metadata is already bundled and does not need to be passed
     explicitly. Supplying bare mappings still requires the corresponding people
-    list so group assignments can be resolved.
+    list so group assignments can be resolved. When ``windows`` is ``None`` a
+    single window spanning the full publication year range is inferred from the
+    data.
     """
 
     if isinstance(pubs, Publications):

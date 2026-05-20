@@ -66,10 +66,25 @@ def _titles_for_windows(
     return title_sets_by_window
 
 
+def _infer_full_span(publications_by_author: Dict[str, List[dict]]) -> str:
+    years = [
+        p["year"]
+        for pubs in publications_by_author.values()
+        for p in pubs
+        if isinstance(p.get("year"), int)
+    ]
+    if not years:
+        raise ValueError(
+            "Cannot infer windows: no publications have a valid integer 'year'. "
+            "Pass windows explicitly, e.g. windows=['2010-2024']."
+        )
+    return f"{min(years)}-{max(years)}"
+
+
 def build_matrices(
     publications_by_author: Dict[str, List[dict]],
     people: List[dict],
-    windows: List[str],
+    windows: Optional[List[str]] = None,
     *,
     name_col: str = "name",
     group_col: Optional[str] = None,
@@ -79,8 +94,12 @@ def build_matrices(
     The result is ``{window: {"labels": [...], "matrix": [[...]]}}`` with
     labels ordered by alphabetical last name. When ``group_col`` is provided the
     output also includes a ``label_to_group`` mapping so callers can color the
-    visualization by group.
+    visualization by group. When ``windows`` is ``None`` a single window
+    spanning the min/max publication year across all authors is used.
     """
+
+    if windows is None:
+        windows = [_infer_full_span(publications_by_author)]
 
     labels, group_map = _prepare_labels_and_groups(people, name_col, group_col)
     mats: Dict[str, dict] = {}

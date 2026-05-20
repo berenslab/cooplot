@@ -147,11 +147,23 @@ def plot_panels(
         raise ValueError("Style 'both' is only supported when a single window is provided.")
 
     base_labels = mats[wins[0]]["labels"]
-    label_to_group_map = mats[wins[0]].get("label_to_group", {}) or {}
-    group_col_for_plot = group_col or ("Group" if label_to_group_map else None)
+    real_label_to_group = mats[wins[0]].get("label_to_group", {}) or {}
+    has_real_groups = bool(real_label_to_group)
 
-    # Compute one consistent permutation for ALL windows
-    perm, ordered_labels = _order_indices(base_labels, label_to_group_map)
+    # Order using only real group info so the per-author fallback below doesn't
+    # promote first-name into the primary sort key.
+    perm, ordered_labels = _order_indices(base_labels, real_label_to_group)
+
+    if has_real_groups:
+        label_to_group_map = real_label_to_group
+        group_col_for_plot = group_col or "Group"
+    else:
+        # No group info baked into mats: treat each author as their own group
+        # so colors are distinct per author. Only render a legend when the user
+        # explicitly opts in (e.g. group_col="name"), since names already label
+        # the axes.
+        label_to_group_map = {label: label for label in base_labels}
+        group_col_for_plot = group_col
 
     # Determine global vmax and apply cap if requested
     vmax_base = vmax or max(int(np.max(np.array(mats[w]["matrix"]))) for w in wins)
@@ -160,7 +172,7 @@ def plot_panels(
     cmap = _reds_shaded()
     node_colors, used_palette = _node_colors(
         ordered_labels,
-        label_to_group_map if group_col_for_plot else {},
+        label_to_group_map,
         palette,
     )
 

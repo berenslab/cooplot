@@ -467,25 +467,41 @@ def _group_value_for(name: str, label_to_group: Optional[Dict[str, str]]) -> str
 
 
 def _order_indices(
-    labels: List[str], label_to_group: Optional[Dict[str, str]]
+    labels: List[str],
+    label_to_group: Optional[Dict[str, str]],
+    *,
+    order: Optional[List[str]] = None,
 ) -> Tuple[List[int], List[str]]:
     """
     Compute a permutation that orders labels by:
       - group value (casefolded) if group_col is given,
       - then last name, then first name (both casefolded).
-    Returns (perm_indices, ordered_labels).
+
+    When ``order`` is given, those names are placed first (in the given order)
+    and remaining labels fall back to the default sort. Unknown names in
+    ``order`` are silently skipped.
     """
-    # Prepare sortable keys
+    pinned: List[int] = []
+    used: set = set()
+    if order:
+        label_to_index = {name: i for i, name in enumerate(labels)}
+        for name in order:
+            idx = label_to_index.get(name)
+            if idx is not None and idx not in used:
+                pinned.append(idx)
+                used.add(idx)
+
+    # Default sort over the remaining labels
     keys = []
     for i, name in enumerate(labels):
+        if i in used:
+            continue
         g = _group_value_for(name, label_to_group)
         last, first = _split_name(name)
         keys.append((i, _casefold(g), last, first))
-
-    # Sort by (group, last, first); if group_col is None, group key is ""
     keys.sort(key=lambda t: (t[1], t[2], t[3]))
 
-    perm = [t[0] for t in keys]
+    perm = pinned + [t[0] for t in keys]
     ordered = [labels[i] for i in perm]
     return perm, ordered
 
@@ -553,6 +569,7 @@ def plot_panels(
     rotate: float = 0.0,
     bin_width: str = "uniform",
     edge_width: str = "uniform",
+    order: Optional[List[str]] = None,
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
@@ -588,7 +605,7 @@ def plot_panels(
 
     # Order using only real group info so the per-author fallback below doesn't
     # promote first-name into the primary sort key.
-    perm, ordered_labels = _order_indices(base_labels, real_label_to_group)
+    perm, ordered_labels = _order_indices(base_labels, real_label_to_group, order=order)
 
     if has_real_groups:
         label_to_group_map = real_label_to_group

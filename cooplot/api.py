@@ -159,6 +159,7 @@ def show(
     rotate=0.0,
     bin_width="uniform",
     edge_width="uniform",
+    order=None,
 ):
     if style is None:
         try:
@@ -190,6 +191,7 @@ def show(
         rotate=rotate,
         bin_width=bin_width,
         edge_width=edge_width,
+        order=order,
     )
 
 

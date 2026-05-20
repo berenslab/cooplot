@@ -158,6 +158,7 @@ def show(
     figsize=None,
     rotate=0.0,
     bin_width="uniform",
+    edge_width="uniform",
 ):
     if style is None:
         try:
@@ -188,6 +189,7 @@ def show(
         figsize=figsize,
         rotate=rotate,
         bin_width=bin_width,
+        edge_width=edge_width,
     )
 
 

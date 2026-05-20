@@ -60,6 +60,9 @@ def _draw_circle(
     fontsize_names: float = 8.0,
     label_box_pad: float = 0.4,
     connection_linewidth: float = 1.5,
+    edge_width: str = "uniform",
+    edge_width_min: float = 0.5,
+    edge_width_max: float = 4.5,
     node_height: float = 1.0,
     node_linewidth: float = 2.0,
     node_edgecolor: str = "white",
@@ -94,7 +97,13 @@ def _draw_circle(
     order = np.argsort(np.abs(vals))
     tril_i, tril_j, vals = tril_i[order], tril_j[order], vals[order]
 
-    for ii, jj, v in zip(tril_i, tril_j, vals):
+    if edge_width == "count" and vmax > vmin:
+        scaled = (vals.astype(float) - vmin) / vrange
+        lw_per_edge = edge_width_min + (edge_width_max - edge_width_min) * scaled
+    else:
+        lw_per_edge = np.full(vals.shape, connection_linewidth, dtype=float)
+
+    for ii, jj, v, lw in zip(tril_i, tril_j, vals, lw_per_edge):
         t0, t1 = centers[ii], centers[jj]
         path = mpath.Path(
             [(t0, 10), (t0, 5), (t1, 5), (t1, 10)],
@@ -110,7 +119,7 @@ def _draw_circle(
                 path,
                 fill=False,
                 edgecolor=cmap((float(v) - vmin) / vrange),
-                linewidth=connection_linewidth,
+                linewidth=float(lw),
                 alpha=1.0,
             )
         )
@@ -258,6 +267,7 @@ def plot_panels(
     figsize: Optional[tuple] = None,
     rotate: float = 0.0,
     bin_width: str = "uniform",
+    edge_width: str = "uniform",
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
@@ -278,6 +288,13 @@ def plot_panels(
     if bin_width_mode not in allowed_bin_widths:
         raise ValueError(
             f"Unsupported bin_width '{bin_width}'. Expected one of {sorted(allowed_bin_widths)}."
+        )
+
+    edge_width_mode = (edge_width or "uniform").lower()
+    allowed_edge_widths = {"uniform", "count"}
+    if edge_width_mode not in allowed_edge_widths:
+        raise ValueError(
+            f"Unsupported edge_width '{edge_width}'. Expected one of {sorted(allowed_edge_widths)}."
         )
 
     base_labels = mats[wins[0]]["labels"]
@@ -591,6 +608,7 @@ def plot_panels(
             rotate=rotate,
             fontsize_names=circle_name_font,
             label_box_pad=label_box_pad,
+            edge_width=edge_width_mode,
         )
 
         right_margin = 0.88
@@ -692,6 +710,7 @@ def plot_panels(
             rotate=rotate,
             fontsize_names=circle_name_font,
             label_box_pad=label_box_pad,
+            edge_width=edge_width_mode,
         )
         axs[i].set_title(
             w,

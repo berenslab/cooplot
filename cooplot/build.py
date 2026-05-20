@@ -115,9 +115,10 @@ def build_matrices(
             for j in range(i, n):
                 tj = title_sets[labels[j]]
                 M[i, j] = M[j, i] = len(ti & tj)
+        totals = np.diagonal(M).astype(int).tolist()
         np.fill_diagonal(M, 0)
 
-        entry = {"labels": labels, "matrix": M.tolist()}
+        entry = {"labels": labels, "matrix": M.tolist(), "totals": totals}
         if group_col:
             entry["label_to_group"] = {
                 label: group_map.get(label, "Unlabeled") for label in labels

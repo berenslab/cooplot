@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import matplotlib.colors as mcolors
+import matplotlib.path as mpath
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patheffects
@@ -14,13 +16,139 @@ from matplotlib.ticker import (
     MaxNLocator,
 )
 
-# Optional circos
-try:
-    from mne_connectivity.viz import plot_connectivity_circle as _circle
 
-    HAVE_CIRCLE = True
-except Exception:
-    HAVE_CIRCLE = False
+def _circle_layout(
+    n: int,
+    weights: Optional[np.ndarray],
+    *,
+    gap_frac: float = 0.01,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Return (centers, widths) in radians for ``n`` nodes around the circle.
+
+    ``weights`` controls relative arc length per node. ``None`` (or any
+    non-positive/invalid total) yields a uniform layout. ``gap_frac`` is the
+    fraction of the full circle reserved for gaps between bars.
+    """
+    if n <= 0:
+        return np.empty(0), np.empty(0)
+    if weights is None:
+        w = np.ones(n, dtype=float)
+    else:
+        w = np.asarray(weights, dtype=float)
+        if w.shape != (n,) or not np.isfinite(w).all() or w.sum() <= 0:
+            w = np.ones(n, dtype=float)
+    w = w / w.sum()
+    total_gap = min(max(gap_frac, 0.0), 0.5) * 2 * np.pi
+    arc = max(0.0, 2 * np.pi - total_gap)
+    widths = w * arc
+    gap = (2 * np.pi - widths.sum()) / n
+    centers = np.cumsum(widths) - widths / 2 + np.arange(n) * gap
+    return centers, widths
+
+
+def _draw_circle(
+    ax,
+    M: np.ndarray,
+    labels: List[str],
+    node_colors: List[str],
+    *,
+    cmap,
+    vmin: float,
+    vmax: float,
+    weights: Optional[np.ndarray] = None,
+    rotate: float = 0.0,
+    fontsize_names: float = 8.0,
+    label_box_pad: float = 0.4,
+    connection_linewidth: float = 1.5,
+    node_height: float = 1.0,
+    node_linewidth: float = 2.0,
+    node_edgecolor: str = "white",
+    padding: float = 6.0,
+) -> None:
+    """Draw a co-occurrence circle plot onto a polar axes.
+
+    Replaces the previous ``mne_connectivity.plot_connectivity_circle`` path.
+    Bars sit at radius 9..10; labels sit just outside; connection beziers curve
+    through r=5 (matches the prior geometry).
+    """
+    n = len(labels)
+    if n == 0:
+        return
+
+    centers, widths = _circle_layout(n, weights)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_ylim(0, 10 + padding)
+    ax.spines["polar"].set_visible(False)
+    if rotate:
+        ax.set_theta_offset(np.deg2rad(rotate))
+
+    vrange = (vmax - vmin) if vmax > vmin else 1.0
+
+    tril_i, tril_j = np.tril_indices(n, -1)
+    vals = M[tril_i, tril_j]
+    keep = vals > 0
+    tril_i, tril_j, vals = tril_i[keep], tril_j[keep], vals[keep]
+    # Draw weakest first so strongest land on top
+    order = np.argsort(np.abs(vals))
+    tril_i, tril_j, vals = tril_i[order], tril_j[order], vals[order]
+
+    for ii, jj, v in zip(tril_i, tril_j, vals):
+        t0, t1 = centers[ii], centers[jj]
+        path = mpath.Path(
+            [(t0, 10), (t0, 5), (t1, 5), (t1, 10)],
+            [
+                mpath.Path.MOVETO,
+                mpath.Path.CURVE4,
+                mpath.Path.CURVE4,
+                mpath.Path.LINETO,
+            ],
+        )
+        ax.add_patch(
+            mpatches.PathPatch(
+                path,
+                fill=False,
+                edgecolor=cmap((float(v) - vmin) / vrange),
+                linewidth=connection_linewidth,
+                alpha=1.0,
+            )
+        )
+
+    bars = ax.bar(
+        centers,
+        np.full(n, node_height),
+        width=widths,
+        bottom=9,
+        edgecolor=node_edgecolor,
+        lw=node_linewidth,
+        align="center",
+    )
+    for bar, color in zip(bars, node_colors):
+        bar.set_facecolor(color)
+
+    label_r = 9.4 + node_height
+    angles_deg = np.rad2deg(centers)
+    for name, theta, deg, color in zip(labels, centers, angles_deg, node_colors):
+        screen_angle = (deg + rotate) % 360
+        if 90 <= screen_angle < 270:
+            text_rot = screen_angle - 180
+            ha = "right"
+        else:
+            text_rot = screen_angle
+            ha = "left"
+        ax.text(
+            theta,
+            label_r,
+            name,
+            rotation=text_rot,
+            rotation_mode="anchor",
+            ha=ha,
+            va="center",
+            size=fontsize_names,
+            color="white",
+            bbox=dict(facecolor=color, edgecolor=color, pad=label_box_pad),
+        )
 
 
 def _casefold(s: str) -> str:
@@ -129,6 +257,7 @@ def plot_panels(
     heatmap_counts: bool = False,
     figsize: Optional[tuple] = None,
     rotate: float = 0.0,
+    bin_width: str = "uniform",
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
@@ -140,12 +269,16 @@ def plot_panels(
         raise ValueError(
             f"Unsupported style '{style}'. Expected one of {sorted(allowed_styles)}."
         )
-    if not HAVE_CIRCLE and style_requested in {"circle", "both"}:
-        style_mode = "heatmap"
-    else:
-        style_mode = style_requested
+    style_mode = style_requested
     if style_mode == "both" and len(wins) != 1:
         raise ValueError("Style 'both' is only supported when a single window is provided.")
+
+    bin_width_mode = (bin_width or "uniform").lower()
+    allowed_bin_widths = {"uniform", "total"}
+    if bin_width_mode not in allowed_bin_widths:
+        raise ValueError(
+            f"Unsupported bin_width '{bin_width}'. Expected one of {sorted(allowed_bin_widths)}."
+        )
 
     base_labels = mats[wins[0]]["labels"]
     real_label_to_group = mats[wins[0]].get("label_to_group", {}) or {}
@@ -441,41 +574,24 @@ def plot_panels(
                         ]
                     )
 
-        _circle(
+        weights = None
+        if bin_width_mode == "total":
+            totals = mats[w].get("totals")
+            if totals is not None:
+                weights = np.asarray(totals, dtype=float)[perm]
+        _draw_circle(
+            ax_circle,
             M,
-            node_names=ordered_labels,
-            node_colors=node_colors,
+            ordered_labels,
+            node_colors,
+            cmap=cmap,
             vmin=0,
             vmax=vmax_used,
-            colorbar=False,
-            facecolor="white",
-            textcolor="black",
-            colormap=cmap,
-            node_edgecolor="white",
-            fig=fig,
-            ax=ax_circle,
-            show=False,
-            fontsize_title=circle_title_font,
+            weights=weights,
+            rotate=rotate,
             fontsize_names=circle_name_font,
+            label_box_pad=label_box_pad,
         )
-        if rotate:
-            ax_circle.set_theta_offset(np.deg2rad(rotate))
-        for j, label in enumerate(ax_circle.texts):
-            label.set_color("white")
-            label.set_fontsize(circle_name_font)
-            label.set_bbox(
-                dict(
-                    facecolor=node_colors[j],
-                    edgecolor=node_colors[j],
-                    pad=label_box_pad,
-                )
-            )
-            rot = (label.get_rotation() + rotate) % 360
-            label.set_rotation(rot)
-            if 90 <= rot < 270:
-                label.set_rotation(rot - 180)
-                label.set_va("center")
-                label.set_ha("left")
 
         right_margin = 0.88
         bottom_margin = 0.22 if legend_groups and group_col_for_plot else 0.12
@@ -559,22 +675,23 @@ def plot_panels(
         if cap_weights is not None:
             M = np.minimum(M, cap_weights)
 
-        _circle(
+        weights = None
+        if bin_width_mode == "total":
+            totals = mats[w].get("totals")
+            if totals is not None:
+                weights = np.asarray(totals, dtype=float)[perm]
+        _draw_circle(
+            axs[i],
             M,
-            node_names=ordered_labels,
-            node_colors=node_colors,
+            ordered_labels,
+            node_colors,
+            cmap=cmap,
             vmin=0,
             vmax=vmax_used,
-            colorbar=False,  # we'll add our own CB
-            facecolor="white",
-            textcolor="black",
-            colormap=cmap,
-            node_edgecolor="white",
-            fig=fig,
-            ax=axs[i],
-            show=False,
-            fontsize_title=circle_title_font,
+            weights=weights,
+            rotate=rotate,
             fontsize_names=circle_name_font,
+            label_box_pad=label_box_pad,
         )
         axs[i].set_title(
             w,
@@ -583,25 +700,6 @@ def plot_panels(
             pad=20 * scale,
             color="black",
         )
-        if rotate:
-            axs[i].set_theta_offset(np.deg2rad(rotate))
-        # label backgrounds
-        for j, label in enumerate(axs[i].texts):
-            label.set_color("white")
-            label.set_fontsize(circle_name_font)
-            label.set_bbox(
-                dict(
-                    facecolor=node_colors[j],
-                    edgecolor=node_colors[j],
-                    pad=label_box_pad,
-                )
-            )
-            rot = (label.get_rotation() + rotate) % 360
-            label.set_rotation(rot)
-            if 90 <= rot < 270:
-                label.set_rotation(rot - 180)
-                label.set_va("center")
-                label.set_ha("left")
 
     # ---- counts legend (colorbar)
     if legend_counts:

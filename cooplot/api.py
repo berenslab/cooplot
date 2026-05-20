@@ -157,6 +157,7 @@ def show(
     heatmap_counts=False,
     figsize=None,
     rotate=0.0,
+    bin_width="uniform",
 ):
     if style is None:
         try:
@@ -186,6 +187,7 @@ def show(
         heatmap_counts=heatmap_counts,
         figsize=figsize,
         rotate=rotate,
+        bin_width=bin_width,
     )
 
 

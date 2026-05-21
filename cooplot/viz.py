@@ -9,12 +9,129 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patheffects
+from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.ticker import (
     FixedFormatter,
     FixedLocator,
     MaxNLocator,
 )
+
+
+_EDGE_WIDTH_MIN = 0.5
+_EDGE_WIDTH_MAX = 4.5
+_EDGE_WIDTH_UNIFORM = 1.5
+
+
+def _render_bottom_legends(
+    fig,
+    *,
+    counts_style: str,
+    legend_counts: bool,
+    legend_groups: bool,
+    group_col_for_plot,
+    unique_groups: List[str],
+    used_palette: Dict[str, str],
+    cmap,
+    vmax_used: float,
+    edge_width_mode: str,
+    counts_label: str,
+    cap_weights: Optional[int],
+    legend_counts_bins: int,
+    legend_font: float,
+    legend_title_font: float,
+) -> None:
+    """Render the swatch-style count legend and the group legend at the bottom."""
+    show_groups = bool(legend_groups and group_col_for_plot)
+    show_swatches = bool(legend_counts and counts_style == "width")
+
+    sw_handles: List[Line2D] = []
+    sw_labels: List[str] = []
+    if show_swatches:
+        sw_handles, sw_labels = _count_legend_swatches(
+            vmax_used,
+            cmap,
+            edge_width_mode=edge_width_mode,
+            bins=legend_counts_bins,
+        )
+        show_swatches = bool(sw_handles)
+
+    stacked = show_swatches and show_groups
+    if show_swatches:
+        title = counts_label + (
+            f" (capped at {cap_weights})" if cap_weights is not None else ""
+        )
+        kwargs = dict(
+            handles=sw_handles,
+            labels=sw_labels,
+            title=title,
+            ncol=len(sw_handles),
+            frameon=False,
+            prop={"size": legend_font},
+            title_fontsize=legend_title_font,
+            loc="lower center",
+        )
+        if stacked:
+            kwargs["bbox_to_anchor"] = (0.5, 0.02)
+        fig.legend(**kwargs)
+
+    if show_groups:
+        handles = [
+            Patch(
+                facecolor=used_palette.get(g, "#808080"),
+                edgecolor="none",
+                label=g or "Unlabeled",
+            )
+            for g in unique_groups
+        ]
+        kwargs = dict(
+            handles=handles,
+            title=group_col_for_plot,
+            ncol=min(len(handles), 6),
+            frameon=False,
+            prop={"size": legend_font},
+            title_fontsize=legend_title_font,
+            loc="lower center",
+        )
+        if stacked:
+            kwargs["bbox_to_anchor"] = (0.5, 0.10)
+        fig.legend(**kwargs)
+
+
+def _count_legend_swatches(
+    vmax: float,
+    cmap,
+    *,
+    edge_width_mode: str,
+    bins: int = 5,
+) -> Tuple[List[Line2D], List[str]]:
+    """Return Line2D handles + integer labels for a discrete count legend.
+
+    Bins are evenly spaced from 1 to ``vmax``. Each swatch uses the cmap color
+    for that count; line widths follow the same scaling as the drawn edges
+    (varying with ``edge_width_mode='count'``, uniform otherwise).
+    """
+    if vmax <= 0:
+        return [], []
+    n = max(2, min(int(bins), int(round(vmax))))
+    raw = np.linspace(1.0, float(vmax), n)
+    seen: List[int] = []
+    for v in np.round(raw).astype(int):
+        iv = int(v)
+        if iv not in seen:
+            seen.append(iv)
+    handles: List[Line2D] = []
+    labels: List[str] = []
+    for v in seen:
+        frac = float(v) / float(vmax)
+        color = cmap(frac)
+        if edge_width_mode == "count":
+            lw = _EDGE_WIDTH_MIN + (_EDGE_WIDTH_MAX - _EDGE_WIDTH_MIN) * frac
+        else:
+            lw = _EDGE_WIDTH_UNIFORM
+        handles.append(Line2D([0], [0], color=color, lw=lw, solid_capstyle="round"))
+        labels.append(str(v))
+    return handles, labels
 
 
 def _circle_layout(
@@ -59,10 +176,10 @@ def _draw_circle(
     rotate: float = 0.0,
     fontsize_names: float = 8.0,
     label_box_pad: float = 0.4,
-    connection_linewidth: float = 1.5,
+    connection_linewidth: float = _EDGE_WIDTH_UNIFORM,
     edge_width: str = "uniform",
-    edge_width_min: float = 0.5,
-    edge_width_max: float = 4.5,
+    edge_width_min: float = _EDGE_WIDTH_MIN,
+    edge_width_max: float = _EDGE_WIDTH_MAX,
     node_height: float = 1.0,
     node_linewidth: float = 2.0,
     node_edgecolor: str = "white",
@@ -563,6 +680,8 @@ def plot_panels(
     cap_weights: Optional[int] = None,
     counts_label: str = "Shared coauthorships",
     legend_counts: bool = True,
+    legend_counts_style: str = "colorbar",
+    legend_counts_bins: int = 5,
     legend_groups: bool = True,
     heatmap_counts: bool = False,
     figsize: Optional[tuple] = None,
@@ -598,6 +717,17 @@ def plot_panels(
         raise ValueError(
             f"Unsupported edge_width '{edge_width}'. Expected one of {sorted(allowed_edge_widths)}."
         )
+
+    counts_style = (legend_counts_style or "colorbar").lower()
+    allowed_counts_styles = {"colorbar", "width"}
+    if counts_style not in allowed_counts_styles:
+        raise ValueError(
+            f"Unsupported legend_counts_style '{legend_counts_style}'. "
+            f"Expected one of {sorted(allowed_counts_styles)}."
+        )
+    # Heatmap-only output has no line edges; fall back to colorbar regardless.
+    if counts_style == "width" and (style or "circle").lower() == "heatmap":
+        counts_style = "colorbar"
 
     base_labels = mats[wins[0]]["labels"]
     real_label_to_group = mats[wins[0]].get("label_to_group", {}) or {}
@@ -913,11 +1043,21 @@ def plot_panels(
             edge_width=edge_width_mode,
         )
 
-        right_margin = 0.88
-        bottom_margin = 0.22 if legend_groups and group_col_for_plot else 0.12
+        counts_uses_colorbar = legend_counts and counts_style == "colorbar"
+        counts_uses_swatches = legend_counts and counts_style == "width"
+        groups_visible = legend_groups and group_col_for_plot
+        right_margin = 0.88 if counts_uses_colorbar else 0.96
+        if counts_uses_swatches and groups_visible:
+            bottom_margin = 0.28
+        elif counts_uses_swatches:
+            bottom_margin = 0.16
+        elif groups_visible:
+            bottom_margin = 0.22
+        else:
+            bottom_margin = 0.12
         fig.subplots_adjust(right=right_margin, bottom=bottom_margin, wspace=0.35)
 
-        if legend_counts:
+        if counts_uses_colorbar:
             norm = mcolors.Normalize(vmin=0, vmax=vmax_used)
             sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
             fig.canvas.draw()
@@ -939,24 +1079,23 @@ def plot_panels(
             cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
             cb.ax.tick_params(labelsize=cb_tick_font)
 
-        if legend_groups and group_col_for_plot:
-            handles = [
-                Patch(
-                    facecolor=used_palette.get(g, "#808080"),
-                    edgecolor="none",
-                    label=g or "Unlabeled",
-                )
-                for g in unique_groups
-            ]
-            fig.legend(
-                handles=handles,
-                title=group_col_for_plot,
-                loc="lower center",
-                ncol=min(len(handles), 6),
-                frameon=False,
-                prop={"size": legend_font},
-                title_fontsize=legend_title_font,
-            )
+        _render_bottom_legends(
+            fig,
+            counts_style=counts_style,
+            legend_counts=legend_counts,
+            legend_groups=legend_groups,
+            group_col_for_plot=group_col_for_plot,
+            unique_groups=unique_groups,
+            used_palette=used_palette,
+            cmap=cmap,
+            vmax_used=vmax_used,
+            edge_width_mode=edge_width_mode,
+            counts_label=counts_label,
+            cap_weights=cap_weights,
+            legend_counts_bins=legend_counts_bins,
+            legend_font=legend_font,
+            legend_title_font=legend_title_font,
+        )
 
         if out_path:
             Path(out_path).parent.mkdir(parents=True, exist_ok=True)
@@ -984,9 +1123,18 @@ def plot_panels(
     if len(wins) == 1:
         axes = [axes]
     axs = axes
-    # Leave margin for the colorbar and optional group legend
-    right_margin = 0.88
-    bottom_margin = 0.18 if legend_groups and group_col_for_plot else 0.08
+    counts_uses_colorbar = legend_counts and counts_style == "colorbar"
+    counts_uses_swatches = legend_counts and counts_style == "width"
+    groups_visible = legend_groups and group_col_for_plot
+    right_margin = 0.88 if counts_uses_colorbar else 0.96
+    if counts_uses_swatches and groups_visible:
+        bottom_margin = 0.24
+    elif counts_uses_swatches:
+        bottom_margin = 0.14
+    elif groups_visible:
+        bottom_margin = 0.18
+    else:
+        bottom_margin = 0.08
     fig.subplots_adjust(right=right_margin, bottom=bottom_margin)
 
     for i, w in enumerate(wins):
@@ -1058,8 +1206,8 @@ def plot_panels(
             color="black",
         )
 
-    # ---- counts legend (colorbar)
-    if legend_counts:
+    # ---- counts legend
+    if counts_uses_colorbar:
         norm = mcolors.Normalize(vmin=0, vmax=vmax_used)
         sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
         fig.canvas.draw()
@@ -1081,25 +1229,23 @@ def plot_panels(
         cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         cb.ax.tick_params(labelsize=cb_tick_font)
 
-    # ---- groups legend
-    if legend_groups and group_col_for_plot:
-        handles = [
-            Patch(
-                facecolor=used_palette.get(g, "#808080"),
-                edgecolor="none",
-                label=g or "Unlabeled",
-            )
-            for g in unique_groups
-        ]
-        fig.legend(
-            handles=handles,
-            title=group_col_for_plot,
-            loc="lower center",
-            ncol=min(len(handles), 6),
-            frameon=False,
-            prop={"size": legend_font},
-            title_fontsize=legend_title_font,
-        )
+    _render_bottom_legends(
+        fig,
+        counts_style=counts_style,
+        legend_counts=legend_counts,
+        legend_groups=legend_groups,
+        group_col_for_plot=group_col_for_plot,
+        unique_groups=unique_groups,
+        used_palette=used_palette,
+        cmap=cmap,
+        vmax_used=vmax_used,
+        edge_width_mode=edge_width_mode,
+        counts_label=counts_label,
+        cap_weights=cap_weights,
+        legend_counts_bins=legend_counts_bins,
+        legend_font=legend_font,
+        legend_title_font=legend_title_font,
+    )
 
     if out_path:
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)

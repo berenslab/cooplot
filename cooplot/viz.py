@@ -1047,6 +1047,10 @@ def plot_panels(
         counts_uses_swatches = legend_counts and counts_style == "width"
         groups_visible = legend_groups and group_col_for_plot
         right_margin = 0.88 if counts_uses_colorbar else 0.96
+        # Match left margin to keep the plot horizontally centered when there
+        # is no right-side colorbar; otherwise the legends (anchored at 0.5)
+        # look offset from the circle.
+        left_margin = 0.04 if counts_uses_swatches else None
         if counts_uses_swatches and groups_visible:
             bottom_margin = 0.28
         elif counts_uses_swatches:
@@ -1055,7 +1059,10 @@ def plot_panels(
             bottom_margin = 0.22
         else:
             bottom_margin = 0.12
-        fig.subplots_adjust(right=right_margin, bottom=bottom_margin, wspace=0.35)
+        adjust_kwargs = dict(right=right_margin, bottom=bottom_margin, wspace=0.35)
+        if left_margin is not None:
+            adjust_kwargs["left"] = left_margin
+        fig.subplots_adjust(**adjust_kwargs)
 
         if counts_uses_colorbar:
             norm = mcolors.Normalize(vmin=0, vmax=vmax_used)
@@ -1127,6 +1134,9 @@ def plot_panels(
     counts_uses_swatches = legend_counts and counts_style == "width"
     groups_visible = legend_groups and group_col_for_plot
     right_margin = 0.88 if counts_uses_colorbar else 0.96
+    # Match left margin to keep the plot horizontally centered when there is
+    # no right-side colorbar; otherwise the legends look offset from the circle.
+    left_margin = 0.04 if counts_uses_swatches else None
     if counts_uses_swatches and groups_visible:
         bottom_margin = 0.24
     elif counts_uses_swatches:
@@ -1135,7 +1145,10 @@ def plot_panels(
         bottom_margin = 0.18
     else:
         bottom_margin = 0.08
-    fig.subplots_adjust(right=right_margin, bottom=bottom_margin)
+    adjust_kwargs = dict(right=right_margin, bottom=bottom_margin)
+    if left_margin is not None:
+        adjust_kwargs["left"] = left_margin
+    fig.subplots_adjust(**adjust_kwargs)
 
     for i, w in enumerate(wins):
         M = np.array(mats[w]["matrix"], dtype=int)

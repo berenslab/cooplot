@@ -33,6 +33,7 @@ def _render_bottom_legends(
     unique_groups: List[str],
     used_palette: Dict[str, str],
     cmap,
+    vmin_data: float,
     vmax_used: float,
     edge_width_mode: str,
     counts_label: str,
@@ -49,6 +50,7 @@ def _render_bottom_legends(
     sw_labels: List[str] = []
     if show_swatches:
         sw_handles, sw_labels = _count_legend_swatches(
+            vmin_data,
             vmax_used,
             cmap,
             edge_width_mode=edge_width_mode,
@@ -99,6 +101,7 @@ def _render_bottom_legends(
 
 
 def _count_legend_swatches(
+    vmin: float,
     vmax: float,
     cmap,
     *,
@@ -107,14 +110,20 @@ def _count_legend_swatches(
 ) -> Tuple[List[Line2D], List[str]]:
     """Return Line2D handles + integer labels for a discrete count legend.
 
-    Bins are evenly spaced from 1 to ``vmax``. Each swatch uses the cmap color
-    for that count; line widths follow the same scaling as the drawn edges
-    (varying with ``edge_width_mode='count'``, uniform otherwise).
+    Bins are evenly spaced from ``vmin`` to ``vmax`` (both clipped to ``>= 1``
+    and to each other). Each swatch uses the cmap color for that count; line
+    widths follow the same scaling as the drawn edges (varying with
+    ``edge_width_mode='count'``, uniform otherwise).
     """
     if vmax <= 0:
         return [], []
-    n = max(2, min(int(bins), int(round(vmax))))
-    raw = np.linspace(1.0, float(vmax), n)
+    lo = max(1.0, float(vmin))
+    hi = float(vmax)
+    if lo > hi:
+        lo = hi
+    span = int(round(hi - lo)) + 1
+    n = max(2, min(int(bins), span))
+    raw = np.linspace(lo, hi, n) if hi > lo else np.array([hi])
     seen: List[int] = []
     for v in np.round(raw).astype(int):
         iv = int(v)
@@ -123,7 +132,7 @@ def _count_legend_swatches(
     handles: List[Line2D] = []
     labels: List[str] = []
     for v in seen:
-        frac = float(v) / float(vmax)
+        frac = float(v) / hi
         color = cmap(frac)
         if edge_width_mode == "count":
             lw = _EDGE_WIDTH_MIN + (_EDGE_WIDTH_MAX - _EDGE_WIDTH_MIN) * frac
@@ -751,6 +760,14 @@ def plot_panels(
     # Determine global vmax and apply cap if requested
     vmax_base = vmax or max(int(np.max(np.array(mats[w]["matrix"]))) for w in wins)
     vmax_used = min(vmax_base, cap_weights) if cap_weights is not None else vmax_base
+    # Smallest non-zero count across windows — used as the legend's lower bound.
+    positive_mins: List[int] = []
+    for w in wins:
+        M_arr = np.array(mats[w]["matrix"])
+        pos = M_arr[M_arr > 0]
+        if pos.size:
+            positive_mins.append(int(pos.min()))
+    vmin_data = min(positive_mins) if positive_mins else 1
 
     cmap = _reds_shaded()
     node_colors, used_palette = _node_colors(
@@ -823,7 +840,7 @@ def plot_panels(
             last_im = ax.imshow(
                 M, vmin=0, vmax=vmax_used, cmap=cmap, interpolation="nearest"
             )
-            ax.set_title(w, loc="left", fontsize=heatmap_title_font)
+            ax.set_title(w, loc="center", fontsize=heatmap_title_font)
             tick_positions = np.arange(len(ordered_labels))
             x_locator = FixedLocator(tick_positions)
             y_locator = FixedLocator(tick_positions)
@@ -1095,6 +1112,7 @@ def plot_panels(
             unique_groups=unique_groups,
             used_palette=used_palette,
             cmap=cmap,
+            vmin_data=vmin_data,
             vmax_used=vmax_used,
             edge_width_mode=edge_width_mode,
             counts_label=counts_label,
@@ -1214,7 +1232,7 @@ def plot_panels(
         axs[i].set_title(
             w,
             fontsize=circle_title_font,
-            loc="left",
+            loc="center",
             pad=20 * scale,
             color="black",
         )
@@ -1251,6 +1269,7 @@ def plot_panels(
         unique_groups=unique_groups,
         used_palette=used_palette,
         cmap=cmap,
+        vmin_data=vmin_data,
         vmax_used=vmax_used,
         edge_width_mode=edge_width_mode,
         counts_label=counts_label,

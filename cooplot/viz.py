@@ -765,6 +765,7 @@ def plot_panels(
     legend_groups: bool = True,
     legend_groups_title: Optional[str] = None,
     legend_groups_anchor_y: Optional[float] = None,
+    legend_groups_order: Optional[List[str]] = None,
     heatmap_counts: bool = False,
     figsize: Optional[tuple] = None,
     rotate: float = 0.0,
@@ -866,7 +867,12 @@ def plot_panels(
     # Build group keys in label order for a legend
     group_keys_in_order = [label_to_group_map.get(n, "") for n in ordered_labels]
     # stable unique
-    unique_groups = []
+    unique_groups: List[str] = []
+    if legend_groups_order:
+        present = set(group_keys_in_order)
+        for g in legend_groups_order:
+            if g in present and g not in unique_groups:
+                unique_groups.append(g)
     for k in group_keys_in_order:
         if k not in unique_groups:
             unique_groups.append(k)

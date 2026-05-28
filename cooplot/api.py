@@ -156,12 +156,17 @@ def show(
     legend_counts_style="colorbar",
     legend_counts_bins=5,
     legend_groups=True,
+    legend_groups_title=None,
+    legend_groups_anchor_y=None,
     heatmap_counts=False,
     figsize=None,
     rotate=0.0,
     bin_width="uniform",
     edge_width="uniform",
     order=None,
+    cmap=None,
+    font_scale=1.0,
+    break_long_names=False,
 ):
     if style is None:
         try:
@@ -190,12 +195,17 @@ def show(
         legend_counts_style=legend_counts_style,
         legend_counts_bins=legend_counts_bins,
         legend_groups=legend_groups,
+        legend_groups_title=legend_groups_title,
+        legend_groups_anchor_y=legend_groups_anchor_y,
         heatmap_counts=heatmap_counts,
         figsize=figsize,
         rotate=rotate,
         bin_width=bin_width,
         edge_width=edge_width,
         order=order,
+        cmap=cmap,
+        font_scale=font_scale,
+        break_long_names=break_long_names,
     )
 
 

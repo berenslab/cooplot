@@ -30,6 +30,7 @@ def _render_bottom_legends(
     legend_counts: bool,
     legend_groups: bool,
     group_col_for_plot,
+    legend_groups_title: Optional[str],
     unique_groups: List[str],
     used_palette: Dict[str, str],
     cmap,
@@ -41,10 +42,15 @@ def _render_bottom_legends(
     legend_counts_bins: int,
     legend_font: float,
     legend_title_font: float,
+    group_legend_anchor_y: Optional[float] = None,
 ) -> None:
     """Render the swatch-style count legend and the group legend at the bottom."""
     show_groups = bool(legend_groups and group_col_for_plot)
     show_swatches = bool(legend_counts and counts_style == "width")
+    if legend_groups_title is None:
+        resolved_title = group_col_for_plot
+    else:
+        resolved_title = legend_groups_title or None
 
     sw_handles: List[Line2D] = []
     sw_labels: List[str] = []
@@ -88,14 +94,16 @@ def _render_bottom_legends(
         ]
         kwargs = dict(
             handles=handles,
-            title=group_col_for_plot,
+            title=resolved_title,
             ncol=min(len(handles), 6),
             frameon=False,
             prop={"size": legend_font},
             title_fontsize=legend_title_font,
             loc="lower center",
         )
-        if stacked:
+        if group_legend_anchor_y is not None:
+            kwargs["bbox_to_anchor"] = (0.5, group_legend_anchor_y)
+        elif stacked:
             kwargs["bbox_to_anchor"] = (0.5, 0.10)
         fig.legend(**kwargs)
 
@@ -491,6 +499,7 @@ def _draw_chord(
     node_edgecolor: str = "white",
     padding: float = 6.0,
     ribbon_alpha: float = 0.7,
+    display_labels: Optional[List[str]] = None,
 ) -> None:
     """Draw a set-membership chord on a polar axes.
 
@@ -549,7 +558,8 @@ def _draw_chord(
 
     label_r = R_inner + 0.4 + node_height
     angles_deg = np.rad2deg(centers)
-    for name, theta, deg, color in zip(labels, centers, angles_deg, node_colors):
+    text_labels = display_labels if display_labels is not None else labels
+    for name, theta, deg, color in zip(text_labels, centers, angles_deg, node_colors):
         screen_angle = (deg + rotate) % 360
         if 90 <= screen_angle < 270:
             text_rot = screen_angle - 180
@@ -656,6 +666,67 @@ def _reds_shaded():
     return mcolors.LinearSegmentedColormap.from_list("white_to_darker_Reds", reduced)
 
 
+def _color_shaded(color, *, start: float = 0.20, stop: float = 0.80, n: int = 256):
+    """White-mixed gradient toward ``color`` analogous to :func:`_reds_shaded`.
+
+    At position 0 the cmap is pure white; the next pixel jumps to a light tint
+    of ``color`` (the ``start`` mixture) so even count=1 edges remain visible.
+    """
+    rgb = np.array(mcolors.to_rgba(color)[:3])
+    t = np.linspace(start, stop, n)
+    mix = 1.0 - t[:, None] * (1.0 - rgb[None, :])
+    rgba = np.concatenate([mix, np.ones((n, 1))], axis=1)
+    rgba[0] = [1, 1, 1, 1]
+    hex_name = mcolors.to_hex(rgb)[1:]
+    return mcolors.LinearSegmentedColormap.from_list(f"white_to_darker_{hex_name}", rgba)
+
+
+def _named_cmap_shaded(name: str, *, start: float = 0.20, stop: float = 0.80, n: int = 256):
+    """Apply the :func:`_reds_shaded` truncation+white-at-0 trick to any named cmap."""
+    original = plt.cm.get_cmap(name)
+    reduced = original(np.linspace(start, stop, n))
+    reduced[0] = np.array([1, 1, 1, 1])
+    return mcolors.LinearSegmentedColormap.from_list(f"white_to_darker_{name}", reduced)
+
+
+def _resolve_cmap(spec):
+    """Resolve ``cmap`` argument to a matplotlib Colormap.
+
+    Accepts: ``None`` (default reds), a ``Colormap`` instance, a hex string,
+    an ``(r, g, b)`` tuple of ints, or a matplotlib cmap name. RGB targets
+    and hex strings are routed through :func:`_color_shaded`; named cmaps
+    through :func:`_named_cmap_shaded` for consistent visibility at low counts.
+    """
+    if spec is None:
+        return _reds_shaded()
+    if isinstance(spec, mcolors.Colormap):
+        return spec
+    if isinstance(spec, (tuple, list)) and len(spec) == 3:
+        return _color_shaded(_to_hex(spec))
+    if isinstance(spec, str):
+        if spec.startswith("#"):
+            return _color_shaded(spec)
+        try:
+            return _named_cmap_shaded(spec)
+        except (ValueError, KeyError) as exc:
+            raise ValueError(f"Unknown cmap name: {spec!r}") from exc
+    raise TypeError(f"Unsupported cmap type: {type(spec).__name__}")
+
+
+def _maybe_break_name(name: str, *, threshold: int = 12) -> str:
+    """Replace the last space with a newline, but only when ``len(name) > threshold``.
+
+    Names at or under the threshold are returned unchanged so short labels stay
+    on one line.
+    """
+    if not isinstance(name, str) or len(name) <= threshold:
+        return name
+    idx = name.rfind(" ")
+    if idx < 0:
+        return name
+    return name[:idx] + "\n" + name[idx + 1 :]
+
+
 def _node_colors(
     labels: List[str],
     label_to_group: Optional[Dict[str, str]],
@@ -692,12 +763,17 @@ def plot_panels(
     legend_counts_style: str = "colorbar",
     legend_counts_bins: int = 5,
     legend_groups: bool = True,
+    legend_groups_title: Optional[str] = None,
+    legend_groups_anchor_y: Optional[float] = None,
     heatmap_counts: bool = False,
     figsize: Optional[tuple] = None,
     rotate: float = 0.0,
     bin_width: str = "uniform",
     edge_width: str = "uniform",
     order: Optional[List[str]] = None,
+    cmap: object = None,
+    font_scale: float = 1.0,
+    break_long_names: bool = False,
 ) -> Optional[plt.Figure]:
     wins = list(mats.keys())
     if not wins:
@@ -769,11 +845,22 @@ def plot_panels(
             positive_mins.append(int(pos.min()))
     vmin_data = min(positive_mins) if positive_mins else 1
 
-    cmap = _reds_shaded()
+    cmap = _resolve_cmap(cmap)
     node_colors, used_palette = _node_colors(
         ordered_labels,
         label_to_group_map,
         palette,
+    )
+    if break_long_names is True:
+        _break_threshold: Optional[int] = 12
+    elif break_long_names is False or break_long_names is None:
+        _break_threshold = None
+    else:
+        _break_threshold = int(break_long_names)
+    display_labels = (
+        [_maybe_break_name(n, threshold=_break_threshold) for n in ordered_labels]
+        if _break_threshold is not None
+        else ordered_labels
     )
 
     # Build group keys in label order for a legend
@@ -797,8 +884,10 @@ def plot_panels(
     if not np.isfinite(scale) or scale <= 0:
         scale = 1.0
 
+    font_scale = float(font_scale) if font_scale and font_scale > 0 else 1.0
+
     def _scaled(value: float, floor: float) -> float:
-        return float(max(floor, value * scale))
+        return float(max(floor, value * scale)) * font_scale
 
     tick_font = _scaled(7, 4)
     cb_tick_font = _scaled(8, 4)
@@ -813,7 +902,7 @@ def plot_panels(
     stroke_width = max(0.6, 0.8 * scale)
     circle_title_font = _scaled(18, 10)
     circle_name_font = _scaled(10, 6)
-    label_box_pad = max(0.3, 0.4 * scale)
+    label_box_pad = max(1.5, 2.0 * scale) * font_scale
 
     # Heatmap path
     if style_mode == "heatmap":
@@ -846,8 +935,8 @@ def plot_panels(
             y_locator = FixedLocator(tick_positions)
             ax.xaxis.set_major_locator(x_locator)
             ax.yaxis.set_major_locator(y_locator)
-            ax.xaxis.set_major_formatter(FixedFormatter(ordered_labels))
-            ax.yaxis.set_major_formatter(FixedFormatter(ordered_labels))
+            ax.xaxis.set_major_formatter(FixedFormatter(display_labels))
+            ax.yaxis.set_major_formatter(FixedFormatter(display_labels))
             ax.tick_params(
                 axis="x", labelsize=tick_font, labelrotation=90, pad=tick_pad
             )
@@ -979,8 +1068,8 @@ def plot_panels(
         y_locator = FixedLocator(tick_positions)
         ax_heat.xaxis.set_major_locator(x_locator)
         ax_heat.yaxis.set_major_locator(y_locator)
-        ax_heat.xaxis.set_major_formatter(FixedFormatter(ordered_labels))
-        ax_heat.yaxis.set_major_formatter(FixedFormatter(ordered_labels))
+        ax_heat.xaxis.set_major_formatter(FixedFormatter(display_labels))
+        ax_heat.yaxis.set_major_formatter(FixedFormatter(display_labels))
         ax_heat.tick_params(axis="x", labelsize=tick_font, labelrotation=90, pad=tick_pad)
         ax_heat.tick_params(axis="y", labelsize=tick_font, pad=tick_pad)
 
@@ -1048,7 +1137,7 @@ def plot_panels(
         _draw_circle(
             ax_circle,
             M,
-            ordered_labels,
+            display_labels,
             node_colors,
             cmap=cmap,
             vmin=0,
@@ -1109,6 +1198,7 @@ def plot_panels(
             legend_counts=legend_counts,
             legend_groups=legend_groups,
             group_col_for_plot=group_col_for_plot,
+            legend_groups_title=legend_groups_title,
             unique_groups=unique_groups,
             used_palette=used_palette,
             cmap=cmap,
@@ -1120,6 +1210,7 @@ def plot_panels(
             legend_counts_bins=legend_counts_bins,
             legend_font=legend_font,
             legend_title_font=legend_title_font,
+            group_legend_anchor_y=legend_groups_anchor_y,
         )
 
         if out_path:
@@ -1208,6 +1299,7 @@ def plot_panels(
                 rotate=rotate,
                 fontsize_names=circle_name_font,
                 label_box_pad=label_box_pad,
+                display_labels=display_labels,
             )
         else:
             weights = None
@@ -1218,7 +1310,7 @@ def plot_panels(
             _draw_circle(
                 axs[i],
                 M,
-                ordered_labels,
+                display_labels,
                 node_colors,
                 cmap=cmap,
                 vmin=0,
@@ -1266,6 +1358,7 @@ def plot_panels(
         legend_counts=legend_counts,
         legend_groups=legend_groups,
         group_col_for_plot=group_col_for_plot,
+        legend_groups_title=legend_groups_title,
         unique_groups=unique_groups,
         used_palette=used_palette,
         cmap=cmap,
@@ -1277,6 +1370,7 @@ def plot_panels(
         legend_counts_bins=legend_counts_bins,
         legend_font=legend_font,
         legend_title_font=legend_title_font,
+        group_legend_anchor_y=legend_groups_anchor_y,
     )
 
     if out_path:
